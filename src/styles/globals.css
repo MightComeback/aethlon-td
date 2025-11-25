@@ -1,0 +1,162 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Press+Start+2P&display=swap");
+
+/* Custom theme using Tailwind v4 CSS variables */
+@theme {
+  /* Colors - Pixel art friendly palette */
+  --color-background: #1a1a2e;
+  --color-background-secondary: #16213e;
+  --color-background-tertiary: #0f3460;
+
+  --color-foreground: #e8e8e8;
+  --color-foreground-muted: #a0a0a0;
+
+  --color-primary: #e94560;
+  --color-primary-hover: #ff6b6b;
+  --color-primary-muted: #c73e54;
+
+  --color-secondary: #533483;
+  --color-secondary-hover: #6b44a8;
+
+  --color-accent-gold: #ffd700;
+  --color-accent-green: #4ecca3;
+  --color-accent-blue: #00d9ff;
+  --color-accent-purple: #9b59b6;
+
+  --color-danger: #e74c3c;
+  --color-warning: #f39c12;
+  --color-success: #27ae60;
+
+  /* Fonts */
+  --font-pixel: "Press Start 2P", monospace;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Font sizes */
+  --text-2xs: 0.625rem;
+
+  /* Shadows */
+  --shadow-pixel: 4px 4px 0px 0px rgba(0, 0, 0, 0.3);
+  --shadow-pixel-sm: 2px 2px 0px 0px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(233, 69, 96, 0.5);
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+/* Custom scrollbar for pixel art aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--color-background-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Component classes */
+.pixel-border {
+  border: 2px solid var(--color-foreground);
+  box-shadow:
+    inset -2px -2px 0 0 rgba(0, 0, 0, 0.3),
+    inset 2px 2px 0 0 rgba(255, 255, 255, 0.1);
+}
+
+.pixel-button {
+  padding: 0.5rem 1rem;
+  font-family: var(--font-pixel);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: var(--color-primary);
+  color: var(--color-foreground);
+  transition: all 0.1s;
+  box-shadow: var(--shadow-pixel);
+}
+
+.pixel-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.pixel-button:active {
+  box-shadow: var(--shadow-pixel-sm);
+  transform: translate(2px, 2px);
+}
+
+.pixel-panel {
+  background-color: var(--color-background-secondary);
+  padding: 1rem;
+  border: 2px solid var(--color-foreground-muted);
+  box-shadow:
+    inset -2px -2px 0 0 rgba(0, 0, 0, 0.5),
+    inset 2px 2px 0 0 rgba(255, 255, 255, 0.05),
+    4px 4px 0 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Utility classes */
+.text-shadow-pixel {
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.font-pixel {
+  font-family: var(--font-pixel);
+}
+
+.text-2xs {
+  font-size: var(--text-2xs);
+}
+
+/* Color utilities */
+.bg-background { background-color: var(--color-background); }
+.bg-background-secondary { background-color: var(--color-background-secondary); }
+.bg-background-tertiary { background-color: var(--color-background-tertiary); }
+.bg-primary { background-color: var(--color-primary); }
+.bg-primary-hover { background-color: var(--color-primary-hover); }
+.bg-accent-green { background-color: var(--color-accent-green); }
+.bg-accent-gold { background-color: var(--color-accent-gold); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-danger { background-color: var(--color-danger); }
+
+.text-foreground { color: var(--color-foreground); }
+.text-foreground-muted { color: var(--color-foreground-muted); }
+.text-primary { color: var(--color-primary); }
+.text-accent-gold { color: var(--color-accent-gold); }
+.text-danger { color: var(--color-danger); }
+
+.border-foreground { border-color: var(--color-foreground); }
+.border-foreground-muted { border-color: var(--color-foreground-muted); }
