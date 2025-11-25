@@ -2,9 +2,9 @@ import { useMemo, useCallback, useRef } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { useEditorStore } from "@/stores/editorStore";
 import { TileType } from "@/types/map";
-import { OBJECT_COMPONENTS, type EditorObjectType } from "./EditorObjects";
 import { floodFill, getTileColor, lightenColor } from "@/utils/colors.utils";
 import { ELEVATION_UNIT, getTileBaseHeight } from "@/constants/grid.constants";
+import { EditorObjectType, OBJECT_COMPONENTS } from "@/utils/objects.utils";
 
 export function EditorGrid() {
   const {

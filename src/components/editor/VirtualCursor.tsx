@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { useEditorStore } from "@/stores/editorStore";
-import { OBJECT_METADATA } from "./EditorObjects";
+import { OBJECT_METADATA } from "@/utils/objects.utils";
 
 interface CursorPosition {
   x: number;
