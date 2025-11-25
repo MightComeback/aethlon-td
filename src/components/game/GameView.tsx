@@ -3,7 +3,6 @@ import { OrthographicCamera } from "@react-three/drei";
 import { Suspense } from "react";
 import { GameScene } from "./GameScene";
 import { GameHUD } from "./GameHUD";
-import { FrameLimiter } from "@/hooks/useFrameLimiter";
 
 export function GameView() {
   return (
@@ -13,9 +12,7 @@ export function GameView() {
         className="absolute inset-0"
         gl={{ antialias: false, alpha: false }}
         dpr={1}
-        frameloop="never"
       >
-        <FrameLimiter />
         <color attach="background" args={["#1a1a2e"]} />
         <OrthographicCamera
           makeDefault

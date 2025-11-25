@@ -1,9 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  useSettingsStore,
-  type FPSPosition,
-  type FPSLimit,
-} from "@/stores/settingsStore";
+import { useSettingsStore, type FPSPosition } from "@/stores/settingsStore";
 
 export const Route = createFileRoute("/settings")({
   component: SettingsPage,
@@ -16,23 +12,13 @@ const positionLabels: Record<FPSPosition, string> = {
   "bottom-right": "Bottom Right",
 };
 
-const fpsLimitOptions: { value: FPSLimit; label: string }[] = [
-  { value: 0, label: "Unlimited" },
-  { value: 30, label: "30 FPS" },
-  { value: 60, label: "60 FPS" },
-  { value: 120, label: "120 FPS" },
-  { value: 144, label: "144 FPS" },
-];
-
 function SettingsPage() {
   const {
     fpsEnabled,
     fpsPosition,
-    fpsLimit,
     debugMode,
     setFpsEnabled,
     setFpsPosition,
-    setFpsLimit,
     setDebugMode,
   } = useSettingsStore();
 
@@ -47,33 +33,8 @@ function SettingsPage() {
 
       {/* Settings Panel */}
       <div className="pixel-panel w-96 p-6">
-        {/* FPS Limit Section */}
-        <div className="mb-6">
-          <h2 className="font-pixel text-sm text-foreground mb-4">
-            Frame Rate
-          </h2>
-
-          {/* FPS Limit Selector */}
-          <div className="flex flex-col gap-2">
-            <span className="text-sm text-foreground-muted">FPS Limit</span>
-            <div className="grid grid-cols-3 gap-2">
-              {fpsLimitOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setFpsLimit(option.value)}
-                  className={`pixel-button text-2xs ${
-                    fpsLimit === option.value ? "bg-accent-green" : ""
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* FPS Counter Section */}
-        <div className="mb-6 pt-4 border-t border-foreground-muted/20">
+        <div className="mb-6">
           <h2 className="font-pixel text-sm text-foreground mb-4">
             FPS Counter
           </h2>

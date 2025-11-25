@@ -5,13 +5,12 @@ import { Link } from "@tanstack/react-router";
 import { EditorGrid } from "./EditorGrid";
 import { EditorToolbar } from "./EditorToolbar";
 import { TilePalette } from "./TilePalette";
-import { EditorCameraController, CameraControlsUI } from "./CameraControls";
+import { EditorCameraController, CameraControlsUI, calculateFitZoom } from "./CameraControls";
 import { VirtualCursor } from "./VirtualCursor";
 import { MapBrowser } from "./MapBrowser";
 import { GenerateMapDialog } from "./GenerateMapDialog";
 import { useEditorStore } from "@/stores/editorStore";
 import { MapStorage } from "@/services/storage/MapStorage";
-import { FrameLimiter } from "@/hooks/useFrameLimiter";
 import type { MapMetadata, MapData } from "@/types/map";
 import {
   IconBack,
@@ -102,8 +101,13 @@ export function MapEditor() {
       loadMap(mapData);
       setCurrentMapId(id);
       setShowMapBrowser(false);
+      // Auto-fit camera for large maps
+      if (Math.max(mapData.width, mapData.height) > 50) {
+        const { zoom, polar } = calculateFitZoom(mapData.width, mapData.height);
+        setCamera({ azimuth: 0, polar, zoom });
+      }
     }
-  }, [loadMap]);
+  }, [loadMap, setCamera]);
 
   // New map handler
   const handleNewMap = useCallback(() => {
@@ -127,7 +131,12 @@ export function MapEditor() {
     loadMap(mapData);
     setCurrentMapId(null); // New unsaved map
     setShowGenerateDialog(false);
-  }, [loadMap]);
+    // Auto-fit camera for large maps
+    if (Math.max(mapData.width, mapData.height) > 50) {
+      const { zoom, polar } = calculateFitZoom(mapData.width, mapData.height);
+      setCamera({ azimuth: 0, polar, zoom });
+    }
+  }, [loadMap, setCamera]);
 
   // Keyboard shortcut for save
   useEffect(() => {
@@ -152,6 +161,11 @@ export function MapEditor() {
     setCustomWidth(newWidth);
     setCustomHeight(newHeight);
     setShowSizeDialog(false);
+    // Auto-fit camera for large maps
+    if (Math.max(newWidth, newHeight) > 50) {
+      const { zoom, polar } = calculateFitZoom(newWidth, newHeight);
+      setCamera({ azimuth: 0, polar, zoom });
+    }
   };
 
   return (
@@ -164,9 +178,7 @@ export function MapEditor() {
         className="absolute inset-0"
         gl={{ antialias: false, alpha: false }}
         dpr={1}
-        frameloop="never"
       >
-        <FrameLimiter />
         <color attach="background" args={["#0a0a0a"]} />
         <OrthographicCamera
           makeDefault
@@ -269,7 +281,7 @@ export function MapEditor() {
         {/* Right: Properties & Camera Controls */}
         <div className="pointer-events-auto absolute right-3 top-20 flex flex-col gap-3 max-h-[calc(100vh-6rem)] overflow-y-auto">
           {/* Camera Controls */}
-          <CameraControlsUI state={camera} onStateChange={setCamera} />
+          <CameraControlsUI state={camera} onStateChange={setCamera} mapWidth={width} mapHeight={height} />
 
           {/* Map Size Panel */}
           <div className="pixel-panel w-48">

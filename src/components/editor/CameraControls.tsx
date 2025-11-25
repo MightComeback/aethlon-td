@@ -9,14 +9,43 @@ import {
   IconZoomOut,
 } from "@/components/ui/PixelIcon";
 
-const ZOOM_MIN = 3;
-const ZOOM_MAX = 150;
+const ZOOM_MIN = 1;
+const ZOOM_MAX = 200;
 const ZOOM_STEP = 10;
 
 // Polar angle constraints (vertical tilt)
-const POLAR_MIN = Math.PI / 8;   // ~22.5° from top
+const POLAR_MIN = 0.1;           // Nearly top-down (~6° from top)
 const POLAR_MAX = Math.PI / 2.2; // ~82° from top (near horizontal)
 const POLAR_DEFAULT = Math.PI / 4; // 45° default
+
+/**
+ * Calculate optimal zoom to fit a map of given dimensions
+ * Returns zoom level and recommended polar angle
+ */
+export function calculateFitZoom(
+  mapWidth: number,
+  mapHeight: number,
+  viewportWidth: number = 1920,
+  viewportHeight: number = 1080
+): { zoom: number; polar: number } {
+  const mapSize = Math.max(mapWidth, mapHeight);
+
+  // For very large maps, use top-down view for better visibility
+  const polar = mapSize > 100 ? POLAR_MIN : POLAR_DEFAULT;
+
+  // Calculate zoom to fit the map
+  // Account for polar angle foreshortening
+  const foreshortening = polar < 0.5 ? 1 : Math.sin(polar);
+  const effectiveHeight = mapHeight * foreshortening;
+
+  // Calculate zoom based on viewport (use smaller dimension)
+  const zoomForWidth = (viewportWidth * 0.7) / mapWidth;
+  const zoomForHeight = (viewportHeight * 0.7) / effectiveHeight;
+
+  const zoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, Math.min(zoomForWidth, zoomForHeight)));
+
+  return { zoom, polar };
+}
 
 // Camera state for 3D view
 export interface EditorCameraState {
@@ -103,12 +132,17 @@ export function EditorCameraController({
       maxAzimuthAngle={Infinity}
       onChange={handleChange}
       mouseButtons={{
-        LEFT: enableRotate ? 0 : -1, // Rotate only when enabled, -1 disables
+        LEFT: enableRotate ? 0 : 2, // Rotate when enabled, otherwise pan
         MIDDLE: 1, // Dolly/Zoom
         RIGHT: 2, // Pan
       }}
     />
   );
+}
+
+interface CameraControlsUIProps extends CameraControlsProps {
+  mapWidth?: number;
+  mapHeight?: number;
 }
 
 /**
@@ -118,7 +152,9 @@ export function EditorCameraController({
 export function CameraControlsUI({
   state,
   onStateChange,
-}: CameraControlsProps) {
+  mapWidth = 20,
+  mapHeight = 15,
+}: CameraControlsUIProps) {
   const rotate = useCallback((delta: number) => {
     onStateChange({ ...state, azimuth: state.azimuth + delta });
   }, [state, onStateChange]);
@@ -141,6 +177,15 @@ export function CameraControlsUI({
   const resetView = useCallback(() => {
     onStateChange({ azimuth: 0, polar: POLAR_DEFAULT, zoom: 50 });
   }, [onStateChange]);
+
+  const fitToMap = useCallback(() => {
+    const { zoom, polar } = calculateFitZoom(mapWidth, mapHeight);
+    onStateChange({ azimuth: 0, polar, zoom });
+  }, [mapWidth, mapHeight, onStateChange]);
+
+  const topDownView = useCallback(() => {
+    onStateChange({ ...state, polar: POLAR_MIN });
+  }, [state, onStateChange]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -172,12 +217,20 @@ export function CameraControlsUI({
           e.preventDefault();
           resetView();
           break;
+        case "f":
+          e.preventDefault();
+          fitToMap();
+          break;
+        case "t":
+          e.preventDefault();
+          topDownView();
+          break;
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [rotate, zoomIn, zoomOut, resetView]);
+  }, [rotate, zoomIn, zoomOut, resetView, fitToMap, topDownView]);
 
   // Calculate rotation display (0-360°)
   const rotationDegrees = Math.round(((state.azimuth * 180) / Math.PI + 360) % 360);
@@ -257,6 +310,24 @@ export function CameraControlsUI({
         </button>
       </div>
 
+      {/* View buttons */}
+      <div className="grid grid-cols-2 gap-1">
+        <button
+          onClick={fitToMap}
+          className="pixel-button text-2xs py-1.5"
+          title="Fit to Map (F)"
+        >
+          Fit Map
+        </button>
+        <button
+          onClick={topDownView}
+          className="pixel-button text-2xs py-1.5"
+          title="Top Down View (T)"
+        >
+          Top Down
+        </button>
+      </div>
+
       {/* Reset button */}
       <button
         onClick={resetView}
@@ -268,10 +339,10 @@ export function CameraControlsUI({
 
       {/* Hint */}
       <p className="text-3xs text-foreground-muted/50 text-center">
-        Left-drag to rotate
+        Left-drag to rotate | F: fit | T: top
       </p>
     </div>
   );
 }
 
-export { ZOOM_MIN, ZOOM_MAX };
+export { ZOOM_MIN, ZOOM_MAX, POLAR_MIN };

@@ -1,5 +1,5 @@
 import { useRef, useMemo, useEffect } from "react";
-import { ThreeEvent } from "@react-three/fiber";
+import { ThreeEvent, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { TileType } from "@/types/map";
 import { ELEVATION_UNIT, getTileBaseHeight } from "@/constants/grid.constants";
@@ -24,13 +24,12 @@ const TILE_TYPES = [
 ] as const;
 
 // LOD thresholds - zoom level determines LOD
-// Higher LOD = fewer tiles rendered = better performance at low zoom
 const LOD_THRESHOLDS = [
-  { maxZoom: 5, step: 16 },   // LOD 4: very far - every 16th tile
-  { maxZoom: 8, step: 8 },    // LOD 3: far - every 8th tile
-  { maxZoom: 15, step: 4 },   // LOD 2: medium - every 4th tile
-  { maxZoom: 25, step: 2 },   // LOD 1: close - every 2nd tile
-  { maxZoom: Infinity, step: 1 }, // LOD 0: full detail
+  { maxZoom: 5, step: 16 },
+  { maxZoom: 8, step: 8 },
+  { maxZoom: 15, step: 4 },
+  { maxZoom: 25, step: 2 },
+  { maxZoom: Infinity, step: 1 },
 ];
 
 function getLODStep(zoom: number): number {
@@ -54,10 +53,46 @@ const tileMaterials: Record<TileType, THREE.MeshStandardMaterial> = {
 const geometryCache = new Map<number, THREE.BoxGeometry>();
 function getGeometryForLOD(step: number): THREE.BoxGeometry {
   if (!geometryCache.has(step)) {
-    const size = step * 0.95 + (step - 1) * 0.05; // Account for gaps
+    const size = step * 0.95 + (step - 1) * 0.05;
     geometryCache.set(step, new THREE.BoxGeometry(size, 1, size));
   }
   return geometryCache.get(step)!;
+}
+
+/**
+ * Calculate visible tile bounds based on camera
+ */
+function getVisibleBounds(
+  camera: THREE.Camera,
+  width: number,
+  height: number,
+  padding: number = 2
+): { minX: number; maxX: number; minY: number; maxY: number } {
+  const halfWidth = width / 2;
+  const halfHeight = height / 2;
+
+  if (camera instanceof THREE.OrthographicCamera) {
+    // Get camera's view frustum in world space
+    const frustumHeight = (camera.top - camera.bottom) / camera.zoom;
+    const frustumWidth = (camera.right - camera.left) / camera.zoom;
+
+    // Get camera target (OrbitControls target is at origin by default)
+    const target = new THREE.Vector3(0, 0, 0);
+
+    // Calculate visible range with padding
+    const viewRadius = Math.max(frustumWidth, frustumHeight) / 2 + padding;
+
+    // Convert to grid coordinates
+    const minX = Math.max(0, Math.floor(target.x + halfWidth - viewRadius));
+    const maxX = Math.min(width - 1, Math.ceil(target.x + halfWidth + viewRadius));
+    const minY = Math.max(0, Math.floor(target.z + halfHeight - viewRadius));
+    const maxY = Math.min(height - 1, Math.ceil(target.z + halfHeight + viewRadius));
+
+    return { minX, maxX, minY, maxY };
+  }
+
+  // Fallback: render everything
+  return { minX: 0, maxX: width - 1, minY: 0, maxY: height - 1 };
 }
 
 export function InstancedTileGrid({
@@ -68,6 +103,7 @@ export function InstancedTileGrid({
   hoveredTile,
   zoom = 50,
 }: InstancedTileGridProps) {
+  const { camera } = useThree();
   const meshRefs = useRef<Record<TileType, THREE.InstancedMesh | null>>({
     [TileType.Ground]: null,
     [TileType.Path]: null,
@@ -85,7 +121,12 @@ export function InstancedTileGrid({
   // Get geometry for current LOD
   const geometry = useMemo(() => getGeometryForLOD(lodStep), [lodStep]);
 
-  // Count tiles per type at current LOD level
+  // Calculate visible bounds - update when zoom changes significantly
+  const visibleBounds = useMemo(() => {
+    return getVisibleBounds(camera, width, height, lodStep * 2);
+  }, [camera, width, height, lodStep, zoom]);
+
+  // Count tiles per type at current LOD level (only visible tiles)
   const tileCounts = useMemo(() => {
     const counts: Record<TileType, number> = {
       [TileType.Ground]: 0,
@@ -96,19 +137,24 @@ export function InstancedTileGrid({
       [TileType.Exit]: 0,
     };
 
-    // Sample tiles based on LOD step
-    for (let x = 0; x < width; x += lodStep) {
-      for (let y = 0; y < height; y += lodStep) {
-        // Get dominant tile type in this LOD cell
+    const { minX, maxX, minY, maxY } = visibleBounds;
+
+    // Align to LOD grid
+    const startX = Math.floor(minX / lodStep) * lodStep;
+    const startY = Math.floor(minY / lodStep) * lodStep;
+
+    for (let x = startX; x <= maxX; x += lodStep) {
+      for (let y = startY; y <= maxY; y += lodStep) {
+        if (x < 0 || x >= width || y < 0 || y >= height) continue;
         const type = getDominantTileType(tiles, x, y, lodStep, width, height);
         counts[type]++;
       }
     }
 
     return counts;
-  }, [tiles, width, height, lodStep]);
+  }, [tiles, width, height, lodStep, visibleBounds]);
 
-  // Update instance matrices when tiles/heightmap/LOD change
+  // Update instance matrices (only visible tiles)
   useEffect(() => {
     const matrix = new THREE.Matrix4();
     const position = new THREE.Vector3();
@@ -128,15 +174,19 @@ export function InstancedTileGrid({
     const halfHeight = height / 2;
     const halfStep = lodStep / 2;
 
-    // Sample tiles based on LOD step
-    for (let x = 0; x < width; x += lodStep) {
-      for (let y = 0; y < height; y += lodStep) {
+    const { minX, maxX, minY, maxY } = visibleBounds;
+    const startX = Math.floor(minX / lodStep) * lodStep;
+    const startY = Math.floor(minY / lodStep) * lodStep;
+
+    for (let x = startX; x <= maxX; x += lodStep) {
+      for (let y = startY; y <= maxY; y += lodStep) {
+        if (x < 0 || x >= width || y < 0 || y >= height) continue;
+
         const type = getDominantTileType(tiles, x, y, lodStep, width, height);
         const avgHeight = getAverageHeight(heightmap, x, y, lodStep, width, height);
         const baseHeight = getTileBaseHeight(type);
         const totalHeight = baseHeight + avgHeight * ELEVATION_UNIT;
 
-        // Position at center of LOD cell
         position.set(
           x + halfStep - halfWidth,
           totalHeight / 2,
@@ -147,7 +197,7 @@ export function InstancedTileGrid({
         matrix.compose(position, quaternion, scale);
 
         const mesh = meshRefs.current[type];
-        if (mesh) {
+        if (mesh && currentIndices[type] < tileCounts[type]) {
           mesh.setMatrixAt(currentIndices[type], matrix);
         }
 
@@ -155,16 +205,19 @@ export function InstancedTileGrid({
       }
     }
 
-    // Mark all meshes as needing update
+    // Update instance counts and mark for update
     for (const type of TILE_TYPES) {
       const mesh = meshRefs.current[type];
-      if (mesh && mesh.instanceMatrix) {
-        mesh.instanceMatrix.needsUpdate = true;
+      if (mesh) {
+        mesh.count = tileCounts[type];
+        if (mesh.instanceMatrix) {
+          mesh.instanceMatrix.needsUpdate = true;
+        }
       }
     }
-  }, [tiles, heightmap, width, height, lodStep]);
+  }, [tiles, heightmap, width, height, lodStep, visibleBounds, tileCounts]);
 
-  // Update hovered tile (always full resolution for interaction)
+  // Update hovered tile (always full resolution)
   useEffect(() => {
     const mesh = hoveredMeshRef.current;
     if (!mesh) return;
@@ -183,14 +236,14 @@ export function InstancedTileGrid({
     const totalHeight = baseHeight + elevation * ELEVATION_UNIT;
 
     const matrix = new THREE.Matrix4();
-    const position = new THREE.Vector3(
+    const pos = new THREE.Vector3(
       x - width / 2 + 0.5,
       totalHeight / 2,
       y - height / 2 + 0.5
     );
     const scaleVec = new THREE.Vector3(1, totalHeight, 1);
 
-    matrix.compose(position, new THREE.Quaternion(), scaleVec);
+    matrix.compose(pos, new THREE.Quaternion(), scaleVec);
     mesh.setMatrixAt(0, matrix);
     mesh.instanceMatrix.needsUpdate = true;
 
@@ -199,18 +252,25 @@ export function InstancedTileGrid({
     );
   }, [hoveredTile, tiles, heightmap, width, height]);
 
-  // Single tile geometry for hover highlight
   const singleTileGeometry = useMemo(() => new THREE.BoxGeometry(0.95, 1, 0.95), []);
+
+  // Calculate max possible tiles for buffer allocation
+  const maxTilesPerType = useMemo(() => {
+    const { minX, maxX, minY, maxY } = visibleBounds;
+    const visibleWidth = Math.ceil((maxX - minX) / lodStep) + 1;
+    const visibleHeight = Math.ceil((maxY - minY) / lodStep) + 1;
+    return Math.max(1, visibleWidth * visibleHeight);
+  }, [visibleBounds, lodStep]);
 
   return (
     <group>
       {TILE_TYPES.map((type) => (
         <instancedMesh
-          key={`${type}-${lodStep}`}
+          key={`${type}-${lodStep}-${maxTilesPerType}`}
           ref={(mesh) => {
             meshRefs.current[type] = mesh;
           }}
-          args={[geometry, tileMaterials[type], tileCounts[type] || 1]}
+          args={[geometry, tileMaterials[type], maxTilesPerType]}
           count={tileCounts[type]}
           frustumCulled={false}
         />
@@ -228,7 +288,7 @@ export function InstancedTileGrid({
 }
 
 /**
- * Get the dominant (most common) tile type in a LOD cell
+ * Get the dominant tile type in a LOD cell
  */
 function getDominantTileType(
   tiles: TileType[][],
@@ -251,7 +311,6 @@ function getDominantTileType(
     [TileType.Exit]: 0,
   };
 
-  // Priority tiles (always shown if present in cell)
   let hasSpawn = false;
   let hasExit = false;
   let hasPath = false;
@@ -267,12 +326,10 @@ function getDominantTileType(
     }
   }
 
-  // Priority: Spawn > Exit > Path > most common
   if (hasSpawn) return TileType.Spawn;
   if (hasExit) return TileType.Exit;
   if (hasPath) return TileType.Path;
 
-  // Return most common type
   let maxCount = 0;
   let dominantType: TileType = TileType.Ground;
   for (const type of TILE_TYPES) {

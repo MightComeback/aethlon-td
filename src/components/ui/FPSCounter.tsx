@@ -15,7 +15,7 @@ export function FPSCounter() {
   const lastTime = useRef(performance.now());
   const rafRef = useRef<number>(0);
 
-  const { fpsEnabled, fpsPosition, fpsLimit, debugMode } = useSettingsStore();
+  const { fpsEnabled, fpsPosition, debugMode } = useSettingsStore();
   const debugInfo = useDebugStore();
 
   useEffect(() => {
@@ -47,20 +47,11 @@ export function FPSCounter() {
     <div
       className={`fixed z-50 font-mono text-xs bg-background/90 px-2 py-1 rounded ${positionClasses[fpsPosition]}`}
     >
-      <div className="text-foreground-muted">
-        {fps} FPS {fpsLimit > 0 && <span className="text-accent-gold">({fpsLimit} cap)</span>}
-      </div>
+      <div className="text-foreground-muted">{fps} FPS</div>
 
       {debugMode && (
         <div className="mt-1 pt-1 border-t border-foreground-muted/30 text-2xs space-y-0.5">
           <div className="text-accent-green">-- Debug --</div>
-          <div>Limiter: {debugInfo.frameLimiterActive ? "ON" : "OFF"}</div>
-          <div>Target: {debugInfo.targetFps || "unlimited"}</div>
-          <div className="text-accent-gold">Render: {debugInfo.actualFps} fps</div>
-          <div>Rendered: {debugInfo.renderedFrames}</div>
-          <div>Skipped: {debugInfo.skippedFrames}</div>
-          <div>Delta: {debugInfo.frameTime.toFixed(2)}ms</div>
-          <div>Clock: {debugInfo.r3fClock.toFixed(2)}s</div>
           {Object.entries(debugInfo.customData).map(([key, value]) => (
             <div key={key}>
               {key}: {String(value)}

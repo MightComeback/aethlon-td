@@ -171,9 +171,31 @@ export function EditorGrid() {
     });
   }, [waypoints, width, height, tiles, heightmap]);
 
-  // Placed objects with terrain height
+  // Calculate object LOD - hide objects when zoomed out
+  const objectLOD = useMemo(() => {
+    const zoom = camera.zoom;
+    if (zoom <= 5) return { show: false, sampleRate: 0 };
+    if (zoom <= 10) return { show: true, sampleRate: 16 }; // Show 1/16 of objects
+    if (zoom <= 15) return { show: true, sampleRate: 8 };  // Show 1/8 of objects
+    if (zoom <= 20) return { show: true, sampleRate: 4 };  // Show 1/4 of objects
+    if (zoom <= 30) return { show: true, sampleRate: 2 };  // Show 1/2 of objects
+    return { show: true, sampleRate: 1 };                   // Show all objects
+  }, [camera.zoom]);
+
+  // Placed objects with terrain height (filtered by LOD)
   const placedObjects = useMemo(() => {
-    return objects.map((obj) => {
+    if (!objectLOD.show) return [];
+
+    // Filter objects based on sample rate using spatial hashing
+    const filtered = objectLOD.sampleRate === 1
+      ? objects
+      : objects.filter((obj) => {
+          // Use position-based sampling for consistent results
+          const hash = (obj.x * 31 + obj.y * 17) % objectLOD.sampleRate;
+          return hash === 0;
+        });
+
+    return filtered.map((obj) => {
       const tileType = tiles[obj.x]?.[obj.y] ?? TileType.Ground;
       const tileElevation = heightmap[obj.x]?.[obj.y] ?? 0;
       const baseHeight = getTileBaseHeight(tileType);
@@ -186,14 +208,16 @@ export function EditorGrid() {
         terrainHeight: totalHeight,
       };
     });
-  }, [objects, width, height, tiles, heightmap]);
+  }, [objects, width, height, tiles, heightmap, objectLOD]);
 
   return (
     <group>
-      {/* Grid helper lines */}
-      <gridHelper
-        args={[Math.max(width, height), Math.max(width, height), "#333", "#222"]}
-      />
+      {/* Grid helper lines (hidden when zoomed out on large maps) */}
+      {(camera.zoom > 10 || Math.max(width, height) < 100) && (
+        <gridHelper
+          args={[Math.max(width, height), Math.max(width, height), "#333", "#222"]}
+        />
+      )}
 
       {/* Instanced tile rendering with LOD based on zoom */}
       <InstancedTileGrid
@@ -229,8 +253,8 @@ export function EditorGrid() {
         );
       })}
 
-      {/* Waypoint markers */}
-      {waypointMarkers.map((wp) => (
+      {/* Waypoint markers (hidden when zoomed out far) */}
+      {camera.zoom > 8 && waypointMarkers.map((wp) => (
         <WaypointMarker
           key={`wp-${wp.index}`}
           x={wp.worldX}
