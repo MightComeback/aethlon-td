@@ -1,7 +1,7 @@
 {
-  "name": "mighty-defense",
+  "name": "aethlon",
   "version": "0.1.0",
-  "description": "A 2.5D web-based tower defense game",
+  "description": "Aethlon - A 2.5D web-based tower defense game",
   "type": "module",
   "sideEffects": false,
   "scripts": {

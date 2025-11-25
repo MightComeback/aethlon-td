@@ -7,7 +7,7 @@ import {
   SCHEMA_VERSION,
 } from "./schema";
 
-const DB_NAME = "mighty-defense";
+const DB_NAME = "aethlon";
 const IDB_STORE = "sqlite-data";
 const IDB_KEY = "database";
 

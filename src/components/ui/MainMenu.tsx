@@ -5,11 +5,8 @@ export function MainMenu() {
     <div className="flex h-full w-full flex-col items-center justify-center bg-background">
       {/* Title */}
       <div className="mb-16 text-center">
-        <h1 className="font-pixel text-4xl text-primary text-shadow-pixel mb-4">
-          MIGHTY
-        </h1>
         <h1 className="font-pixel text-5xl text-accent-gold text-shadow-pixel">
-          DEFENSE
+          AETHLON
         </h1>
         <p className="mt-4 text-foreground-muted text-sm">
           A 2.5D Tower Defense Experience

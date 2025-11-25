@@ -12,8 +12,8 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Mighty Defense" },
-      { name: "description", content: "A 2.5D tower defense game" },
+      { title: "Aethlon" },
+      { name: "description", content: "Aethlon - A 2.5D tower defense game" },
     ],
   }),
   component: RootComponent,

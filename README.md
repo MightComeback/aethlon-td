@@ -1,21 +1,20 @@
-# Mighty Defense
+# Aethlon
 
 A 2.5D web-based tower defense game built with React, TanStack Start, Three.js, and SQLite.
 
 ## Tech Stack
 
 - **Runtime**: Bun
-- **Framework**: TanStack Start (React)
+- **Framework**: TanStack Start (React 19)
 - **3D Rendering**: Three.js / React Three Fiber
 - **State Management**: Zustand
 - **Database**: sql.js (SQLite in browser)
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS v4
 
 ## Project Structure
 
 ```
 src/
-  app/                    # TanStack Start configuration
   routes/                 # File-based routing
   components/
     ui/                   # Base UI components
