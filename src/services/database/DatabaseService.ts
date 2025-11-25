@@ -26,7 +26,7 @@ export class DatabaseService {
   private initialized = false;
   private saveTimeout: NodeJS.Timeout | null = null;
 
-  private constructor() {}
+  private constructor() { }
 
   static getInstance(): DatabaseService {
     if (!DatabaseService.instance) {

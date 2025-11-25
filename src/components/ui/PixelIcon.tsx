@@ -1113,6 +1113,44 @@ export const IconClose: IconComponent = ({
   </svg>
 );
 
+export const IconDice: IconComponent = ({
+  size = 16,
+  color = "currentColor",
+  className,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill={color}
+    className={className}
+    style={{ imageRendering: "pixelated" }}
+  >
+    {/* Dice / Random */}
+    <path d={createPixelPath([
+      // Outer frame
+      [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [10, 2], [11, 2], [12, 2], [13, 2],
+      [2, 3], [13, 3],
+      [2, 4], [13, 4],
+      [2, 5], [13, 5],
+      [2, 6], [13, 6],
+      [2, 7], [13, 7],
+      [2, 8], [13, 8],
+      [2, 9], [13, 9],
+      [2, 10], [13, 10],
+      [2, 11], [13, 11],
+      [2, 12], [13, 12],
+      [2, 13], [3, 13], [4, 13], [5, 13], [6, 13], [7, 13], [8, 13], [9, 13], [10, 13], [11, 13], [12, 13], [13, 13],
+      // Dots (1-6 dice pattern showing 5)
+      [4, 4], [5, 4], [4, 5], [5, 5],       // Top-left dot
+      [10, 4], [11, 4], [10, 5], [11, 5],   // Top-right dot
+      [7, 7], [8, 7], [7, 8], [8, 8],       // Center dot
+      [4, 10], [5, 10], [4, 11], [5, 11],   // Bottom-left dot
+      [10, 10], [11, 10], [10, 11], [11, 11], // Bottom-right dot
+    ])} />
+  </svg>
+);
+
 // ============================================================================
 // ICON MAP FOR DYNAMIC ACCESS
 // ============================================================================
@@ -1160,6 +1198,7 @@ export const PixelIcons = {
   trash: IconTrash,
   plus: IconPlus,
   close: IconClose,
+  dice: IconDice,
 } as const;
 
 export type PixelIconName = keyof typeof PixelIcons;

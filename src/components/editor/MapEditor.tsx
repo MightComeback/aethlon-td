@@ -8,14 +8,16 @@ import { TilePalette } from "./TilePalette";
 import { EditorCameraController, CameraControlsUI } from "./CameraControls";
 import { VirtualCursor } from "./VirtualCursor";
 import { MapBrowser } from "./MapBrowser";
+import { GenerateMapDialog } from "./GenerateMapDialog";
 import { useEditorStore } from "@/stores/editorStore";
 import { MapStorage } from "@/services/storage/MapStorage";
-import type { MapMetadata } from "@/types/map";
+import type { MapMetadata, MapData } from "@/types/map";
 import {
   IconBack,
   IconPlay,
   IconSave,
   IconFolder,
+  IconDice,
 } from "@/components/ui/PixelIcon";
 
 // Map size presets
@@ -55,6 +57,7 @@ export function MapEditor() {
   const [customWidth, setCustomWidth] = useState(width);
   const [customHeight, setCustomHeight] = useState(height);
   const [showMapBrowser, setShowMapBrowser] = useState(false);
+  const [showGenerateDialog, setShowGenerateDialog] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentMapId, setCurrentMapId] = useState<string | null>(null);
   const [savedMaps, setSavedMaps] = useState<MapMetadata[]>([]);
@@ -116,6 +119,13 @@ export function MapEditor() {
       setCurrentMapId(null);
     }
   }, [currentMapId, refreshMapList]);
+
+  // Generate map handler
+  const handleGenerateMap = useCallback((mapData: MapData) => {
+    loadMap(mapData);
+    setCurrentMapId(null); // New unsaved map
+    setShowGenerateDialog(false);
+  }, [loadMap]);
 
   // Keyboard shortcut for save
   useEffect(() => {
@@ -205,6 +215,16 @@ export function MapEditor() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
+            {/* Generate button */}
+            <button
+              className="pixel-button flex items-center gap-2 text-2xs py-2 px-3"
+              title="Generate Random Map"
+              onClick={() => setShowGenerateDialog(true)}
+            >
+              <IconDice size={12} />
+              <span className="hidden sm:inline">Generate</span>
+            </button>
+
             {/* Load button */}
             <button
               className="pixel-button flex items-center gap-2 text-2xs py-2 px-3"
@@ -379,6 +399,14 @@ export function MapEditor() {
           onLoadMap={handleLoadMap}
           onNewMap={handleNewMap}
           onDeleteMap={handleDeleteMap}
+        />
+      )}
+
+      {/* Generate Map Dialog */}
+      {showGenerateDialog && (
+        <GenerateMapDialog
+          onClose={() => setShowGenerateDialog(false)}
+          onGenerate={handleGenerateMap}
         />
       )}
     </div>
