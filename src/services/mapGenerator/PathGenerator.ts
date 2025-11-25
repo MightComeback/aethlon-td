@@ -16,12 +16,17 @@ export interface PathResult {
 /**
  * Generate a path from spawn to exit using control points and Bresenham lines.
  * Guarantees 100% connectivity with no diagonal jumps.
+ * Path width scales with map size for larger maps.
  */
 export function generatePath(
   rng: SeededRandom,
   width: number,
-  height: number
+  height: number,
+  scaleFactor: number = 1
 ): PathResult {
+  // Calculate path width based on scale (1 for small maps, up to 12 for epic)
+  const pathWidth = Math.max(1, Math.floor(scaleFactor / 2));
+
   // 1. Place spawn on left edge (Y in middle 60% of height)
   const marginY = Math.floor(height * 0.2);
   const spawnY = rng.nextInt(marginY, height - marginY - 1);
@@ -32,13 +37,16 @@ export function generatePath(
   const exit: Point = { x: width - 1, y: exitY };
 
   // 3. Generate control points for interesting path shape
-  const numControlPoints = rng.nextInt(2, 4);
+  // More control points on larger maps for more interesting paths
+  const baseControlPoints = rng.nextInt(2, 4);
+  const extraControlPoints = Math.floor(scaleFactor / 5);
+  const numControlPoints = baseControlPoints + extraControlPoints;
   const controlPoints: Point[] = [spawn];
 
   for (let i = 1; i <= numControlPoints; i++) {
     // X positions evenly distributed with some randomness
     const baseX = Math.floor((i / (numControlPoints + 1)) * width);
-    const xOffset = rng.nextInt(-2, 2);
+    const xOffset = rng.nextInt(-2, 2) * Math.ceil(scaleFactor / 2);
     const x = Math.max(1, Math.min(width - 2, baseX + xOffset));
 
     // Y alternates between upper and lower regions for S-curves
@@ -62,10 +70,14 @@ export function generatePath(
     const lineTiles = bresenhamLine(from, to);
 
     for (const tile of lineTiles) {
-      const key = `${tile.x},${tile.y}`;
-      if (!visited.has(key)) {
-        visited.add(key);
-        pathTiles.push(tile);
+      // Add the center tile and expand for path width
+      const expandedTiles = expandPath(tile, pathWidth, width, height);
+      for (const expanded of expandedTiles) {
+        const key = `${expanded.x},${expanded.y}`;
+        if (!visited.has(key)) {
+          visited.add(key);
+          pathTiles.push(expanded);
+        }
       }
     }
   }
@@ -79,6 +91,28 @@ export function generatePath(
   }));
 
   return { pathTiles, waypoints, spawn, exit };
+}
+
+/**
+ * Expand a single path tile into a wider path
+ */
+function expandPath(center: Point, width: number, mapWidth: number, mapHeight: number): Point[] {
+  if (width <= 1) return [center];
+
+  const tiles: Point[] = [];
+  const halfWidth = Math.floor(width / 2);
+
+  for (let dx = -halfWidth; dx <= halfWidth; dx++) {
+    for (let dy = -halfWidth; dy <= halfWidth; dy++) {
+      const x = center.x + dx;
+      const y = center.y + dy;
+      if (isInBounds(x, y, mapWidth, mapHeight)) {
+        tiles.push({ x, y });
+      }
+    }
+  }
+
+  return tiles;
 }
 
 /**

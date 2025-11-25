@@ -59,3 +59,6 @@ export function getTileColor(type: TileType, isHovered: boolean): string {
   return color;
 }
 
+
+
+

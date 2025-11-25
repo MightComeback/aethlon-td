@@ -1,65 +1,87 @@
 import { useMemo } from "react";
-import { TileType } from "@/types/map";
+import { TileType, MapData } from "@/types/map";
+import { InstancedTileGrid } from "@/components/shared/InstancedTileGrid";
 
 interface IsometricGridProps {
   width: number;
   height: number;
+  tiles?: TileType[][];
+  heightmap?: number[][];
 }
 
-export function IsometricGrid({ width, height }: IsometricGridProps) {
-  const tiles = useMemo(() => {
-    const result: Array<{ x: number; z: number; type: TileType }> = [];
+export function IsometricGrid({
+  width,
+  height,
+  tiles,
+  heightmap,
+}: IsometricGridProps) {
+  // Generate default tiles if none provided (demo pattern)
+  const gridTiles = useMemo(() => {
+    if (tiles) return tiles;
+
+    const result: TileType[][] = [];
     for (let x = 0; x < width; x++) {
+      result[x] = [];
       for (let z = 0; z < height; z++) {
-        // Demo: create a simple path pattern
-        const isPath = (x === 0 || x === width - 1 || z === Math.floor(height / 2));
-        result.push({
-          x: x - width / 2,
-          z: z - height / 2,
-          type: isPath ? TileType.Path : TileType.Ground,
-        });
+        const isPath = x === 0 || x === width - 1 || z === Math.floor(height / 2);
+        result[x]![z] = isPath ? TileType.Path : TileType.Ground;
       }
     }
     return result;
-  }, [width, height]);
+  }, [width, height, tiles]);
+
+  // Generate default heightmap if none provided
+  const gridHeightmap = useMemo(() => {
+    if (heightmap) return heightmap;
+
+    const result: number[][] = [];
+    for (let x = 0; x < width; x++) {
+      result[x] = [];
+      for (let z = 0; z < height; z++) {
+        result[x]![z] = 0;
+      }
+    }
+    return result;
+  }, [width, height, heightmap]);
 
   return (
     <group>
-      {tiles.map((tile, index) => (
-        <Tile key={index} x={tile.x} z={tile.z} type={tile.type} />
-      ))}
+      <InstancedTileGrid
+        width={width}
+        height={height}
+        tiles={gridTiles}
+        heightmap={gridHeightmap}
+      />
     </group>
   );
 }
 
-interface TileProps {
-  x: number;
-  z: number;
-  type: TileType;
+// Game grid that takes full MapData
+interface GameGridProps {
+  mapData: MapData;
 }
 
-function Tile({ x, z, type }: TileProps) {
-  const color = getTileColor(type);
+export function GameGrid({ mapData }: GameGridProps) {
+  // Generate empty heightmap if not provided
+  const heightmap = useMemo(() => {
+    if (mapData.heightmap) return mapData.heightmap;
+
+    const result: number[][] = [];
+    for (let x = 0; x < mapData.width; x++) {
+      result[x] = [];
+      for (let z = 0; z < mapData.height; z++) {
+        result[x]![z] = 0;
+      }
+    }
+    return result;
+  }, [mapData.heightmap, mapData.width, mapData.height]);
 
   return (
-    <mesh position={[x, 0, z]} receiveShadow>
-      <boxGeometry args={[0.95, 0.1, 0.95]} />
-      <meshStandardMaterial color={color} />
-    </mesh>
+    <InstancedTileGrid
+      width={mapData.width}
+      height={mapData.height}
+      tiles={mapData.tiles}
+      heightmap={heightmap}
+    />
   );
-}
-
-function getTileColor(type: TileType): string {
-  switch (type) {
-    case TileType.Ground:
-      return "#4ecca3";
-    case TileType.Path:
-      return "#8b7355";
-    case TileType.Water:
-      return "#00d9ff";
-    case TileType.Blocked:
-      return "#444444";
-    default:
-      return "#4ecca3";
-  }
 }

@@ -59,6 +59,24 @@
 
 [] Game Mods (Save The Keeper, TD (Basic), Aegis)
 
+[] Maps are 400x400 by default
+[] Map generator has "Big" mode to make tiles path wider and the magnitude of the map larger
+
+[] Maps generate villages in monster path
+[] Villages allow for trade
+[] Villages can be destroyed by monsters
+
+[] Map Events are defined
+[] Map events 
+
+[] Player Characters are defined
+[] Player Characters can move
+[] Player Characters have classes
+
+[] Catalog
+
+[] Animals are defined
+[] Animals appear on map randomly
 
 [] Local first
 
@@ -66,6 +84,8 @@
 [] Friend List
 
 
-# [] Game Loop is defined
+[] Game Loop is defined
+
+TBD...
 
 

@@ -25,6 +25,21 @@ export interface GeneratedMap {
 const DEFAULT_WIDTH = 20;
 const DEFAULT_HEIGHT = 15;
 
+// Reference size for scale calculations (20x15 = 300 tiles)
+const REFERENCE_AREA = 300;
+
+/**
+ * Calculate scale factor based on map size.
+ * Scale 1.0 = 20x15 map (reference)
+ * Scale increases with map area (sqrt to keep it reasonable)
+ */
+export function getMapScaleFactor(width: number, height: number): number {
+  const area = width * height;
+  // Use sqrt so 400x400 (160000 tiles) doesn't have 533x scale
+  // Result: 20x15=1.0, 50x35=2.4, 100x100=5.8, 200x200=11.5, 400x400=23.1
+  return Math.sqrt(area / REFERENCE_AREA);
+}
+
 /**
  * Create an empty tile grid initialized to Ground
  */
@@ -64,8 +79,11 @@ export function generateMap(config: GeneratorConfig = {}): GeneratedMap {
   const height = config.height || DEFAULT_HEIGHT;
 
   // Validate dimensions
-  const clampedWidth = Math.max(10, Math.min(100, width));
-  const clampedHeight = Math.max(8, Math.min(60, height));
+  const clampedWidth = Math.max(10, Math.min(500, width));
+  const clampedHeight = Math.max(8, Math.min(500, height));
+
+  // Calculate scale factor for size-dependent generation
+  const scaleFactor = getMapScaleFactor(clampedWidth, clampedHeight);
 
   // Initialize RNG with seed
   const rng = new SeededRandom(seed);
@@ -73,23 +91,24 @@ export function generateMap(config: GeneratorConfig = {}): GeneratedMap {
   // 1. Create empty tile grid
   const tiles = createTileGrid(clampedWidth, clampedHeight);
 
-  // 2. Generate path with spawn and exit
+  // 2. Generate path with spawn and exit (wider paths on larger maps)
   const { pathTiles, waypoints, spawn, exit } = generatePath(
     rng,
     clampedWidth,
-    clampedHeight
+    clampedHeight,
+    scaleFactor
   );
 
   // 3. Apply path to tile grid
   applyPathToGrid(tiles, pathTiles, spawn, exit);
 
-  // 4. Build exclusion zone around path
-  const excluded = buildExclusionZone(pathTiles, clampedWidth, clampedHeight);
+  // 4. Build exclusion zone around path (scales with path width)
+  const excluded = buildExclusionZone(pathTiles, clampedWidth, clampedHeight, scaleFactor);
 
   // 5. Get tiles available for obstacles
   const available = getAvailableTiles(clampedWidth, clampedHeight, excluded);
 
-  // 6. Place water clusters (5-12% coverage)
+  // 6. Place water clusters (5-12% coverage, larger clusters on bigger maps)
   const waterCoverage = 0.05 + rng.next() * 0.07;
   const waterTiles = placeWaterClusters(
     rng,
@@ -97,10 +116,11 @@ export function generateMap(config: GeneratorConfig = {}): GeneratedMap {
     available,
     clampedWidth,
     clampedHeight,
-    waterCoverage
+    waterCoverage,
+    scaleFactor
   );
 
-  // 7. Place blocked clusters (3-8% coverage)
+  // 7. Place blocked clusters (3-8% coverage, larger clusters on bigger maps)
   const blockedCoverage = 0.03 + rng.next() * 0.05;
   placeBlockedClusters(
     rng,
@@ -109,7 +129,8 @@ export function generateMap(config: GeneratorConfig = {}): GeneratedMap {
     clampedWidth,
     clampedHeight,
     waterTiles,
-    blockedCoverage
+    blockedCoverage,
+    scaleFactor
   );
 
   // 8. Generate heightmap

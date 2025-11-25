@@ -10,10 +10,14 @@ interface SettingsStore {
   fpsPosition: FPSPosition;
   fpsLimit: FPSLimit;
 
+  // Debug
+  debugMode: boolean;
+
   // Actions
   setFpsEnabled: (enabled: boolean) => void;
   setFpsPosition: (position: FPSPosition) => void;
   setFpsLimit: (limit: FPSLimit) => void;
+  setDebugMode: (enabled: boolean) => void;
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -22,10 +26,12 @@ export const useSettingsStore = create<SettingsStore>()(
       fpsEnabled: true,
       fpsPosition: "top-left",
       fpsLimit: 0,
+      debugMode: false,
 
       setFpsEnabled: (enabled) => set({ fpsEnabled: enabled }),
       setFpsPosition: (position) => set({ fpsPosition: position }),
       setFpsLimit: (limit) => set({ fpsLimit: limit }),
+      setDebugMode: (enabled) => set({ debugMode: enabled }),
     }),
     {
       name: "aethlon-settings",

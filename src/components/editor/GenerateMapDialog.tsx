@@ -6,9 +6,10 @@ import type { MapData } from "@/types/map";
 // Map size presets
 const SIZE_PRESETS = [
   { label: "Small", width: 20, height: 15 },
-  { label: "Medium", width: 30, height: 20 },
-  { label: "Large", width: 50, height: 35 },
-  { label: "Huge", width: 80, height: 50 },
+  { label: "Medium", width: 50, height: 35 },
+  { label: "Large", width: 100, height: 100 },
+  { label: "Huge", width: 200, height: 200 },
+  { label: "Epic", width: 400, height: 400 },
 ] as const;
 
 interface GenerateMapDialogProps {
@@ -94,7 +95,7 @@ export function GenerateMapDialog({
           <label className="font-pixel text-3xs text-foreground-muted/50 uppercase tracking-wide block mb-2">
             Map Size
           </label>
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-5 gap-2">
             {SIZE_PRESETS.map((preset, index) => (
               <button
                 key={preset.label}

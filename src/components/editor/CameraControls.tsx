@@ -9,8 +9,8 @@ import {
   IconZoomOut,
 } from "@/components/ui/PixelIcon";
 
-const ZOOM_MIN = 25;
-const ZOOM_MAX = 120;
+const ZOOM_MIN = 3;
+const ZOOM_MAX = 150;
 const ZOOM_STEP = 10;
 
 // Polar angle constraints (vertical tilt)

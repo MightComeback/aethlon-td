@@ -4,23 +4,27 @@ import { type Point, getNeighbors8, isInBounds } from "./PathGenerator";
 
 /**
  * Build a set of tiles that should be excluded from obstacle placement
- * (path tiles + 1-tile buffer around them)
+ * (path tiles + buffer around them, buffer scales with map size)
  */
 export function buildExclusionZone(
   pathTiles: Point[],
   width: number,
-  height: number
+  height: number,
+  scaleFactor: number = 1
 ): Set<string> {
   const excluded = new Set<string>();
+  // Buffer size scales with map size (1 for small, up to 6 for epic)
+  const bufferSize = Math.max(1, Math.floor(scaleFactor / 4));
 
   for (const tile of pathTiles) {
-    // Add the path tile itself
-    excluded.add(`${tile.x},${tile.y}`);
-
-    // Add all 8-directional neighbors as buffer
-    for (const neighbor of getNeighbors8(tile)) {
-      if (isInBounds(neighbor.x, neighbor.y, width, height)) {
-        excluded.add(`${neighbor.x},${neighbor.y}`);
+    // Add the path tile itself and surrounding buffer
+    for (let dx = -bufferSize; dx <= bufferSize; dx++) {
+      for (let dy = -bufferSize; dy <= bufferSize; dy++) {
+        const x = tile.x + dx;
+        const y = tile.y + dy;
+        if (isInBounds(x, y, width, height)) {
+          excluded.add(`${x},${y}`);
+        }
       }
     }
   }
@@ -53,6 +57,7 @@ export function getAvailableTiles(
 /**
  * Place water clusters on the map
  * Uses flood-fill from seed points to create organic shapes
+ * Cluster sizes scale with map size for larger rivers/lakes
  */
 export function placeWaterClusters(
   rng: SeededRandom,
@@ -60,7 +65,8 @@ export function placeWaterClusters(
   available: Point[],
   width: number,
   height: number,
-  coverage: number = 0.08
+  coverage: number = 0.08,
+  scaleFactor: number = 1
 ): Set<string> {
   const waterTiles = new Set<string>();
   const targetCount = Math.floor(available.length * coverage);
@@ -72,6 +78,11 @@ export function placeWaterClusters(
 
   let seedIndex = 0;
 
+  // Scale cluster sizes with map size
+  // Small map: 3-8, Epic map: 30-150
+  const minClusterSize = Math.floor(3 * scaleFactor);
+  const maxClusterSize = Math.floor(8 * scaleFactor);
+
   while (placedCount < targetCount && seedIndex < shuffled.length) {
     const seed = shuffled[seedIndex]!;
     seedIndex++;
@@ -79,8 +90,8 @@ export function placeWaterClusters(
     // Skip if already water
     if (waterTiles.has(`${seed.x},${seed.y}`)) continue;
 
-    // Grow a cluster from this seed
-    const clusterSize = rng.nextInt(3, 8);
+    // Grow a cluster from this seed (scaled size)
+    const clusterSize = rng.nextInt(minClusterSize, maxClusterSize);
     const cluster = growCluster(
       rng,
       seed,
@@ -106,6 +117,7 @@ export function placeWaterClusters(
 
 /**
  * Place blocked (rock/cliff) clusters on the map
+ * Cluster sizes scale with map size
  */
 export function placeBlockedClusters(
   rng: SeededRandom,
@@ -114,7 +126,8 @@ export function placeBlockedClusters(
   width: number,
   height: number,
   waterTiles: Set<string>,
-  coverage: number = 0.05
+  coverage: number = 0.05,
+  scaleFactor: number = 1
 ): Set<string> {
   const blockedTiles = new Set<string>();
 
@@ -131,14 +144,19 @@ export function placeBlockedClusters(
 
   let seedIndex = 0;
 
+  // Scale cluster sizes with map size
+  // Small map: 2-5, Epic map: 20-100
+  const minClusterSize = Math.floor(2 * scaleFactor);
+  const maxClusterSize = Math.floor(5 * scaleFactor);
+
   while (placedCount < targetCount && seedIndex < shuffled.length) {
     const seed = shuffled[seedIndex]!;
     seedIndex++;
 
     if (blockedTiles.has(`${seed.x},${seed.y}`)) continue;
 
-    // Smaller clusters for blocked areas
-    const clusterSize = rng.nextInt(2, 5);
+    // Scaled cluster size for blocked areas
+    const clusterSize = rng.nextInt(minClusterSize, maxClusterSize);
     const cluster = growCluster(
       rng,
       seed,

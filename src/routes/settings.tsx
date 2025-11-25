@@ -29,9 +29,11 @@ function SettingsPage() {
     fpsEnabled,
     fpsPosition,
     fpsLimit,
+    debugMode,
     setFpsEnabled,
     setFpsPosition,
     setFpsLimit,
+    setDebugMode,
   } = useSettingsStore();
 
   return (
@@ -106,6 +108,31 @@ function SettingsPage() {
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Debug Section */}
+        <div className="pt-4 border-t border-foreground-muted/20">
+          <h2 className="font-pixel text-sm text-foreground mb-4">
+            Developer
+          </h2>
+
+          {/* Debug Mode Toggle */}
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-sm text-foreground-muted">Debug Mode</span>
+              <p className="text-2xs text-foreground-muted/60">
+                Shows detailed debug info overlay
+              </p>
+            </div>
+            <button
+              onClick={() => setDebugMode(!debugMode)}
+              className={`pixel-button text-2xs ${
+                debugMode ? "bg-warning" : ""
+              }`}
+            >
+              {debugMode ? "ON" : "OFF"}
+            </button>
           </div>
         </div>
       </div>

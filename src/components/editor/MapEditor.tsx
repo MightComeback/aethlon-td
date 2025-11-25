@@ -23,10 +23,11 @@ import {
 
 // Map size presets
 const SIZE_PRESETS = [
-  { label: "Small", width: 15, height: 10 },
-  { label: "Medium", width: 20, height: 15 },
-  { label: "Large", width: 30, height: 20 },
-  { label: "Wide", width: 40, height: 15 },
+  { label: "Small", width: 20, height: 15 },
+  { label: "Medium", width: 50, height: 35 },
+  { label: "Large", width: 100, height: 100 },
+  { label: "Huge", width: 200, height: 200 },
+  { label: "Epic", width: 400, height: 400 },
 ];
 
 // Tools that require brush/drawing interactions (disable camera rotation)
@@ -316,7 +317,7 @@ export function MapEditor() {
                     <input
                       type="number"
                       min={5}
-                      max={50}
+                      max={500}
                       value={customWidth}
                       onChange={(e) => setCustomWidth(Number(e.target.value))}
                       className="flex-1 bg-background-tertiary text-foreground text-2xs px-2 py-1 outline-none focus:ring-1 focus:ring-primary"
@@ -327,7 +328,7 @@ export function MapEditor() {
                     <input
                       type="number"
                       min={5}
-                      max={50}
+                      max={500}
                       value={customHeight}
                       onChange={(e) => setCustomHeight(Number(e.target.value))}
                       className="flex-1 bg-background-tertiary text-foreground text-2xs px-2 py-1 outline-none focus:ring-1 focus:ring-primary"
