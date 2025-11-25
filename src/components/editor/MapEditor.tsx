@@ -163,7 +163,7 @@ export function MapEditor() {
         className="absolute inset-0"
         gl={{ antialias: false, alpha: false }}
         dpr={1}
-        frameloop="demand"
+        frameloop="never"
       >
         <FrameLimiter />
         <color attach="background" args={["#0a0a0a"]} />

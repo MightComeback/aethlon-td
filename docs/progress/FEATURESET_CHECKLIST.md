@@ -1,17 +1,18 @@
-[] Map editor is defined
-[] Maps are saved and loaded
+[x] Map editor is defined
+[x] Maps are saved and loaded
 
-[] Objects
-[] Tiles
+[x] Objects are defined
+[x] Tiles are defined
 
-[] Camera Pan
-[] Camera Zoom
-[] Camera Rotate
+[x] Camera Pan
+[x] Camera Zoom
+[x] Camera Rotate
 
 [] Weather Concept
 [] Weather Effects
 [] Weather is Dynamic (chagnes automatically}
 [] Weather Affects Objects
+[] Weather Affects Towers
 [] Preview And Configure Weather in Map Editor
 
 [] Time Of Day
@@ -22,6 +23,15 @@
 [] Seasons affect weather
 [] Preview and Configure Time of year in Map Editor
 
+[] Biomes concept is defined
+
+[] Map generator generates multiple spawn/exit points
+[] Maps spawn/exit points can be bound to waves
+[] "Temporary" paths are defined (i.e. towers are not placeable, destroyed/converted into path on scripted wave - configured by seed/map editor)
+
+[] Map generator algo is sequential (rivers -> paths -> heightmap -> objects)
+[] Path tiles can be defined on top a of river, but replaced with bridge tiles
+[] Path tiles can be deifned on top of a mountain (i.e. adjacent tiles heightmap Y > 4), but replaced with tunnel tiles
 
 [] Game is Colored
 [] Textures are congruent
