@@ -1,0 +1,261 @@
+/**
+ * Mountain Element - Tier 3 Towers (Crystal + Earth mastery)
+ * Ultimate defensive Earth specialization
+ */
+
+import {
+  TowerCategory,
+  TowerRarity,
+  BuffType,
+  type ExtendedTowerDefinition,
+} from "@/types/tower";
+import { MergedElementT2, MergedElementT3, BaseElement } from "@/types/element";
+import { StatusEffectType } from "@/types/enemy";
+import { createTowerId } from "../../mergeGraph";
+
+export const MOUNTAIN_TIER3_TOWERS: ExtendedTowerDefinition[] = [
+  // 1. Mountain Damage Tower
+  {
+    id: createTowerId(MergedElementT3.Mountain, TowerCategory.Damage, 3),
+    type: "mountain_damage" as any,
+    name: "Titan's Peak",
+    description: "An immovable crystalline mountain that devastates enemies with sheer mass.",
+    element: MergedElementT3.Mountain,
+    category: TowerCategory.Damage,
+    tier: 3,
+    rarity: TowerRarity.Rare,
+    baseStats: {
+      damage: 75,
+      attackSpeed: 0.55,
+      range: 3.2,
+      cost: 650,
+      upgradeCost: 325,
+      health: 450,
+      armor: 35,
+      magicPen: 4,
+      armorPen: 8,
+      splashRadius: 1.4,
+    },
+    ability: {
+      id: "mountain_fall",
+      name: "Mountain Fall",
+      description: "Causes a localized earthquake that stuns and damages all enemies.",
+      cooldown: 20000,
+      duration: 2000,
+      strength: 2.0,
+      type: "active",
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(MergedElementT2.Crystal, TowerCategory.Damage, 2),
+        createTowerId(BaseElement.Earth, TowerCategory.Damage, 1),
+      ],
+      output: createTowerId(MergedElementT3.Mountain, TowerCategory.Damage, 3),
+      tier: 3,
+      rarity: TowerRarity.Rare,
+    },
+    meshConfig: {
+      baseShape: "tower",
+      scale: 1.6,
+      height: 2.1,
+      effectColor: "#696969",
+      parts: [
+        { type: "cone", position: [0, 0, 0], size: [0.4, 0.7], color: "#3a3a3a" },
+        { type: "cone", position: [0, 0.6, 0], size: [0.3, 0.55], color: "#444444" },
+        { type: "cone", position: [0, 1.05, 0], size: [0.22, 0.4], color: "#4a4a4a" },
+        { type: "octahedron", position: [0, 1.4, 0], size: [0.14], color: "#555555", emissive: "#a9a9a9", animated: { type: "pulse", speed: 0.6 } },
+        { type: "octahedron", position: [0.15, 0.8, 0.1], size: [0.06], color: "#888888", emissive: "#b19cd9" },
+      ],
+    },
+  },
+
+  // 2. Mountain Magic Damage Tower
+  {
+    id: createTowerId(MergedElementT3.Mountain, TowerCategory.MagicDamage, 3),
+    type: "mountain_magic_damage" as any,
+    name: "Geode Sanctum",
+    description: "Channels earth's crystalline magic from deep within the mountain.",
+    element: MergedElementT3.Mountain,
+    category: TowerCategory.MagicDamage,
+    tier: 3,
+    rarity: TowerRarity.Rare,
+    baseStats: {
+      damage: 68,
+      attackSpeed: 0.5,
+      range: 3.4,
+      cost: 700,
+      upgradeCost: 350,
+      health: 380,
+      armor: 28,
+      magicPen: 16,
+      armorPen: 0,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(MergedElementT2.Crystal, TowerCategory.MagicDamage, 2),
+        createTowerId(BaseElement.Earth, TowerCategory.MagicDamage, 1),
+      ],
+      output: createTowerId(MergedElementT3.Mountain, TowerCategory.MagicDamage, 3),
+      tier: 3,
+      rarity: TowerRarity.Rare,
+    },
+    meshConfig: {
+      baseShape: "crystal",
+      scale: 1.5,
+      height: 1.9,
+      effectColor: "#a9a9a9",
+      parts: [
+        { type: "cone", position: [0, 0, 0], size: [0.32, 0.5], color: "#3a3a3a" },
+        { type: "octahedron", position: [0, 0.55, 0], size: [0.24], color: "#444444" },
+        { type: "dodecahedron", position: [0, 0.95, 0], size: [0.16], color: "#555555", emissive: "#b19cd9", animated: { type: "rotate", speed: 0.5, axis: "y" } },
+        { type: "sphere", position: [0, 1.25, 0], size: [0.1], color: "#888888", emissive: "#dda0dd", animated: { type: "pulse", speed: 1 } },
+      ],
+    },
+  },
+
+  // 3. Mountain Physical Damage Tower
+  {
+    id: createTowerId(MergedElementT3.Mountain, TowerCategory.PhysicalDamage, 3),
+    type: "mountain_physical_damage" as any,
+    name: "Colossus Catapult",
+    description: "Hurls massive crystallized boulders with catastrophic force.",
+    element: MergedElementT3.Mountain,
+    category: TowerCategory.PhysicalDamage,
+    tier: 3,
+    rarity: TowerRarity.Rare,
+    baseStats: {
+      damage: 145,
+      attackSpeed: 0.35,
+      range: 2.8,
+      cost: 750,
+      upgradeCost: 375,
+      health: 480,
+      armor: 38,
+      magicPen: 0,
+      armorPen: 14,
+      splashRadius: 2.0,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(MergedElementT2.Crystal, TowerCategory.PhysicalDamage, 2),
+        createTowerId(BaseElement.Earth, TowerCategory.PhysicalDamage, 1),
+      ],
+      output: createTowerId(MergedElementT3.Mountain, TowerCategory.PhysicalDamage, 3),
+      tier: 3,
+      rarity: TowerRarity.Rare,
+    },
+    meshConfig: {
+      baseShape: "tower",
+      scale: 1.6,
+      height: 2.0,
+      effectColor: "#696969",
+      parts: [
+        { type: "cone", position: [0, 0, 0], size: [0.4, 0.6], color: "#3a3a3a" },
+        { type: "box", position: [0, 0.55, 0], size: [0.3, 0.25, 0.3], color: "#444444" },
+        { type: "cylinder", position: [0, 0.8, 0.15], rotation: [0.45, 0, 0], size: [0.14, 0.5], color: "#555555" },
+        { type: "octahedron", position: [0, 1.1, 0.48], size: [0.12], color: "#888888" },
+      ],
+    },
+  },
+
+  // 4. Mountain Buff Tower
+  {
+    id: createTowerId(MergedElementT3.Mountain, TowerCategory.Buff, 3),
+    type: "mountain_buff" as any,
+    name: "Adamantine Citadel",
+    description: "Provides unbreakable fortification, greatly boosting armor penetration.",
+    element: MergedElementT3.Mountain,
+    category: TowerCategory.Buff,
+    tier: 3,
+    rarity: TowerRarity.Rare,
+    baseStats: {
+      damage: 15,
+      attackSpeed: 0.3,
+      range: 4.0,
+      cost: 770,
+      upgradeCost: 385,
+      health: 520,
+      armor: 42,
+      magicPen: 0,
+      armorPen: 0,
+    },
+    buff: {
+      type: BuffType.ArmorPen,
+      radius: 4.0,
+      strength: 0.35,
+      stackable: false,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(MergedElementT2.Crystal, TowerCategory.Buff, 2),
+        createTowerId(BaseElement.Earth, TowerCategory.Buff, 1),
+      ],
+      output: createTowerId(MergedElementT3.Mountain, TowerCategory.Buff, 3),
+      tier: 3,
+      rarity: TowerRarity.Rare,
+    },
+    meshConfig: {
+      baseShape: "pedestal",
+      scale: 1.55,
+      height: 2.0,
+      effectColor: "#a9a9a9",
+      parts: [
+        { type: "cone", position: [0, 0, 0], size: [0.38, 0.55], color: "#3a3a3a" },
+        { type: "box", position: [0, 0.5, 0], size: [0.26, 0.6, 0.26], color: "#444444" },
+        { type: "box", position: [0, 1.0, 0], size: [0.3, 0.12, 0.3], color: "#555555" },
+        { type: "octahedron", position: [0, 1.25, 0], size: [0.16], color: "#666666", emissive: "#b19cd9", animated: { type: "pulse", speed: 0.6 } },
+        { type: "torus", position: [0, 0.25, 0], rotation: [1.57, 0, 0], size: [0.55, 0.03], color: "#69696944" },
+      ],
+    },
+  },
+
+  // 5. Mountain Debuff Tower
+  {
+    id: createTowerId(MergedElementT3.Mountain, TowerCategory.Debuff, 3),
+    type: "mountain_debuff" as any,
+    name: "Crushing Weight",
+    description: "Creates gravitational fields that root enemies and shatter their armor.",
+    element: MergedElementT3.Mountain,
+    category: TowerCategory.Debuff,
+    tier: 3,
+    rarity: TowerRarity.Rare,
+    baseStats: {
+      damage: 32,
+      attackSpeed: 0.55,
+      range: 3.2,
+      cost: 730,
+      upgradeCost: 365,
+      health: 420,
+      armor: 32,
+      magicPen: 0,
+      armorPen: 0,
+    },
+    statusEffect: {
+      type: StatusEffectType.Root,
+      chance: 0.35,
+      duration: 2.5,
+      strength: 1,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(MergedElementT2.Crystal, TowerCategory.Debuff, 2),
+        createTowerId(BaseElement.Earth, TowerCategory.Debuff, 1),
+      ],
+      output: createTowerId(MergedElementT3.Mountain, TowerCategory.Debuff, 3),
+      tier: 3,
+      rarity: TowerRarity.Rare,
+    },
+    meshConfig: {
+      baseShape: "statue",
+      scale: 1.5,
+      height: 1.7,
+      effectColor: "#696969",
+      parts: [
+        { type: "cone", position: [0, 0, 0], size: [0.35, 0.5], color: "#3a3a3a" },
+        { type: "box", position: [0, 0.45, 0], size: [0.24, 0.4, 0.24], color: "#444444" },
+        { type: "octahedron", position: [0, 0.85, 0], size: [0.14], color: "#555555", emissive: "#a9a9a9", animated: { type: "pulse", speed: 0.8 } },
+        { type: "octahedron", position: [0.12, 0.65, 0.08], size: [0.05], color: "#888888", emissive: "#b19cd9" },
+      ],
+    },
+  },
+];

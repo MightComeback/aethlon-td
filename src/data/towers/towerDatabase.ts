@@ -10,11 +10,36 @@ import type {
 } from "@/types/tower";
 import type { Element } from "@/types/element";
 
-// Import tower definitions
+// Import Tier 1 tower definitions
 import { FIRE_TIER1_TOWERS } from "./definitions/tier1/fire";
+import { WATER_TIER1_TOWERS } from "./definitions/tier1/water";
 import { EARTH_TIER1_TOWERS } from "./definitions/tier1/earth";
+import { AIR_TIER1_TOWERS } from "./definitions/tier1/air";
+import { LIGHTNING_TIER1_TOWERS } from "./definitions/tier1/lightning";
+
+// Import Tier 2 tower definitions
+import { STEAM_TIER2_TOWERS } from "./definitions/tier2/steam";
 import { LAVA_TIER2_TOWERS } from "./definitions/tier2/lava";
+import { PLASMA_TIER2_TOWERS } from "./definitions/tier2/plasma";
+import { STORM_TIER2_TOWERS } from "./definitions/tier2/storm";
+import { ICE_TIER2_TOWERS } from "./definitions/tier2/ice";
+import { MIST_TIER2_TOWERS } from "./definitions/tier2/mist";
+import { TEMPEST_TIER2_TOWERS } from "./definitions/tier2/tempest";
+import { DUST_TIER2_TOWERS } from "./definitions/tier2/dust";
+import { CRYSTAL_TIER2_TOWERS } from "./definitions/tier2/crystal";
+import { THUNDER_TIER2_TOWERS } from "./definitions/tier2/thunder";
+
+// Import Tier 3 tower definitions
 import { VOLCANO_TIER3_TOWERS } from "./definitions/tier3/volcano";
+import { EARTHQUAKE_TIER3_TOWERS } from "./definitions/tier3/earthquake";
+import { INFERNO_TIER3_TOWERS } from "./definitions/tier3/inferno";
+import { TSUNAMI_TIER3_TOWERS } from "./definitions/tier3/tsunami";
+import { BLIZZARD_TIER3_TOWERS } from "./definitions/tier3/blizzard";
+import { MOUNTAIN_TIER3_TOWERS } from "./definitions/tier3/mountain";
+import { HURRICANE_TIER3_TOWERS } from "./definitions/tier3/hurricane";
+import { CYCLONE_TIER3_TOWERS } from "./definitions/tier3/cyclone";
+import { SUPERCELL_TIER3_TOWERS } from "./definitions/tier3/supercell";
+import { DISCHARGE_TIER3_TOWERS } from "./definitions/tier3/discharge";
 
 import { buildTowerMergeGraph, type TowerMergeGraph } from "./mergeGraph";
 
@@ -22,11 +47,39 @@ import { buildTowerMergeGraph, type TowerMergeGraph } from "./mergeGraph";
 // COMBINED DATABASE
 // ============================================================================
 
-const ALL_TIER1 = [...FIRE_TIER1_TOWERS, ...EARTH_TIER1_TOWERS];
+const ALL_TIER1 = [
+  ...FIRE_TIER1_TOWERS,
+  ...WATER_TIER1_TOWERS,
+  ...EARTH_TIER1_TOWERS,
+  ...AIR_TIER1_TOWERS,
+  ...LIGHTNING_TIER1_TOWERS,
+];
 
-const ALL_TIER2 = [...LAVA_TIER2_TOWERS];
+const ALL_TIER2 = [
+  ...STEAM_TIER2_TOWERS,
+  ...LAVA_TIER2_TOWERS,
+  ...PLASMA_TIER2_TOWERS,
+  ...STORM_TIER2_TOWERS,
+  ...ICE_TIER2_TOWERS,
+  ...MIST_TIER2_TOWERS,
+  ...TEMPEST_TIER2_TOWERS,
+  ...DUST_TIER2_TOWERS,
+  ...CRYSTAL_TIER2_TOWERS,
+  ...THUNDER_TIER2_TOWERS,
+];
 
-const ALL_TIER3 = [...VOLCANO_TIER3_TOWERS];
+const ALL_TIER3 = [
+  ...VOLCANO_TIER3_TOWERS,
+  ...EARTHQUAKE_TIER3_TOWERS,
+  ...INFERNO_TIER3_TOWERS,
+  ...TSUNAMI_TIER3_TOWERS,
+  ...BLIZZARD_TIER3_TOWERS,
+  ...MOUNTAIN_TIER3_TOWERS,
+  ...HURRICANE_TIER3_TOWERS,
+  ...CYCLONE_TIER3_TOWERS,
+  ...SUPERCELL_TIER3_TOWERS,
+  ...DISCHARGE_TIER3_TOWERS,
+];
 
 const ALL_TOWERS = [...ALL_TIER1, ...ALL_TIER2, ...ALL_TIER3];
 

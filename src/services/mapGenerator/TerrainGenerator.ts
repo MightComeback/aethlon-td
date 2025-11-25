@@ -225,8 +225,21 @@ function growCluster(
   return cluster;
 }
 
+interface MountainPeak {
+  x: number;
+  y: number;
+  height: number;
+  radius: number;
+}
+
+interface MountainPass {
+  x: number;
+  y: number;
+  width: number;
+}
+
 /**
- * Generate heightmap using grid-sampled interpolation
+ * Generate heightmap using multi-layered noise with mountains and passes
  */
 export function generateHeightmap(
   rng: SeededRandom,
@@ -238,44 +251,44 @@ export function generateHeightmap(
     Array.from({ length: height }, () => 0)
   );
 
-  // 1. Create low-resolution sample grid (every 4 tiles)
-  const sampleInterval = 4;
-  const samplesX = Math.ceil(width / sampleInterval) + 1;
-  const samplesY = Math.ceil(height / sampleInterval) + 1;
+  // 1. Base terrain layer - gentle rolling hills
+  const baseLayer = generateBaseTerrainLayer(rng, width, height);
 
-  const samples: number[][] = Array.from({ length: samplesX }, () =>
-    Array.from({ length: samplesY }, () => rng.nextInt(0, 3))
-  );
+  // 2. Generate mountain peaks (2-6 peaks depending on map size)
+  const peaks = generateMountainPeaks(rng, width, height, tiles);
 
-  // 2. Bilinear interpolate to full resolution
+  // 3. Generate mountain passes (corridors between peaks)
+  const passes = generateMountainPasses(rng, width, height, peaks);
+
+  // 4. Combine layers
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
-      const sampleX = x / sampleInterval;
-      const sampleY = y / sampleInterval;
+      // Start with base terrain
+      let height = baseLayer[x]![y]!;
 
-      const x0 = Math.floor(sampleX);
-      const y0 = Math.floor(sampleY);
-      const x1 = Math.min(x0 + 1, samplesX - 1);
-      const y1 = Math.min(y0 + 1, samplesY - 1);
+      // Add mountain influences
+      let maxMountainInfluence = 0;
+      for (const peak of peaks) {
+        const influence = getMountainInfluence(x, y, peak);
+        maxMountainInfluence = Math.max(maxMountainInfluence, influence);
+      }
 
-      const fx = sampleX - x0;
-      const fy = sampleY - y0;
+      // Reduce mountain height in passes
+      let passReduction = 0;
+      for (const pass of passes) {
+        const passInfluence = getPassInfluence(x, y, pass);
+        passReduction = Math.max(passReduction, passInfluence);
+      }
 
-      // Bilinear interpolation
-      const v00 = samples[x0]![y0]!;
-      const v10 = samples[x1]![y0]!;
-      const v01 = samples[x0]![y1]!;
-      const v11 = samples[x1]![y1]!;
+      // Combine: base + mountains - passes
+      height = height + maxMountainInfluence * (1 - passReduction * 0.7);
 
-      const v0 = v00 * (1 - fx) + v10 * fx;
-      const v1 = v01 * (1 - fx) + v11 * fx;
-      const value = v0 * (1 - fy) + v1 * fy;
-
-      heightmap[x]![y] = Math.round(value);
+      // Clamp to reasonable range (0-10)
+      heightmap[x]![y] = Math.max(0, Math.min(10, Math.round(height)));
     }
   }
 
-  // 3. Apply tile-type modifiers
+  // 5. Apply tile-type modifiers
   for (let x = 0; x < width; x++) {
     for (let y = 0; y < height; y++) {
       const tileType = tiles[x]![y];
@@ -287,14 +300,219 @@ export function generateHeightmap(
         case TileType.Path:
         case TileType.Spawn:
         case TileType.Exit:
-          heightmap[x]![y] = Math.min(heightmap[x]![y]!, 1);
+          // Paths are relatively flat but can have slight elevation
+          heightmap[x]![y] = Math.min(heightmap[x]![y]!, 2);
           break;
         case TileType.Blocked:
-          heightmap[x]![y] = Math.max(heightmap[x]![y]!, 3);
+          // Blocked areas are elevated
+          heightmap[x]![y] = Math.max(heightmap[x]![y]!, 4);
           break;
       }
     }
   }
 
   return heightmap;
+}
+
+/**
+ * Generate base terrain layer using multi-octave noise
+ */
+function generateBaseTerrainLayer(
+  rng: SeededRandom,
+  width: number,
+  height: number
+): number[][] {
+  const layer: number[][] = Array.from({ length: width }, () =>
+    Array.from({ length: height }, () => 0)
+  );
+
+  // Create multiple octaves of noise for natural-looking terrain
+  const octaves = [
+    { interval: 8, amplitude: 1.5 },
+    { interval: 16, amplitude: 1.0 },
+    { interval: 32, amplitude: 0.5 },
+  ];
+
+  for (const octave of octaves) {
+    const samplesX = Math.ceil(width / octave.interval) + 1;
+    const samplesY = Math.ceil(height / octave.interval) + 1;
+
+    // Generate random samples for this octave
+    const samples: number[][] = Array.from({ length: samplesX }, () =>
+      Array.from({ length: samplesY }, () => rng.nextFloat(-1, 1))
+    );
+
+    // Interpolate and add to layer
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        const value = bilinearSample(samples, x, y, octave.interval, samplesX, samplesY);
+        layer[x]![y] = layer[x]![y]! + value * octave.amplitude;
+      }
+    }
+  }
+
+  return layer;
+}
+
+/**
+ * Bilinear sampling from a grid
+ */
+function bilinearSample(
+  samples: number[][],
+  x: number,
+  y: number,
+  interval: number,
+  samplesX: number,
+  samplesY: number
+): number {
+  const sampleX = x / interval;
+  const sampleY = y / interval;
+
+  const x0 = Math.floor(sampleX);
+  const y0 = Math.floor(sampleY);
+  const x1 = Math.min(x0 + 1, samplesX - 1);
+  const y1 = Math.min(y0 + 1, samplesY - 1);
+
+  const fx = sampleX - x0;
+  const fy = sampleY - y0;
+
+  const v00 = samples[x0]![y0]!;
+  const v10 = samples[x1]![y0]!;
+  const v01 = samples[x0]![y1]!;
+  const v11 = samples[x1]![y1]!;
+
+  const v0 = v00 * (1 - fx) + v10 * fx;
+  const v1 = v01 * (1 - fx) + v11 * fx;
+  return v0 * (1 - fy) + v1 * fy;
+}
+
+/**
+ * Generate mountain peaks across the map
+ */
+function generateMountainPeaks(
+  rng: SeededRandom,
+  width: number,
+  height: number,
+  tiles: TileType[][]
+): MountainPeak[] {
+  const peaks: MountainPeak[] = [];
+
+  // Number of peaks scales with map size
+  const area = width * height;
+  const peakDensity = 1 / 800; // 1 peak per 800 tiles
+  const numPeaks = Math.max(2, Math.min(12, Math.floor(area * peakDensity)));
+
+  // Generate peaks at semi-random locations, avoiding paths
+  for (let i = 0; i < numPeaks; i++) {
+    let attempts = 0;
+    let validPeak = false;
+    let px = 0, py = 0;
+
+    // Try to find a valid location (not on path)
+    while (!validPeak && attempts < 50) {
+      px = rng.nextInt(Math.floor(width * 0.1), Math.floor(width * 0.9));
+      py = rng.nextInt(Math.floor(height * 0.1), Math.floor(height * 0.9));
+
+      // Check if too close to existing peaks
+      let tooClose = false;
+      for (const peak of peaks) {
+        const dx = px - peak.x;
+        const dy = py - peak.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < Math.min(width, height) * 0.15) {
+          tooClose = true;
+          break;
+        }
+      }
+
+      if (!tooClose && tiles[px]![py] === TileType.Ground) {
+        validPeak = true;
+      }
+      attempts++;
+    }
+
+    if (validPeak) {
+      peaks.push({
+        x: px,
+        y: py,
+        height: rng.nextFloat(5, 8),
+        radius: rng.nextFloat(
+          Math.min(width, height) * 0.1,
+          Math.min(width, height) * 0.2
+        ),
+      });
+    }
+  }
+
+  return peaks;
+}
+
+/**
+ * Generate mountain passes between peaks
+ */
+function generateMountainPasses(
+  rng: SeededRandom,
+  width: number,
+  height: number,
+  peaks: MountainPeak[]
+): MountainPass[] {
+  const passes: MountainPass[] = [];
+
+  if (peaks.length < 2) return passes;
+
+  // Create passes between some peak pairs
+  const numPasses = Math.max(1, Math.floor(peaks.length * 0.6));
+
+  for (let i = 0; i < numPasses; i++) {
+    // Pick two random peaks
+    const peak1 = rng.pick(peaks);
+    const peak2 = rng.pick(peaks.filter(p => p !== peak1));
+
+    // Create a pass between them (midpoint)
+    const midX = Math.floor((peak1.x + peak2.x) / 2);
+    const midY = Math.floor((peak1.y + peak2.y) / 2);
+
+    passes.push({
+      x: midX,
+      y: midY,
+      width: rng.nextFloat(
+        Math.min(width, height) * 0.08,
+        Math.min(width, height) * 0.15
+      ),
+    });
+  }
+
+  return passes;
+}
+
+/**
+ * Calculate mountain influence at a point using smooth falloff
+ */
+function getMountainInfluence(x: number, y: number, peak: MountainPeak): number {
+  const dx = x - peak.x;
+  const dy = y - peak.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance > peak.radius) return 0;
+
+  // Smooth falloff using cosine interpolation
+  const t = distance / peak.radius;
+  const falloff = (Math.cos(t * Math.PI) + 1) / 2; // 1 at center, 0 at edge
+
+  return peak.height * falloff;
+}
+
+/**
+ * Calculate pass influence (reduces mountain height)
+ */
+function getPassInfluence(x: number, y: number, pass: MountainPass): number {
+  const dx = x - pass.x;
+  const dy = y - pass.y;
+  const distance = Math.sqrt(dx * dx + dy * dy);
+
+  if (distance > pass.width) return 0;
+
+  // Smooth reduction
+  const t = distance / pass.width;
+  return (Math.cos(t * Math.PI) + 1) / 2; // 1 at center, 0 at edge
 }

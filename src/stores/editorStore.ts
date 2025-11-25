@@ -17,13 +17,48 @@ export type EditorTool =
 
 // Object types that can be placed on the map
 export type PlaceableObjectType =
+  // Trees
   | "tree_pine"
   | "tree_oak"
+  | "tree_birch"
+  | "tree_willow"
+  | "tree_dead"
+  | "tree_pine_snow"
+  // Rocks & Terrain
   | "rock"
+  | "ice_crystal"
+  | "rock_volcanic"
+  // Plants
   | "bush"
   | "grass"
   | "flower"
-  | "tower_base";
+  | "sunflower"
+  | "cactus"
+  | "mushroom"
+  | "cattail"
+  // Structures
+  | "tower_base"
+  | "fence"
+  | "house"
+  | "well"
+  | "windmill"
+  | "hay_bale"
+  | "log"
+  | "stump"
+  | "cabin"
+  | "tent"
+  | "grave"
+  | "lantern"
+  | "snowman"
+  | "igloo"
+  // Decorations
+  | "pottery"
+  | "bones"
+  | "skull"
+  | "obelisk"
+  | "fire_pit"
+  | "snow_pile"
+  | "lily_pad";
 
 // Placed object instance
 export interface PlacedObject {

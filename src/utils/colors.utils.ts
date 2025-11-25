@@ -1,10 +1,33 @@
 import { TileType } from "@/types/map";
+import { BIOME_DEFINITIONS, DEFAULT_BIOME, type BiomeType } from "@/data/biomes/definitions";
 
 export function lightenColor(hex: string, amount: number): string {
   const num = parseInt(hex.slice(1), 16);
   const r = Math.min(255, Math.floor((num >> 16) + (255 - (num >> 16)) * amount));
   const g = Math.min(255, Math.floor(((num >> 8) & 0x00ff) + (255 - ((num >> 8) & 0x00ff)) * amount));
   const b = Math.min(255, Math.floor((num & 0x0000ff) + (255 - (num & 0x0000ff)) * amount));
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
+export function darkenColor(hex: string, amount: number): string {
+  const num = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.floor((num >> 16) * (1 - amount)));
+  const g = Math.max(0, Math.floor(((num >> 8) & 0x00ff) * (1 - amount)));
+  const b = Math.max(0, Math.floor((num & 0x0000ff) * (1 - amount)));
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
+export function interpolateColor(hex1: string, hex2: string, t: number): string {
+  const num1 = parseInt(hex1.slice(1), 16);
+  const num2 = parseInt(hex2.slice(1), 16);
+
+  const r1 = num1 >> 16, g1 = (num1 >> 8) & 0xff, b1 = num1 & 0xff;
+  const r2 = num2 >> 16, g2 = (num2 >> 8) & 0xff, b2 = num2 & 0xff;
+
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const b = Math.round(b1 + (b2 - b1) * t);
+
   return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
 }
 
@@ -38,25 +61,55 @@ export function floodFill(
   }
 }
 
-export function getTileColor(type: TileType, isHovered: boolean): string {
-  // Black and white color scheme
+// Current active biome (can be changed at runtime)
+let currentBiome: BiomeType = DEFAULT_BIOME;
+
+export function setCurrentBiome(biome: BiomeType): void {
+  currentBiome = biome;
+}
+
+export function getCurrentBiome(): BiomeType {
+  return currentBiome;
+}
+
+export function getTileColor(type: TileType, isHovered: boolean, biome?: BiomeType): string {
+  const activeBiome = biome || currentBiome;
+  const biomeColors = BIOME_DEFINITIONS[activeBiome].colors;
+
+  // Map tile types to biome colors
   const baseColors: Record<TileType, string> = {
-    [TileType.Ground]: "#333333",
-    [TileType.Path]: "#666666",
-    [TileType.Water]: "#1a1a1a",
-    [TileType.Blocked]: "#0a0a0a",
-    [TileType.Spawn]: "#ffffff",
-    [TileType.Exit]: "#888888",
+    [TileType.Ground]: biomeColors.ground,
+    [TileType.Path]: biomeColors.path,
+    [TileType.Water]: biomeColors.water,
+    [TileType.Blocked]: biomeColors.blocked,
+    [TileType.Spawn]: "#ffffff", // Always white for visibility
+    [TileType.Exit]: "#ff4444", // Always red for visibility
   };
 
-  const color = baseColors[type] || "#333333";
+  const color = baseColors[type] || biomeColors.ground;
 
   if (isHovered) {
-    // Lighten the color when hovered
     return lightenColor(color, 0.3);
   }
 
   return color;
+}
+
+/**
+ * Get all tile colors for current biome
+ */
+export function getBiomeTileColors(biome?: BiomeType): Record<TileType, string> {
+  const activeBiome = biome || currentBiome;
+  const biomeColors = BIOME_DEFINITIONS[activeBiome].colors;
+
+  return {
+    [TileType.Ground]: biomeColors.ground,
+    [TileType.Path]: biomeColors.path,
+    [TileType.Water]: biomeColors.water,
+    [TileType.Blocked]: biomeColors.blocked,
+    [TileType.Spawn]: "#ffffff",
+    [TileType.Exit]: "#ff4444",
+  };
 }
 
 

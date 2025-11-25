@@ -23,7 +23,7 @@
 [] Seasons affect weather
 [] Preview and Configure Time of year in Map Editor
 
-[] Biomes concept is defined
+[x] Biomes concept is defined
 
 [] Map generator generates multiple spawn/exit points
 [] Maps spawn/exit points can be bound to waves
@@ -34,12 +34,12 @@
 [] Path tiles can be defined on top a of river, but replaced with bridge tiles
 [] Path tiles can be deifned on top of a mountain (i.e. adjacent tiles heightmap Y > 4), but replaced with tunnel tiles
 
-[] Game is Colored
+[x] Game is Colored
 [x] Textures are congruent
 [] Textures are randomized
 [x] Tiles blend together
 
-[] Meshes blend together
+[x] Meshes blend together
 
 [] Map editor wave configuration
 [] Map editor preset wave configuraiton
@@ -94,7 +94,7 @@
 [] Online Sync engine
 [] Friend List
 
-
+[] Animation system
 
 [] Game Loop is defined
 

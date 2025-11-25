@@ -5,8 +5,22 @@
 
 import * as THREE from "three";
 import { useEffect, useState } from "react";
-import { TILE_COLORS, ATLAS_SIZE, TILE_PIXEL_SIZE } from "@/data/textures/tileAtlasConfig";
+import { ATLAS_SIZE, TILE_PIXEL_SIZE } from "@/data/textures/tileAtlasConfig";
 import { TileType } from "@/types/map";
+import { BIOME_DEFINITIONS, DEFAULT_BIOME, type BiomeType } from "@/data/biomes/definitions";
+
+// Get tile colors from current biome
+function getTileColors(biome: BiomeType = DEFAULT_BIOME): Record<TileType, string> {
+  const colors = BIOME_DEFINITIONS[biome].colors;
+  return {
+    [TileType.Ground]: colors.ground,
+    [TileType.Path]: colors.path,
+    [TileType.Water]: colors.water,
+    [TileType.Blocked]: colors.blocked,
+    [TileType.Spawn]: "#ffffff",
+    [TileType.Exit]: "#ff4444",
+  };
+}
 
 /**
  * Load the tile atlas texture from file
@@ -69,7 +83,7 @@ function configureTextureForPixelArt(texture: THREE.Texture): void {
  * Generate a tile atlas texture procedurally
  * Creates base tiles and transition variants with marching squares
  */
-export function generateTileAtlas(): THREE.Texture {
+export function generateTileAtlas(biome: BiomeType = DEFAULT_BIOME): THREE.Texture {
   const canvas = document.createElement("canvas");
   canvas.width = ATLAS_SIZE;
   canvas.height = ATLAS_SIZE;
@@ -79,6 +93,8 @@ export function generateTileAtlas(): THREE.Texture {
   // Fill with black background
   ctx.fillStyle = "#000000";
   ctx.fillRect(0, 0, ATLAS_SIZE, ATLAS_SIZE);
+
+  const TILE_COLORS = getTileColors(biome);
 
   const tileTypes: TileType[] = [
     TileType.Ground,
