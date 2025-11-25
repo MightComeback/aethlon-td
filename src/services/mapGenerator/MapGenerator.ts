@@ -64,8 +64,8 @@ export function generateMap(config: GeneratorConfig = {}): GeneratedMap {
   const height = config.height || DEFAULT_HEIGHT;
 
   // Validate dimensions
-  const clampedWidth = Math.max(10, Math.min(50, width));
-  const clampedHeight = Math.max(8, Math.min(30, height));
+  const clampedWidth = Math.max(10, Math.min(100, width));
+  const clampedHeight = Math.max(8, Math.min(60, height));
 
   // Initialize RNG with seed
   const rng = new SeededRandom(seed);

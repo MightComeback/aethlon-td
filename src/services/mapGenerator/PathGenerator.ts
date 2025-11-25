@@ -70,8 +70,9 @@ export function generatePath(
     }
   }
 
-  // 5. Convert to waypoints (ordered sequence for enemy movement)
-  const waypoints: Waypoint[] = pathTiles.map((p, i) => ({
+  // 5. Convert control points to waypoints (key points for enemy movement)
+  // Only use spawn, control points, and exit - not every path tile
+  const waypoints: Waypoint[] = controlPoints.map((p, i) => ({
     x: p.x,
     y: p.y,
     order: i,

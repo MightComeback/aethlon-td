@@ -11,6 +11,7 @@ import { MapBrowser } from "./MapBrowser";
 import { GenerateMapDialog } from "./GenerateMapDialog";
 import { useEditorStore } from "@/stores/editorStore";
 import { MapStorage } from "@/services/storage/MapStorage";
+import { FrameLimiter } from "@/hooks/useFrameLimiter";
 import type { MapMetadata, MapData } from "@/types/map";
 import {
   IconBack,
@@ -162,7 +163,9 @@ export function MapEditor() {
         className="absolute inset-0"
         gl={{ antialias: false, alpha: false }}
         dpr={1}
+        frameloop="demand"
       >
+        <FrameLimiter />
         <color attach="background" args={["#0a0a0a"]} />
         <OrthographicCamera
           makeDefault

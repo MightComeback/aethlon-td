@@ -5,6 +5,7 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { FPSCounter } from "@/components/ui/FPSCounter";
 import "../styles/globals.css";
 
 export const Route = createRootRoute({
@@ -26,6 +27,7 @@ function RootComponent() {
         <HeadContent />
       </head>
       <body>
+        <FPSCounter />
         <div id="root" className="h-full w-full">
           <Outlet />
         </div>

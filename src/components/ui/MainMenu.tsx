@@ -20,9 +20,7 @@ export function MainMenu() {
         <MenuButton to="/collection" disabled>
           Collection
         </MenuButton>
-        <MenuButton to="/settings" disabled>
-          Settings
-        </MenuButton>
+        <MenuButton to="/settings">Settings</MenuButton>
       </nav>
 
       {/* Version */}

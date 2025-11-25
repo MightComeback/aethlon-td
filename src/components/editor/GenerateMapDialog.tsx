@@ -5,10 +5,10 @@ import type { MapData } from "@/types/map";
 
 // Map size presets
 const SIZE_PRESETS = [
-  { label: "Small", width: 15, height: 10 },
-  { label: "Medium", width: 20, height: 15 },
-  { label: "Large", width: 30, height: 20 },
-  { label: "Wide", width: 40, height: 15 },
+  { label: "Small", width: 20, height: 15 },
+  { label: "Medium", width: 30, height: 20 },
+  { label: "Large", width: 50, height: 35 },
+  { label: "Huge", width: 80, height: 50 },
 ] as const;
 
 interface GenerateMapDialogProps {
