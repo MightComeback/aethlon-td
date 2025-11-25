@@ -9,7 +9,7 @@ export function MainMenu() {
           AETHLON
         </h1>
         <p className="mt-4 text-foreground-muted text-sm">
-          A 2.5D Tower Defense Experience
+          A 2.5D Tower Defense
         </p>
       </div>
 
