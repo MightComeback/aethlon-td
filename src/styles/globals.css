@@ -3,29 +3,29 @@
 
 /* Custom theme using Tailwind v4 CSS variables */
 @theme {
-  /* Colors - Pixel art friendly palette */
-  --color-background: #1a1a2e;
-  --color-background-secondary: #16213e;
-  --color-background-tertiary: #0f3460;
+  /* Colors - Black and white minimal palette */
+  --color-background: #0a0a0a;
+  --color-background-secondary: #141414;
+  --color-background-tertiary: #1f1f1f;
 
-  --color-foreground: #e8e8e8;
-  --color-foreground-muted: #a0a0a0;
+  --color-foreground: #ffffff;
+  --color-foreground-muted: #888888;
 
-  --color-primary: #e94560;
-  --color-primary-hover: #ff6b6b;
-  --color-primary-muted: #c73e54;
+  --color-primary: #ffffff;
+  --color-primary-hover: #e0e0e0;
+  --color-primary-muted: #cccccc;
 
-  --color-secondary: #533483;
-  --color-secondary-hover: #6b44a8;
+  --color-secondary: #333333;
+  --color-secondary-hover: #444444;
 
-  --color-accent-gold: #ffd700;
-  --color-accent-green: #4ecca3;
-  --color-accent-blue: #00d9ff;
-  --color-accent-purple: #9b59b6;
+  --color-accent-gold: #ffffff;
+  --color-accent-green: #ffffff;
+  --color-accent-blue: #ffffff;
+  --color-accent-purple: #888888;
 
-  --color-danger: #e74c3c;
-  --color-warning: #f39c12;
-  --color-success: #27ae60;
+  --color-danger: #ff4444;
+  --color-warning: #ffaa00;
+  --color-success: #ffffff;
 
   /* Fonts */
   --font-pixel: "Press Start 2P", monospace;
@@ -35,9 +35,9 @@
   --text-2xs: 0.625rem;
 
   /* Shadows */
-  --shadow-pixel: 4px 4px 0px 0px rgba(0, 0, 0, 0.3);
-  --shadow-pixel-sm: 2px 2px 0px 0px rgba(0, 0, 0, 0.3);
-  --shadow-glow: 0 0 20px rgba(233, 69, 96, 0.5);
+  --shadow-pixel: 4px 4px 0px 0px rgba(255, 255, 255, 0.1);
+  --shadow-pixel-sm: 2px 2px 0px 0px rgba(255, 255, 255, 0.1);
+  --shadow-glow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 /* Base styles */
@@ -114,11 +114,10 @@ body {
 .pixel-panel {
   background-color: var(--color-background-secondary);
   padding: 1rem;
-  border: 2px solid var(--color-foreground-muted);
+  border: 1px solid var(--color-foreground-muted);
   box-shadow:
-    inset -2px -2px 0 0 rgba(0, 0, 0, 0.5),
-    inset 2px 2px 0 0 rgba(255, 255, 255, 0.05),
-    4px 4px 0 0 rgba(0, 0, 0, 0.3);
+    inset -1px -1px 0 0 rgba(0, 0, 0, 0.5),
+    inset 1px 1px 0 0 rgba(255, 255, 255, 0.05);
 }
 
 /* Utility classes */
@@ -160,3 +159,68 @@ body {
 
 .border-foreground { border-color: var(--color-foreground); }
 .border-foreground-muted { border-color: var(--color-foreground-muted); }
+.border-border { border-color: var(--color-foreground-muted); }
+
+/* Additional text sizes */
+.text-3xs {
+  font-size: 0.5rem;
+  line-height: 0.75rem;
+}
+
+/* Icon button style */
+.pixel-button-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  background-color: var(--color-background-tertiary);
+  color: var(--color-foreground-muted);
+  transition: all 0.1s;
+}
+
+.pixel-button-icon:hover {
+  background-color: var(--color-primary);
+  color: var(--color-foreground);
+}
+
+.pixel-button-icon:active {
+  transform: scale(0.95);
+}
+
+/* Virtual cursor styles */
+.virtual-cursor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+}
+
+.virtual-cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-foreground);
+  border: 1px solid var(--color-background);
+}
+
+.virtual-cursor-preview {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  padding: 4px 8px;
+  background-color: var(--color-background-secondary);
+  border: 1px solid var(--color-foreground-muted);
+  font-family: var(--font-pixel);
+  font-size: 0.5rem;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+/* Hide system cursor when virtual cursor is active */
+.cursor-hidden {
+  cursor: none !important;
+}
+
+.cursor-hidden * {
+  cursor: none !important;
+}

@@ -91,6 +91,7 @@ Game-changing abilities with strategic importance.
 ------------------
 Requirements:
 - Two towers of the same type
+- Two towers of different types (graph merging system)
 - Both at maximum upgrade level
 - Adjacent placement on the map
 
@@ -126,6 +127,7 @@ SPECIAL:
 - Speed: Movement rate along path
 - Armor: Reduces physical damage
 - Magic Resistance: Reduces magical damage
+- Dodge Rate: Chance to avoid taking damage
 - Bounty: Currency awarded on kill
 - Score: Points awarded on kill
 

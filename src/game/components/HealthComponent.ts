@@ -11,6 +11,8 @@ export class HealthComponent extends Component {
   public armor: number;
   public magicResistance: number;
   public invulnerable: boolean;
+  public dodgeRate: number;
+
 
   constructor(
     maxHealth: number,
@@ -23,6 +25,7 @@ export class HealthComponent extends Component {
     this.armor = armor;
     this.magicResistance = magicResistance;
     this.invulnerable = false;
+    this.dodgeRate = 0;
   }
 
   /**
