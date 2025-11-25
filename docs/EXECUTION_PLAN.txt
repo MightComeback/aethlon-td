@@ -1,0 +1,523 @@
+================================================================================
+                                 AETHLON
+                            Execution Plan v1.0
+================================================================================
+
+--------------------------------------------------------------------------------
+PHASE 0: PROJECT SETUP
+--------------------------------------------------------------------------------
+
+0.1 DEVELOPMENT ENVIRONMENT
+---------------------------
+[x] Initialize TanStack Start project with React
+[ ] Configure TypeScript with strict mode
+[ ] Set up ESLint and Prettier
+[ ] Configure Vite build settings
+[ ] Set up path aliases (@/components, @/game, etc.)
+
+0.2 PROJECT STRUCTURE
+---------------------
+/src
+  /app                    # TanStack Start app configuration
+  /routes                 # File-based routing
+  /components             # React UI components
+    /ui                   # Base UI components (buttons, modals, etc.)
+    /game                 # Game-specific components
+    /editor               # Map editor components
+  /game                   # Game engine
+    /core                 # Core game logic
+    /entities             # Entity definitions
+    /systems              # ECS systems
+    /components           # ECS components (not React)
+    /rendering            # Canvas/WebGL rendering
+    /assets               # Asset loading/management
+  /services               # Application services
+    /database             # SQLite/sql.js integration
+    /storage              # Save/load functionality
+    /api                  # Future API layer
+  /stores                 # State management
+  /hooks                  # Custom React hooks
+  /types                  # TypeScript type definitions
+  /utils                  # Utility functions
+  /constants              # Game constants and configuration
+/public
+  /assets                 # Static assets
+    /sprites              # Sprite sheets
+    /tiles                # Tile graphics
+    /ui                   # UI graphics
+/docs                     # Documentation
+
+0.3 DEPENDENCIES
+----------------
+Runtime:
+- bun                    # JavaScript runtime and package manager
+
+Core:
+- @tanstack/start        # Full-stack React framework
+- @tanstack/react-router # Type-safe routing
+- react, react-dom       # UI framework
+- vinxi                  # Server framework (TanStack Start dep)
+
+Game Engine:
+- three                  # 3D/2.5D WebGL rendering
+- @react-three/fiber     # React renderer for Three.js
+- @react-three/drei      # Useful helpers for R3F
+- howler                 # Audio (future)
+
+Database:
+- sql.js                 # SQLite compiled to WebAssembly
+- idb                    # IndexedDB wrapper for persistence
+
+State Management:
+- zustand                # Lightweight state management
+- immer                  # Immutable state updates
+
+UI:
+- tailwindcss            # Utility-first CSS
+- @radix-ui/react-*      # Accessible UI primitives
+- class-variance-authority # Component variants
+
+Development:
+- typescript             # Type safety
+- vitest                 # Testing
+- playwright             # E2E testing
+
+--------------------------------------------------------------------------------
+PHASE 1: CORE ENGINE
+--------------------------------------------------------------------------------
+
+1.1 GAME LOOP
+-------------
+[ ] Implement main game loop with fixed timestep
+[ ] Create update/render cycle
+[ ] Add pause/resume functionality
+[ ] Implement speed controls (1x, 2x, 3x)
+[ ] Set up FPS monitoring and limiting
+
+1.2 ENTITY-COMPONENT-SYSTEM (ECS)
+---------------------------------
+[ ] Define Entity base class/interface
+[ ] Create Component interface
+[ ] Implement System base class
+[ ] Build EntityManager for entity lifecycle
+[ ] Create SystemManager for system orchestration
+[ ] Implement component queries
+
+1.3 EVENT SYSTEM
+----------------
+[ ] Create EventEmitter/EventBus
+[ ] Define game event types
+[ ] Implement event queuing
+[ ] Add event filtering/priorities
+[ ] Create debug event logger
+
+1.4 RENDERING SYSTEM (Three.js)
+-------------------------------
+[ ] Set up React Three Fiber scene
+[ ] Configure orthographic camera for 2.5D view
+[ ] Implement isometric projection (45-degree rotation)
+[ ] Create sprite/plane-based entity rendering
+[ ] Build animation system with sprite sheets
+[ ] Implement camera controls (pan, zoom)
+[ ] Add layered rendering (ground, entities, effects, UI)
+[ ] Create particle system for effects
+[ ] Set up post-processing for pixel-art aesthetic
+
+1.5 INPUT HANDLING
+------------------
+[ ] Mouse/touch input abstraction
+[ ] Click detection on isometric grid
+[ ] Drag operations (camera pan, tower placement)
+[ ] Keyboard shortcuts
+[ ] Mobile gesture support
+
+--------------------------------------------------------------------------------
+PHASE 2: GAME MECHANICS
+--------------------------------------------------------------------------------
+
+2.1 MAP SYSTEM
+--------------
+[ ] Define map data structure
+[ ] Create tile types and properties
+[ ] Implement grid-based map class
+[ ] Add pathfinding (A* or flow fields)
+[ ] Create map renderer
+[ ] Implement tile selection/highlighting
+
+2.2 TOWER SYSTEM
+----------------
+[ ] Define Tower interface
+[ ] Create base Tower class
+[ ] Implement tower stats and modifiers
+[ ] Build targeting system (nearest, strongest, etc.)
+[ ] Create attack system
+[ ] Implement projectile system
+[ ] Add tower range visualization
+
+Tower Types (incremental):
+[ ] Arrow Tower
+[ ] Cannon Tower
+[ ] Magic Tower
+[ ] Ice Tower
+[ ] Lightning Tower
+
+2.3 UPGRADE SYSTEM
+------------------
+[ ] Define upgrade tree structure
+[ ] Create upgrade data definitions
+[ ] Implement upgrade application
+[ ] Add visual upgrade indicators
+[ ] Build upgrade UI
+
+2.4 MERGE SYSTEM
+----------------
+[ ] Define merge rules and recipes
+[ ] Implement adjacency detection
+[ ] Create merge validation
+[ ] Build merge animation
+[ ] Add merged tower definitions
+
+2.5 ENEMY SYSTEM
+----------------
+[ ] Define Enemy interface
+[ ] Create base Enemy class
+[ ] Implement path following
+[ ] Add health and damage system
+[ ] Create death/reward system
+[ ] Implement special abilities
+
+Enemy Types (incremental):
+[ ] Grunt
+[ ] Runner
+[ ] Tank
+[ ] Swarm
+[ ] Healer
+
+2.6 WAVE SYSTEM
+---------------
+[ ] Define wave data structure
+[ ] Create wave spawner
+[ ] Implement spawn timing
+[ ] Add wave progression
+[ ] Create wave completion detection
+[ ] Build wave preview system
+
+2.7 GAME STATE
+--------------
+[ ] Create game state machine
+[ ] Implement state transitions
+[ ] Add game session data (lives, currency, score)
+[ ] Create win/lose conditions
+[ ] Implement game reset
+
+--------------------------------------------------------------------------------
+PHASE 3: DATA PERSISTENCE
+--------------------------------------------------------------------------------
+
+3.1 SQL.JS SETUP
+----------------
+[ ] Initialize sql.js with WASM
+[ ] Create database wrapper service
+[ ] Implement IndexedDB persistence
+[ ] Add auto-save functionality
+[ ] Create migration system
+
+3.2 DATABASE SCHEMA
+-------------------
+Tables:
+[ ] player_profile (id, name, xp, level, created_at)
+[ ] game_progress (id, map_id, stars, high_score, completed)
+[ ] maps (id, name, data, is_custom, created_at)
+[ ] tower_unlocks (id, tower_type, unlocked_at)
+[ ] achievements (id, achievement_id, unlocked_at)
+[ ] settings (key, value)
+[ ] save_states (id, map_id, state_data, created_at)
+
+3.3 DATA SERVICES
+-----------------
+[ ] PlayerService (profile CRUD)
+[ ] ProgressService (game progress)
+[ ] MapService (map storage/retrieval)
+[ ] SaveService (game state save/load)
+[ ] SettingsService (preferences)
+
+--------------------------------------------------------------------------------
+PHASE 4: USER INTERFACE
+--------------------------------------------------------------------------------
+
+4.1 DESIGN SYSTEM
+-----------------
+[ ] Define color palette (pixel art friendly)
+[ ] Create typography scale
+[ ] Design spacing system
+[ ] Build button variants
+[ ] Create modal system
+[ ] Design notification/toast system
+
+4.2 MAIN MENU
+-------------
+[ ] Layout and navigation
+[ ] Play button and mode selection
+[ ] Map editor access
+[ ] Profile/collection view
+[ ] Settings panel
+
+4.3 GAME HUD
+------------
+[ ] Wave counter display
+[ ] Lives indicator
+[ ] Currency display
+[ ] Tower selection panel
+[ ] Selected tower info panel
+[ ] Speed controls
+[ ] Pause menu
+
+4.4 TOWER INTERACTION UI
+------------------------
+[ ] Tower placement preview
+[ ] Radial action menu
+[ ] Upgrade tree display
+[ ] Merge indicator
+[ ] Range visualization
+
+4.5 MAP SELECT
+--------------
+[ ] World/campaign selector
+[ ] Map grid/list view
+[ ] Map preview
+[ ] Difficulty indicator
+[ ] Progress display
+
+--------------------------------------------------------------------------------
+PHASE 5: MAP EDITOR
+--------------------------------------------------------------------------------
+
+5.1 EDITOR CORE
+---------------
+[ ] Editor state management
+[ ] Tool system (paint, erase, select)
+[ ] Tile palette
+[ ] Grid rendering with coordinates
+[ ] Undo/redo system
+
+5.2 TILE EDITING
+----------------
+[ ] Tile type selection
+[ ] Brush sizes
+[ ] Fill tool
+[ ] Copy/paste regions
+
+5.3 PATH EDITING
+----------------
+[ ] Path drawing tool
+[ ] Waypoint placement
+[ ] Spawn/exit point placement
+[ ] Path validation
+[ ] Path preview
+
+5.4 WAVE EDITING
+----------------
+[ ] Wave list management
+[ ] Enemy type selection
+[ ] Spawn timing configuration
+[ ] Wave preview
+[ ] Difficulty estimation
+
+5.5 MAP MANAGEMENT
+------------------
+[ ] Save map to database
+[ ] Load existing maps
+[ ] Map metadata (name, description)
+[ ] Export/import (JSON)
+[ ] Playtest mode
+
+--------------------------------------------------------------------------------
+PHASE 6: CAMPAIGN CONTENT
+--------------------------------------------------------------------------------
+
+6.1 WORLD 1: GRASSLANDS
+-----------------------
+[ ] Design 10 maps
+[ ] Create map assets
+[ ] Balance wave difficulties
+[ ] Add tutorial elements
+
+6.2 ADDITIONAL WORLDS
+---------------------
+[ ] World 2: Desert
+[ ] World 3: Frozen Tundra
+[ ] World 4: Volcanic
+[ ] World 5: Shadow Realm
+
+6.3 BOSS DESIGNS
+----------------
+[ ] World 1 Boss
+[ ] World 2 Boss
+[ ] World 3 Boss
+[ ] World 4 Boss
+[ ] World 5 Boss
+
+--------------------------------------------------------------------------------
+PHASE 7: POLISH
+--------------------------------------------------------------------------------
+
+7.1 VISUAL EFFECTS
+------------------
+[ ] Tower attack effects
+[ ] Enemy death effects
+[ ] Upgrade/merge effects
+[ ] Environmental particles
+[ ] Screen shake
+
+7.2 ANIMATIONS
+--------------
+[ ] Tower idle/attack animations
+[ ] Enemy walk/death animations
+[ ] UI transitions
+[ ] Victory/defeat sequences
+
+7.3 AUDIO (Future)
+------------------
+[ ] Sound effect integration
+[ ] Music system
+[ ] Audio settings
+
+7.4 PERFORMANCE
+---------------
+[ ] Object pooling
+[ ] Render culling
+[ ] Asset preloading
+[ ] Memory management
+[ ] Mobile optimization
+
+--------------------------------------------------------------------------------
+PHASE 8: ONLINE FEATURES (Future)
+--------------------------------------------------------------------------------
+
+8.1 BACKEND SETUP
+-----------------
+[ ] API design
+[ ] Authentication system
+[ ] Database (PostgreSQL/Supabase)
+[ ] WebSocket server
+
+8.2 USER ACCOUNTS
+-----------------
+[ ] Registration/login
+[ ] Profile sync
+[ ] Cloud saves
+
+8.3 SOCIAL FEATURES
+-------------------
+[ ] Friends system
+[ ] Map sharing
+[ ] Leaderboards
+
+8.4 MULTIPLAYER
+---------------
+[ ] Game state synchronization
+[ ] Co-op mode
+[ ] Versus mode
+
+--------------------------------------------------------------------------------
+IMPLEMENTATION ORDER (MVP)
+--------------------------------------------------------------------------------
+
+Sprint 1: Foundation
+--------------------
+1. Project setup with TanStack Start
+2. Basic canvas rendering
+3. Isometric grid display
+4. Game loop implementation
+
+Sprint 2: Core Mechanics
+------------------------
+1. Entity-Component-System implementation
+2. Basic tower placement
+3. Basic enemy spawning and movement
+4. Pathfinding
+
+Sprint 3: Combat
+----------------
+1. Tower targeting and attacking
+2. Projectile system
+3. Enemy health and death
+4. Wave spawning
+
+Sprint 4: Progression
+---------------------
+1. Currency and economy
+2. Tower upgrades
+3. Win/lose conditions
+4. Game state management
+
+Sprint 5: Persistence
+---------------------
+1. sql.js integration
+2. Save/load system
+3. Player progress tracking
+
+Sprint 6: UI/UX
+---------------
+1. Main menu
+2. Game HUD
+3. Tower interaction UI
+4. Map selection
+
+Sprint 7: Map Editor
+--------------------
+1. Basic editor functionality
+2. Wave designer
+3. Save/load maps
+
+Sprint 8: Content
+-----------------
+1. All tower types
+2. All enemy types
+3. Campaign maps
+
+--------------------------------------------------------------------------------
+TESTING STRATEGY
+--------------------------------------------------------------------------------
+
+Unit Tests:
+- Game logic (damage calculations, pathfinding)
+- State management
+- Data services
+
+Integration Tests:
+- Database operations
+- Save/load functionality
+- Game state transitions
+
+E2E Tests:
+- Complete game flow
+- Map editor workflow
+- UI interactions
+
+Performance Tests:
+- Stress test with many entities
+- Memory leak detection
+- Frame rate monitoring
+
+--------------------------------------------------------------------------------
+ARCHITECTURE PRINCIPLES
+--------------------------------------------------------------------------------
+
+SOLID:
+- Single Responsibility: Each class/module has one job
+- Open/Closed: Extend via composition, not modification
+- Liskov Substitution: Subtypes must be substitutable
+- Interface Segregation: Small, focused interfaces
+- Dependency Inversion: Depend on abstractions
+
+Additional:
+- Composition over inheritance
+- Data-driven design for game content
+- Event-driven for loose coupling
+- Immutable state where practical
+- Plugin architecture for extensibility
+
+================================================================================
+                              END OF DOCUMENT
+================================================================================

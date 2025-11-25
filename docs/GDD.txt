@@ -1,0 +1,425 @@
+================================================================================
+                                 AETHLON
+                         Game Design Document v1.0
+================================================================================
+
+--------------------------------------------------------------------------------
+1. GAME OVERVIEW
+--------------------------------------------------------------------------------
+
+Title: Aethlon
+Genre: Tower Defense (2.5D)
+Platform: Web Browser (Desktop/Mobile)
+Engine: React + TanStack Start + Canvas/WebGL
+Art Style: Modern Pixel Art (16-32px base with smooth scaling)
+
+High Concept:
+A strategic tower defense game featuring deep tower customization through
+upgrades and merging mechanics, combined with community-driven map creation
+and competitive online features.
+
+--------------------------------------------------------------------------------
+2. CORE GAMEPLAY
+--------------------------------------------------------------------------------
+
+2.1 GAME LOOP
+-------------
+1. Player selects a map from available campaigns or community maps
+2. Player places towers on designated build spots
+3. Waves of enemies spawn and follow predefined paths
+4. Towers automatically attack enemies in range
+5. Player earns currency from defeated enemies
+6. Player spends currency on new towers, upgrades, or merges
+7. Game ends when all waves are cleared (win) or lives reach zero (lose)
+
+2.2 VICTORY/DEFEAT CONDITIONS
+-----------------------------
+Victory: Complete all waves with at least 1 life remaining
+Defeat: Lives reach zero (enemies reach the exit point)
+
+2.3 SCORING SYSTEM
+------------------
+- Base points per enemy killed (varies by enemy type)
+- Bonus multiplier for remaining lives
+- Speed bonus for fast completion
+- Efficiency bonus for minimal tower usage
+- Perfect wave bonus (no leaks)
+
+--------------------------------------------------------------------------------
+3. TOWERS
+--------------------------------------------------------------------------------
+
+3.1 TOWER TYPES
+---------------
+Each tower has a base form and can be upgraded or merged.
+
+BASIC TOWERS (Tier 1):
+- Arrow Tower: Fast attack, low damage, medium range
+- Cannon Tower: Slow attack, high damage, splash, short range
+- Magic Tower: Medium attack, medium damage, ignores armor, long range
+- Ice Tower: Slow attack, slows enemies, medium range
+- Lightning Tower: Chain damage to multiple targets
+
+ADVANCED TOWERS (Tier 2 - via upgrade):
+Each basic tower has 2 upgrade paths leading to specialized variants.
+
+ELITE TOWERS (Tier 3 - via merging):
+Created by combining two max-level towers of the same type.
+Unique abilities and significantly enhanced stats.
+
+LEGENDARY TOWERS (Tier 4 - via special merging):
+Created by combining specific elite tower combinations.
+Game-changing abilities with strategic importance.
+
+3.2 TOWER STATS
+---------------
+- Damage: Base damage per attack
+- Attack Speed: Attacks per second
+- Range: Radius of attack coverage
+- Special Effects: Slow, burn, chain, pierce, etc.
+- Cost: Currency required to build
+- Upgrade Cost: Currency for each upgrade level
+
+3.3 UPGRADE SYSTEM
+------------------
+- Each tower has 3 upgrade levels per path
+- Two distinct upgrade paths per tower (branch at level 2)
+- Upgrades enhance specific aspects (damage vs utility)
+- Visual changes accompany each upgrade level
+
+3.4 MERGING SYSTEM
+------------------
+Requirements:
+- Two towers of the same type
+- Both at maximum upgrade level
+- Adjacent placement on the map
+
+Process:
+1. Select first tower
+2. Select second tower (merge option appears if valid)
+3. Confirm merge
+4. New tower spawns at first tower's location
+5. Second tower's spot becomes empty
+
+--------------------------------------------------------------------------------
+4. ENEMIES
+--------------------------------------------------------------------------------
+
+4.1 ENEMY TYPES
+---------------
+STANDARD:
+- Grunt: Basic enemy, balanced stats
+- Runner: Fast movement, low health
+- Tank: Slow movement, high health, high armor
+- Swarm: Very low health, spawns in large groups
+- Healer: Heals nearby enemies
+
+SPECIAL:
+- Shield Bearer: Frontal damage reduction
+- Phaser: Periodically becomes invulnerable
+- Splitter: Splits into smaller units on death
+- Boss: Large health pool, unique abilities per boss
+
+4.2 ENEMY STATS
+---------------
+- Health: Total hit points
+- Speed: Movement rate along path
+- Armor: Reduces physical damage
+- Magic Resistance: Reduces magical damage
+- Bounty: Currency awarded on kill
+- Score: Points awarded on kill
+
+4.3 WAVE SYSTEM
+---------------
+- Maps define wave compositions
+- Progressive difficulty scaling
+- Boss waves at intervals (every 5-10 waves)
+- Bonus waves for extra rewards
+- Endless mode after campaign completion
+
+--------------------------------------------------------------------------------
+5. MAPS
+--------------------------------------------------------------------------------
+
+5.1 MAP STRUCTURE
+-----------------
+- Grid-based layout (configurable size, default 20x15)
+- Isometric 2.5D perspective
+- Tile types: Path, Buildable, Blocked, Decoration
+- Entry and exit points for enemies
+- Multiple path support for complex maps
+
+5.2 MAP COMPONENTS
+------------------
+TILES:
+- Ground (buildable)
+- Path (enemy route)
+- Water (blocked, decoration)
+- Rocks (blocked)
+- Trees (blocked, decoration)
+- Special tiles (buffs/debuffs)
+
+OBJECTS:
+- Spawn points (enemy entry)
+- Exit points (player base)
+- Waypoints (path definition)
+- Environmental hazards
+- Decorative elements
+
+5.3 CAMPAIGN MAPS
+-----------------
+- 5 Worlds with distinct themes
+- 10 Maps per world (50 total)
+- Progressive difficulty
+- Unique mechanics per world
+- Boss levels at world end
+
+WORLD THEMES:
+1. Grasslands (tutorial/basic)
+2. Desert (speed-focused enemies)
+3. Frozen Tundra (environmental slows)
+4. Volcanic (damage tiles)
+5. Shadow Realm (visibility mechanics)
+
+--------------------------------------------------------------------------------
+6. MAP EDITOR
+--------------------------------------------------------------------------------
+
+6.1 EDITOR FEATURES
+-------------------
+- Grid-based tile placement
+- Tile palette with categories
+- Path drawing tool
+- Enemy wave designer
+- Playtest mode
+- Save/Load functionality
+- Export/Import for sharing
+
+6.2 WAVE DESIGNER
+-----------------
+- Enemy type selection
+- Spawn timing configuration
+- Wave composition builder
+- Difficulty calculator
+- Preview mode
+
+6.3 VALIDATION
+--------------
+- Path connectivity check
+- Minimum path length
+- Buildable spot requirements
+- Wave difficulty balance suggestions
+
+--------------------------------------------------------------------------------
+7. PROGRESSION SYSTEM
+--------------------------------------------------------------------------------
+
+7.1 PLAYER PROFILE
+------------------
+- Experience points (XP)
+- Player level
+- Unlocked towers
+- Unlocked maps
+- Achievement progress
+- Statistics tracking
+
+7.2 UNLOCKS
+-----------
+- New tower types (level-gated)
+- Tower skins (achievement-based)
+- Map themes (campaign progress)
+- Editor features (level-gated)
+- Game modes (campaign progress)
+
+7.3 ACHIEVEMENTS
+----------------
+Categories:
+- Campaign completion
+- Tower mastery
+- Enemy defeats
+- Score milestones
+- Challenge completions
+- Editor creations
+
+--------------------------------------------------------------------------------
+8. GAME MODES
+--------------------------------------------------------------------------------
+
+8.1 SINGLE PLAYER
+-----------------
+- Campaign: Story-driven progression through worlds
+- Challenge: Pre-defined difficult scenarios
+- Endless: Survive as long as possible
+- Custom: Play community maps
+
+8.2 ONLINE (Future)
+-------------------
+- Co-op: Team-based tower placement
+- Versus: Competitive send-enemy mode
+- Weekly Challenges: Global events
+- Tournaments: Ranked competitions
+
+--------------------------------------------------------------------------------
+9. USER INTERFACE
+--------------------------------------------------------------------------------
+
+9.1 MAIN MENU
+-------------
+- Play (Campaign/Custom/Endless)
+- Map Editor
+- Collection (Towers/Enemies/Achievements)
+- Profile
+- Settings
+- Online (when implemented)
+
+9.2 IN-GAME HUD
+---------------
+- Wave counter
+- Lives remaining
+- Currency display
+- Tower selection panel
+- Selected tower info
+- Wave preview
+- Speed controls (1x/2x/3x)
+- Pause menu
+
+9.3 TOWER INTERACTION
+---------------------
+- Click/tap to select
+- Radial menu for actions
+- Upgrade paths display
+- Merge highlight for valid targets
+- Range indicator on hover/select
+
+--------------------------------------------------------------------------------
+10. TECHNICAL SPECIFICATIONS
+--------------------------------------------------------------------------------
+
+10.1 RENDERING
+--------------
+- Canvas-based 2D rendering with WebGL acceleration
+- Isometric projection (2:1 ratio)
+- Sprite-based animations
+- Particle system for effects
+- 60 FPS target
+
+10.2 DATA STORAGE
+-----------------
+- SQLite via sql.js (IndexedDB persistence)
+- Local save states
+- Map data (JSON structure)
+- Player progress
+- Settings/preferences
+
+10.3 ARCHITECTURE
+-----------------
+- SOLID principles
+- Entity-Component-System for game objects
+- Event-driven communication
+- State machine for game flow
+- Plugin system for extensions
+
+10.4 PERFORMANCE TARGETS
+------------------------
+- 100+ simultaneous enemies
+- 50+ active towers
+- Smooth scrolling/zooming
+- Sub-100ms response time
+- Mobile-friendly touch controls
+
+--------------------------------------------------------------------------------
+11. AUDIO (Future Enhancement)
+--------------------------------------------------------------------------------
+
+11.1 SOUND EFFECTS
+------------------
+- Tower attacks (per type)
+- Enemy deaths
+- Wave start/complete
+- UI interactions
+- Achievement unlocks
+- Upgrade/merge sounds
+
+11.2 MUSIC
+----------
+- Menu theme
+- Per-world ambient music
+- Boss battle themes
+- Victory/defeat stingers
+
+--------------------------------------------------------------------------------
+12. ONLINE FEATURES (Phase 2)
+--------------------------------------------------------------------------------
+
+12.1 ACCOUNTS
+-------------
+- User registration/login
+- Profile customization
+- Cross-device sync
+- Social features
+
+12.2 LEADERBOARDS
+-----------------
+- Global rankings
+- Per-map rankings
+- Weekly/monthly resets
+- Friend comparisons
+
+12.3 SOCIAL
+-----------
+- Friends list
+- Map sharing
+- Replays
+- Chat (lobby)
+- Guilds/clans
+
+12.4 MULTIPLAYER
+----------------
+- Real-time co-op
+- Competitive modes
+- Matchmaking
+- Spectator mode
+
+--------------------------------------------------------------------------------
+13. MONETIZATION (Optional/Future)
+--------------------------------------------------------------------------------
+
+- Cosmetic tower skins
+- Map theme packs
+- Profile customization
+- No pay-to-win mechanics
+- Optional ad viewing for bonuses
+
+--------------------------------------------------------------------------------
+14. CONTENT ROADMAP
+--------------------------------------------------------------------------------
+
+PHASE 1 - CORE (MVP):
+- 3 tower types with upgrades
+- 5 enemy types
+- 10 campaign maps
+- Basic map editor
+- Local save system
+
+PHASE 2 - EXPANSION:
+- All tower types
+- All enemy types
+- Full campaign (50 maps)
+- Advanced editor
+- Endless mode
+
+PHASE 3 - ONLINE:
+- User accounts
+- Leaderboards
+- Map sharing
+- Basic multiplayer
+
+PHASE 4 - COMPETITIVE:
+- Ranked modes
+- Tournaments
+- Guilds
+- Full multiplayer suite
+
+================================================================================
+                              END OF DOCUMENT
+================================================================================
