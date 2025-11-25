@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { GameState, type Tower, type Enemy } from "@/types";
+import type { CommanderState } from "@/types/commander";
+import { DEFAULT_COMMANDER_STATE } from "@/types/commander";
 
 interface GameStore {
   // Session state
@@ -21,6 +23,9 @@ interface GameStore {
 
   // Selected
   selectedTowerId: string | null;
+
+  // Commander
+  commander: CommanderState;
 
   // Actions
   setGameState: (state: GameState) => void;
@@ -46,6 +51,12 @@ interface GameStore {
   // Game flow
   startGame: (mapId: string, waves: number) => void;
   resetGame: () => void;
+
+  // Commander actions
+  initCommander: (x: number, y: number) => void;
+  setCommanderTarget: (x: number, y: number) => void;
+  updateCommanderPosition: (deltaTime: number) => void;
+  clearCommanderTarget: () => void;
 }
 
 const initialState = {
@@ -59,9 +70,10 @@ const initialState = {
   speed: 1,
   isPaused: false,
   elapsedTime: 0,
-  towers: [],
-  enemies: [],
-  selectedTowerId: null,
+  towers: [] as Tower[],
+  enemies: [] as Enemy[],
+  selectedTowerId: null as string | null,
+  commander: { ...DEFAULT_COMMANDER_STATE },
 };
 
 export const useGameStore = create<GameStore>()(
@@ -182,6 +194,53 @@ export const useGameStore = create<GameStore>()(
     resetGame: () =>
       set((s) => {
         Object.assign(s, initialState);
+      }),
+
+    // Commander actions
+    initCommander: (x, y) =>
+      set((s) => {
+        s.commander = {
+          ...DEFAULT_COMMANDER_STATE,
+          position: { x, y },
+        };
+      }),
+
+    setCommanderTarget: (x, y) =>
+      set((s) => {
+        s.commander.targetPosition = { x, y };
+        s.commander.isMoving = true;
+      }),
+
+    updateCommanderPosition: (deltaTime) =>
+      set((s) => {
+        const { commander } = s;
+        if (!commander.targetPosition || !commander.isMoving) return;
+
+        const dx = commander.targetPosition.x - commander.position.x;
+        const dy = commander.targetPosition.y - commander.position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Check if arrived at destination
+        if (distance < 0.1) {
+          commander.position = { ...commander.targetPosition };
+          commander.targetPosition = null;
+          commander.isMoving = false;
+          return;
+        }
+
+        // Move toward target
+        const moveDistance = commander.speed * deltaTime;
+        const ratio = Math.min(moveDistance / distance, 1);
+
+        commander.position.x += dx * ratio;
+        commander.position.y += dy * ratio;
+        commander.facing = Math.atan2(dy, dx);
+      }),
+
+    clearCommanderTarget: () =>
+      set((s) => {
+        s.commander.targetPosition = null;
+        s.commander.isMoving = false;
       }),
   }))
 );

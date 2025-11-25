@@ -81,9 +81,55 @@ export class DatabaseService {
     const currentVersion = result[0]?.values[0]?.[0] as number ?? 0;
 
     if (currentVersion < SCHEMA_VERSION) {
-      // Run migrations here when needed
       console.log(`Migrating from version ${currentVersion} to ${SCHEMA_VERSION}`);
+
+      // Migration from v1 to v2: Add commander_profile table
+      if (currentVersion < 2) {
+        this.db.run(`
+          CREATE TABLE IF NOT EXISTS commander_profile (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            level INTEGER DEFAULT 1,
+            current_xp INTEGER DEFAULT 0,
+            xp_to_next_level INTEGER DEFAULT 100,
+            total_enemies_killed INTEGER DEFAULT 0,
+            total_damage_dealt INTEGER DEFAULT 0,
+            total_towers_placed INTEGER DEFAULT 0,
+            total_towers_merged INTEGER DEFAULT 0,
+            total_currency_spent INTEGER DEFAULT 0,
+            total_currency_earned INTEGER DEFAULT 0,
+            total_waves_completed INTEGER DEFAULT 0,
+            total_games_played INTEGER DEFAULT 0,
+            total_games_won INTEGER DEFAULT 0,
+            longest_survival_wave INTEGER DEFAULT 0,
+            total_xp_earned INTEGER DEFAULT 0,
+            total_play_time INTEGER DEFAULT 0,
+            created_at INTEGER NOT NULL,
+            last_played_at INTEGER NOT NULL
+          )
+        `);
+
+        // Create default commander profile if none exists
+        const now = Date.now();
+        this.db.run(
+          `INSERT OR IGNORE INTO commander_profile (
+            id, name, level, current_xp, xp_to_next_level,
+            total_enemies_killed, total_damage_dealt, total_towers_placed,
+            total_towers_merged, total_currency_spent, total_currency_earned,
+            total_waves_completed, total_games_played, total_games_won,
+            longest_survival_wave, total_xp_earned, total_play_time,
+            created_at, last_played_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            crypto.randomUUID(), "Commander", 1, 0, 100,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            now, now
+          ]
+        );
+      }
+
       this.db.run(`UPDATE schema_version SET version = ${SCHEMA_VERSION}`);
+      await this.save();
     }
   }
 
@@ -114,6 +160,23 @@ export class DatabaseService {
       `INSERT OR IGNORE INTO player_profile (id, name, xp, level, created_at, last_played_at)
        VALUES (?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), "Player", 0, 1, now, now]
+    );
+
+    // Create default commander profile
+    this.db.run(
+      `INSERT OR IGNORE INTO commander_profile (
+        id, name, level, current_xp, xp_to_next_level,
+        total_enemies_killed, total_damage_dealt, total_towers_placed,
+        total_towers_merged, total_currency_spent, total_currency_earned,
+        total_waves_completed, total_games_played, total_games_won,
+        longest_survival_wave, total_xp_earned, total_play_time,
+        created_at, last_played_at
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        crypto.randomUUID(), "Commander", 1, 0, 100,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        now, now
+      ]
     );
 
     // Insert default maps

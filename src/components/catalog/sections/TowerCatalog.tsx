@@ -1,6 +1,6 @@
 /**
  * Tower Catalog Section
- * Displays all towers with merge graph visualization and 3D previews
+ * Displays all towers with 3D previews
  */
 
 import { useState, useMemo, Suspense } from "react";
@@ -12,14 +12,10 @@ import {
   getTowersByCategory,
   getTowersByTier,
   searchTowers,
-  TOWER_MERGE_GRAPH,
-  getMergePathTo,
   getRarityColor,
 } from "@/data/towers";
-import { getElementColor, getElementName } from "@/data/elements";
 import { TowerMeshPreview } from "@/components/game/towers";
 import type { ExtendedTowerDefinition } from "@/types/tower";
-import { TowerMergeGraph as TowerMergeGraphViz } from "../visualizations/TowerMergeGraph";
 
 const CATEGORY_FILTERS = [
   { id: "all", label: "All" },
@@ -129,19 +125,6 @@ export function TowerCatalog() {
         </div>
       </div>
 
-      {/* Merge Graph Visualization */}
-      <div className="pixel-panel bg-background-secondary p-6">
-        <h3 className="font-pixel text-sm text-foreground mb-4">Tower Merge Paths</h3>
-        <p className="text-xs text-foreground-muted mb-4">
-          {categoryFilter !== "all"
-            ? `Showing ${categoryFilter} towers only`
-            : "Showing all categories - filter to simplify view"}
-        </p>
-        <TowerMergeGraphViz
-          filterCategory={categoryFilter !== "all" ? (categoryFilter as TowerCategory) : undefined}
-        />
-      </div>
-
       {/* Tower grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredTowers.map((tower) => (
@@ -208,20 +191,9 @@ function TowerCard({
       {/* Info */}
       <div className="flex-1">
         <h3 className="font-pixel text-sm text-foreground">{tower.name}</h3>
-        <div className="flex gap-1 mt-1">
-          <span
-            className="text-2xs px-2 py-0.5 rounded capitalize"
-            style={{
-              backgroundColor: getElementColor(tower.element) + "33",
-              color: getElementColor(tower.element),
-            }}
-          >
-            {getElementName(tower.element)}
-          </span>
-          <span className="text-2xs px-2 py-0.5 bg-background-secondary rounded capitalize">
-            {tower.category}
-          </span>
-        </div>
+        <span className="text-2xs px-2 py-0.5 bg-background-secondary rounded capitalize">
+          {tower.category}
+        </span>
         <p className="text-2xs text-foreground-muted mt-2 line-clamp-2">{tower.description}</p>
       </div>
 
@@ -242,9 +214,6 @@ function TowerDetailModal({
   tower: ExtendedTowerDefinition;
   onClose: () => void;
 }) {
-  const mergePath = getMergePathTo(tower.id, TOWER_MERGE_GRAPH);
-  const possibleMerges = tower.mergeOutput?.map((id) => getAllTowers().find((t) => t.id === id)) || [];
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={onClose}>
       <div
@@ -279,14 +248,8 @@ function TowerDetailModal({
           <div className="space-y-4">
             {/* Badges */}
             <div className="flex gap-2 flex-wrap">
-              <span
-                className="px-2 py-1 rounded text-sm"
-                style={{
-                  backgroundColor: getElementColor(tower.element) + "44",
-                  color: getElementColor(tower.element),
-                }}
-              >
-                {getElementName(tower.element)} (T{tower.tier})
+              <span className="px-2 py-1 bg-background-tertiary rounded text-sm">
+                Tier {tower.tier}
               </span>
               <span
                 className="px-2 py-1 rounded text-sm text-background"
@@ -347,61 +310,6 @@ function TowerDetailModal({
             )}
           </div>
         </div>
-
-        {/* Merge Info */}
-        {(tower.mergeRecipe || possibleMerges.length > 0) && (
-          <div className="mt-6 pt-4 border-t border-border">
-            {/* Recipe */}
-            {tower.mergeRecipe && (
-              <div className="mb-4">
-                <h4 className="text-xs text-foreground-muted uppercase mb-2">Created From</h4>
-                <div className="flex items-center gap-2">
-                  {tower.mergeRecipe.inputs.map((inputId, i) => (
-                    <span key={i}>
-                      {i > 0 && <span className="text-foreground-muted">+</span>}
-                      <span className="text-xs px-2 py-1 bg-background-secondary rounded">
-                        {inputId.split("_").slice(0, 2).join(" ")}
-                      </span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Possible merges */}
-            {possibleMerges.length > 0 && (
-              <div>
-                <h4 className="text-xs text-foreground-muted uppercase mb-2">
-                  Can Merge Into ({possibleMerges.length})
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {possibleMerges.filter(Boolean).map((mergeTower) => (
-                    <div
-                      key={mergeTower!.id}
-                      className="text-2xs px-2 py-1 rounded"
-                      style={{
-                        backgroundColor: getElementColor(mergeTower!.element) + "33",
-                        color: getElementColor(mergeTower!.element),
-                      }}
-                    >
-                      {mergeTower!.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Merge path */}
-            {mergePath.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-xs text-foreground-muted uppercase mb-2">Merge Path</h4>
-                <div className="text-2xs text-foreground-muted font-mono">
-                  {mergePath.length} merge(s) required from base towers
-                </div>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

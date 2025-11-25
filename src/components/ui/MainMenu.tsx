@@ -18,6 +18,7 @@ export function MainMenu() {
         <MenuButton to="/play">Play</MenuButton>
         <MenuButton to="/editor">Map Editor</MenuButton>
         <MenuButton to="/catalog">Catalog</MenuButton>
+        <MenuButton to="/profile">Profile</MenuButton>
         <MenuButton to="/settings">Settings</MenuButton>
       </nav>
 

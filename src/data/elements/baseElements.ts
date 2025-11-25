@@ -11,7 +11,8 @@ import {
 
 /**
  * Base element configurations
- * Each has strengths and weaknesses in a rock-paper-scissors pattern
+ * Clean rock-paper-scissors cycle: Fire > Air > Earth > Water > Fire
+ * Lightning is special: strong vs Water/Air, weak vs Earth
  */
 export const BASE_ELEMENT_DEFINITIONS: Record<BaseElement, ElementDefinition> = {
   [BaseElement.Fire]: {
@@ -23,7 +24,7 @@ export const BASE_ELEMENT_DEFINITIONS: Record<BaseElement, ElementDefinition> = 
     secondaryColor: "#ffd700",
     icon: "fire",
     description: "The primal force of combustion and heat. Burns enemies over time.",
-    strongAgainst: [BaseElement.Earth, BaseElement.Air],
+    strongAgainst: [BaseElement.Air],
     weakAgainst: [BaseElement.Water],
   },
 
@@ -37,7 +38,7 @@ export const BASE_ELEMENT_DEFINITIONS: Record<BaseElement, ElementDefinition> = 
     icon: "water",
     description: "The flowing essence of life and adaptability. Extinguishes fire, slows enemies.",
     strongAgainst: [BaseElement.Fire],
-    weakAgainst: [BaseElement.Lightning, BaseElement.Earth],
+    weakAgainst: [BaseElement.Earth],
   },
 
   [BaseElement.Earth]: {
@@ -49,8 +50,8 @@ export const BASE_ELEMENT_DEFINITIONS: Record<BaseElement, ElementDefinition> = 
     secondaryColor: "#daa520",
     icon: "mountain",
     description: "Solid and unyielding. Grounds lightning, absorbs water.",
-    strongAgainst: [BaseElement.Lightning, BaseElement.Water],
-    weakAgainst: [BaseElement.Fire],
+    strongAgainst: [BaseElement.Water, BaseElement.Lightning],
+    weakAgainst: [BaseElement.Air],
   },
 
   [BaseElement.Air]: {
@@ -61,9 +62,9 @@ export const BASE_ELEMENT_DEFINITIONS: Record<BaseElement, ElementDefinition> = 
     color: "#87ceeb",
     secondaryColor: "#f0f8ff",
     icon: "wind",
-    description: "Swift and elusive. Erodes earth, fans flames.",
+    description: "Swift and elusive. Erodes earth, cuts through defenses.",
     strongAgainst: [BaseElement.Earth],
-    weakAgainst: [BaseElement.Fire, BaseElement.Lightning],
+    weakAgainst: [BaseElement.Fire],
   },
 
   [BaseElement.Lightning]: {

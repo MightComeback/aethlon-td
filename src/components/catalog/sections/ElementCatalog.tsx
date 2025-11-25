@@ -1,6 +1,6 @@
 /**
  * Element Catalog Section
- * Displays all elements with merge tree graph visualization
+ * Displays all elements with their properties and merge recipes
  */
 
 import { useState, useMemo } from "react";
@@ -13,7 +13,6 @@ import {
   getElementColor,
 } from "@/data/elements";
 import type { ElementDefinition } from "@/types/element";
-import { ElementMergeGraph } from "../visualizations/ElementMergeGraph";
 
 const TIER_FILTERS = [
   { id: "all", label: "All Tiers" },
@@ -60,12 +59,6 @@ export function ElementCatalog() {
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Merge Tree Visualization */}
-      <div className="pixel-panel bg-background-secondary p-6">
-        <h3 className="font-pixel text-sm text-foreground mb-4">Element Merge Tree</h3>
-        <ElementMergeGraph />
       </div>
 
       {/* Element grid */}

@@ -64,7 +64,7 @@ const CATALOG_SECTIONS: CatalogSection[] = [
     id: "elements",
     label: "Elements",
     component: ElementCatalog,
-    description: "Elemental system with merge tree",
+    description: "Elemental system and combinations",
   },
   {
     id: "enemies",

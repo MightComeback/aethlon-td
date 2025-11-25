@@ -1,6 +1,6 @@
 // SQL schema definitions for the game database
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
 
 export const CREATE_TABLES_SQL = `
 -- Player profile table
@@ -9,6 +9,29 @@ CREATE TABLE IF NOT EXISTS player_profile (
   name TEXT NOT NULL,
   xp INTEGER DEFAULT 0,
   level INTEGER DEFAULT 1,
+  created_at INTEGER NOT NULL,
+  last_played_at INTEGER NOT NULL
+);
+
+-- Commander profile with stats tracking
+CREATE TABLE IF NOT EXISTS commander_profile (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  level INTEGER DEFAULT 1,
+  current_xp INTEGER DEFAULT 0,
+  xp_to_next_level INTEGER DEFAULT 100,
+  total_enemies_killed INTEGER DEFAULT 0,
+  total_damage_dealt INTEGER DEFAULT 0,
+  total_towers_placed INTEGER DEFAULT 0,
+  total_towers_merged INTEGER DEFAULT 0,
+  total_currency_spent INTEGER DEFAULT 0,
+  total_currency_earned INTEGER DEFAULT 0,
+  total_waves_completed INTEGER DEFAULT 0,
+  total_games_played INTEGER DEFAULT 0,
+  total_games_won INTEGER DEFAULT 0,
+  longest_survival_wave INTEGER DEFAULT 0,
+  total_xp_earned INTEGER DEFAULT 0,
+  total_play_time INTEGER DEFAULT 0,
   created_at INTEGER NOT NULL,
   last_played_at INTEGER NOT NULL
 );

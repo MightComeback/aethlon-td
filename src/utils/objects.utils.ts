@@ -18,7 +18,7 @@ import {
   Cactus,
   Mushroom,
   Cattail,
-  // Structures
+  // Single-tile Structures
   TowerBase,
   Fence,
   House,
@@ -41,6 +41,19 @@ import {
   FirePit,
   SnowPile,
   LilyPad,
+  // Multi-tile Structures
+  LargeHouse,
+  Farmhouse,
+  Barn,
+  WindmillStructure,
+  MarketStall,
+  Inn,
+  Blacksmith,
+  Church,
+  Bridge,
+  Pier,
+  StoneWall,
+  Gate,
 } from "@/components/editor/EditorObjects";
 
 // Object type mapping for easy instantiation
@@ -87,6 +100,19 @@ export const OBJECT_COMPONENTS = {
   fire_pit: FirePit,
   snow_pile: SnowPile,
   lily_pad: LilyPad,
+  // Multi-tile structures
+  large_house: LargeHouse,
+  farmhouse: Farmhouse,
+  barn: Barn,
+  windmill_structure: WindmillStructure,
+  market: MarketStall,
+  inn: Inn,
+  blacksmith: Blacksmith,
+  church: Church,
+  bridge: Bridge,
+  pier: Pier,
+  wall: StoneWall,
+  gate: Gate,
 } as const;
 
 export type EditorObjectType = keyof typeof OBJECT_COMPONENTS;
@@ -135,6 +161,19 @@ export const OBJECT_METADATA: Record<EditorObjectType, { label: string; color: s
   fire_pit: { label: "Fire Pit", color: "#ff5722", category: "decorations" },
   snow_pile: { label: "Snow Pile", color: "#ffffff", category: "decorations" },
   lily_pad: { label: "Lily Pad", color: "#66bb6a", category: "decorations" },
+  // Multi-tile structures
+  large_house: { label: "Large House (2x2)", color: "#efebe9", category: "multi_structures" },
+  farmhouse: { label: "Farmhouse (2x3)", color: "#d7ccc8", category: "multi_structures" },
+  barn: { label: "Barn (3x2)", color: "#8d6e63", category: "multi_structures" },
+  windmill_structure: { label: "Windmill (2x2)", color: "#bcaaa4", category: "multi_structures" },
+  market: { label: "Market Stall (2x1)", color: "#fdd835", category: "multi_structures" },
+  inn: { label: "Inn (3x2)", color: "#795548", category: "multi_structures" },
+  blacksmith: { label: "Blacksmith (2x2)", color: "#546e7a", category: "multi_structures" },
+  church: { label: "Church (2x3)", color: "#e0e0e0", category: "multi_structures" },
+  bridge: { label: "Bridge (1x3)", color: "#8d6e63", category: "multi_structures" },
+  pier: { label: "Pier (2x4)", color: "#6d4c41", category: "multi_structures" },
+  wall: { label: "Wall (1x1)", color: "#78909c", category: "multi_structures" },
+  gate: { label: "Gate (1x2)", color: "#5d4037", category: "multi_structures" },
 };
 
 // Get objects by category
@@ -145,4 +184,4 @@ export function getObjectsByCategory(category: string): EditorObjectType[] {
 }
 
 // All categories
-export const OBJECT_CATEGORIES = ["trees", "terrain", "plants", "structures", "decorations"] as const;
+export const OBJECT_CATEGORIES = ["trees", "terrain", "plants", "structures", "decorations", "multi_structures"] as const;

@@ -24,11 +24,12 @@ export interface Waypoint {
 // Placeable 3D object on the map
 export interface PlacedObject {
   id: string;
-  type: string; // e.g., "tree_pine", "rock", "bush"
-  x: number;
-  y: number;
+  type: string; // e.g., "tree_pine", "rock", "bush", "house"
+  x: number; // Anchor point X
+  y: number; // Anchor point Y
   scale?: number;
   rotation?: number;
+  footprint?: [number, number]; // [width, height] for multi-tile structures
 }
 
 export interface MapData {

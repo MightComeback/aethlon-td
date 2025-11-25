@@ -959,3 +959,447 @@ export function LilyPad({ position, scale = 1 }: ObjectProps) {
     </group>
   );
 }
+
+// ============================================
+// MULTI-TILE STRUCTURES
+// ============================================
+
+interface StructureProps {
+  position: [number, number, number];
+  scale?: number;
+  footprint?: [number, number]; // [width, height] in tiles
+}
+
+/**
+ * Large House - 2x2 multi-tile structure
+ */
+export function LargeHouse({ position, scale = 1, footprint = [2, 2] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Base walls */}
+      <mesh position={[0, 0.25, 0]}>
+        <boxGeometry args={[width, 0.5, depth]} />
+        <meshStandardMaterial color="#efebe9" />
+      </mesh>
+      {/* Roof */}
+      <mesh position={[0, 0.6, 0]} rotation={[0, Math.PI / 4, 0]}>
+        <coneGeometry args={[width * 0.8, 0.4, 4]} />
+        <meshStandardMaterial color="#8d6e63" />
+      </mesh>
+      {/* Door */}
+      <mesh position={[0, 0.15, depth / 2 + 0.01]}>
+        <boxGeometry args={[0.2, 0.3, 0.05]} />
+        <meshStandardMaterial color="#5d4037" />
+      </mesh>
+      {/* Windows */}
+      <mesh position={[width / 3, 0.28, depth / 2 + 0.01]}>
+        <boxGeometry args={[0.15, 0.15, 0.05]} />
+        <meshStandardMaterial color="#81d4fa" />
+      </mesh>
+      <mesh position={[-width / 3, 0.28, depth / 2 + 0.01]}>
+        <boxGeometry args={[0.15, 0.15, 0.05]} />
+        <meshStandardMaterial color="#81d4fa" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Farmhouse - 2x3 structure
+ */
+export function Farmhouse({ position, scale = 1, footprint = [2, 3] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Main building */}
+      <mesh position={[0, 0.3, 0]}>
+        <boxGeometry args={[width, 0.6, depth]} />
+        <meshStandardMaterial color="#d7ccc8" />
+      </mesh>
+      {/* Roof peak */}
+      <mesh position={[0, 0.72, 0]}>
+        <boxGeometry args={[width + 0.1, 0.1, depth + 0.1]} />
+        <meshStandardMaterial color="#6d4c41" />
+      </mesh>
+      <mesh position={[0, 0.85, 0]}>
+        <boxGeometry args={[width, 0.1, depth]} />
+        <meshStandardMaterial color="#5d4037" />
+      </mesh>
+      {/* Porch */}
+      <mesh position={[0, 0.1, depth / 2 + 0.25]}>
+        <boxGeometry args={[width * 0.6, 0.05, 0.4]} />
+        <meshStandardMaterial color="#8d6e63" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Barn - 3x2 structure
+ */
+export function Barn({ position, scale = 1, footprint = [3, 2] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Main structure */}
+      <mesh position={[0, 0.35, 0]}>
+        <boxGeometry args={[width, 0.7, depth]} />
+        <meshStandardMaterial color="#8d6e63" />
+      </mesh>
+      {/* Gambrel roof */}
+      <mesh position={[0, 0.75, 0]}>
+        <boxGeometry args={[width + 0.1, 0.15, depth + 0.1]} />
+        <meshStandardMaterial color="#5d4037" />
+      </mesh>
+      {/* Barn doors */}
+      <mesh position={[0, 0.25, depth / 2 + 0.01]}>
+        <boxGeometry args={[0.4, 0.5, 0.05]} />
+        <meshStandardMaterial color="#3e2723" />
+      </mesh>
+      {/* Hayloft window */}
+      <mesh position={[0, 0.6, depth / 2 + 0.01]}>
+        <boxGeometry args={[0.3, 0.15, 0.05]} />
+        <meshStandardMaterial color="#212121" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Windmill Structure - 2x2 with rotating blades
+ */
+export function WindmillStructure({ position, scale = 1, footprint = [2, 2] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const baseWidth = w * tileSize * 0.7;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Tower - wider base */}
+      <mesh position={[0, 0.4, 0]}>
+        <cylinderGeometry args={[baseWidth * 0.4, baseWidth * 0.6, 0.8, 8]} />
+        <meshStandardMaterial color="#efebe9" />
+      </mesh>
+      {/* Roof */}
+      <mesh position={[0, 0.88, 0]}>
+        <coneGeometry args={[baseWidth * 0.5, 0.25, 8]} />
+        <meshStandardMaterial color="#5d4037" />
+      </mesh>
+      {/* Blades (4-part cross) */}
+      {[0, 90, 180, 270].map((angle, i) => (
+        <mesh
+          key={i}
+          position={[0, 0.6, baseWidth * 0.45]}
+          rotation={[0, 0, (angle * Math.PI) / 180]}
+        >
+          <boxGeometry args={[0.08, 0.6, 0.04]} />
+          <meshStandardMaterial color="#8d6e63" />
+        </mesh>
+      ))}
+      {/* Door */}
+      <mesh position={[0, 0.2, baseWidth * 0.6 + 0.02]}>
+        <boxGeometry args={[0.15, 0.3, 0.05]} />
+        <meshStandardMaterial color="#3e2723" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Market Stall - 2x1 structure
+ */
+export function MarketStall({ position, scale = 1, footprint = [2, 1] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Counter */}
+      <mesh position={[0, 0.15, 0]}>
+        <boxGeometry args={[width, 0.3, depth]} />
+        <meshStandardMaterial color="#8d6e63" />
+      </mesh>
+      {/* Awning posts */}
+      <mesh position={[-width / 3, 0.35, -depth / 3]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.4, 6]} />
+        <meshStandardMaterial color="#6d4c41" />
+      </mesh>
+      <mesh position={[width / 3, 0.35, -depth / 3]}>
+        <cylinderGeometry args={[0.03, 0.03, 0.4, 6]} />
+        <meshStandardMaterial color="#6d4c41" />
+      </mesh>
+      {/* Awning */}
+      <mesh position={[0, 0.58, -depth / 4]}>
+        <boxGeometry args={[width + 0.2, 0.05, depth * 0.8]} />
+        <meshStandardMaterial color="#fdd835" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Inn - 3x2 structure with sign
+ */
+export function Inn({ position, scale = 1, footprint = [3, 2] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Main building */}
+      <mesh position={[0, 0.3, 0]}>
+        <boxGeometry args={[width, 0.6, depth]} />
+        <meshStandardMaterial color="#795548" />
+      </mesh>
+      {/* Sloped roof */}
+      <mesh position={[0, 0.7, 0]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[width + 0.15, 0.1, depth + 0.15]} />
+        <meshStandardMaterial color="#4e342e" />
+      </mesh>
+      {/* Sign post */}
+      <mesh position={[width / 2 + 0.15, 0.4, 0]}>
+        <cylinderGeometry args={[0.02, 0.02, 0.5, 6]} />
+        <meshStandardMaterial color="#3e2723" />
+      </mesh>
+      {/* Hanging sign */}
+      <mesh position={[width / 2 + 0.3, 0.5, 0]}>
+        <boxGeometry args={[0.2, 0.15, 0.05]} />
+        <meshStandardMaterial color="#fdd835" />
+      </mesh>
+      {/* Door */}
+      <mesh position={[0, 0.18, depth / 2 + 0.01]}>
+        <boxGeometry args={[0.25, 0.35, 0.05]} />
+        <meshStandardMaterial color="#3e2723" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Blacksmith - 2x2 structure with chimney
+ */
+export function Blacksmith({ position, scale = 1, footprint = [2, 2] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Stone building */}
+      <mesh position={[0, 0.25, 0]}>
+        <boxGeometry args={[width, 0.5, depth]} />
+        <meshStandardMaterial color="#546e7a" />
+      </mesh>
+      {/* Roof */}
+      <mesh position={[0, 0.55, 0]}>
+        <boxGeometry args={[width + 0.1, 0.1, depth + 0.1]} />
+        <meshStandardMaterial color="#37474f" />
+      </mesh>
+      {/* Chimney */}
+      <mesh position={[width / 3, 0.75, -depth / 4]}>
+        <cylinderGeometry args={[0.08, 0.1, 0.5, 6]} />
+        <meshStandardMaterial color="#263238" />
+      </mesh>
+      {/* Smoke (particle effect placeholder) */}
+      <mesh position={[width / 3, 0.95, -depth / 4]}>
+        <sphereGeometry args={[0.06, 4, 4]} />
+        <meshStandardMaterial color="#757575" transparent opacity={0.5} />
+      </mesh>
+      {/* Anvil outside */}
+      <mesh position={[width / 2 + 0.3, 0.08, 0]}>
+        <boxGeometry args={[0.12, 0.15, 0.08]} />
+        <meshStandardMaterial color="#212121" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Church - 2x3 tall structure with cross
+ */
+export function Church({ position, scale = 1, footprint = [2, 3] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Base */}
+      <mesh position={[0, 0.35, 0]}>
+        <boxGeometry args={[width, 0.7, depth]} />
+        <meshStandardMaterial color="#e0e0e0" />
+      </mesh>
+      {/* Roof */}
+      <mesh position={[0, 0.75, 0]} rotation={[0, Math.PI / 4, 0]}>
+        <coneGeometry args={[width * 0.75, 0.3, 4]} />
+        <meshStandardMaterial color="#616161" />
+      </mesh>
+      {/* Tower/steeple */}
+      <mesh position={[0, 1.0, -depth / 3]}>
+        <cylinderGeometry args={[0.15, 0.18, 0.5, 6]} />
+        <meshStandardMaterial color="#bdbdbd" />
+      </mesh>
+      <mesh position={[0, 1.32, -depth / 3]}>
+        <coneGeometry args={[0.2, 0.3, 6]} />
+        <meshStandardMaterial color="#757575" />
+      </mesh>
+      {/* Cross on top */}
+      <mesh position={[0, 1.55, -depth / 3]}>
+        <boxGeometry args={[0.15, 0.05, 0.03]} />
+        <meshStandardMaterial color="#ffd700" />
+      </mesh>
+      <mesh position={[0, 1.6, -depth / 3]}>
+        <boxGeometry args={[0.05, 0.2, 0.03]} />
+        <meshStandardMaterial color="#ffd700" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Bridge - 1x3 horizontal structure
+ */
+export function Bridge({ position, scale = 1, footprint = [1, 3] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const length = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Bridge deck */}
+      <mesh position={[0, 0.08, 0]}>
+        <boxGeometry args={[0.8, 0.08, length]} />
+        <meshStandardMaterial color="#8d6e63" />
+      </mesh>
+      {/* Side rails */}
+      <mesh position={[0.35, 0.15, 0]}>
+        <boxGeometry args={[0.05, 0.2, length]} />
+        <meshStandardMaterial color="#6d4c41" />
+      </mesh>
+      <mesh position={[-0.35, 0.15, 0]}>
+        <boxGeometry args={[0.05, 0.2, length]} />
+        <meshStandardMaterial color="#6d4c41" />
+      </mesh>
+      {/* Support posts */}
+      <mesh position={[0, -0.1, 0]}>
+        <cylinderGeometry args={[0.06, 0.08, 0.2, 6]} />
+        <meshStandardMaterial color="#5d4037" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Pier - 2x4 structure extending into water
+ */
+export function Pier({ position, scale = 1, footprint = [2, 4] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const width = w * tileSize;
+  const length = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Main deck */}
+      <mesh position={[0, 0.05, 0]}>
+        <boxGeometry args={[width, 0.1, length]} />
+        <meshStandardMaterial color="#6d4c41" />
+      </mesh>
+      {/* Wooden planks (texture detail) */}
+      {[-0.3, -0.1, 0.1, 0.3].map((offset, i) => (
+        <mesh key={i} position={[offset, 0.11, 0]}>
+          <boxGeometry args={[0.15, 0.01, length]} />
+          <meshStandardMaterial color="#5d4037" />
+        </mesh>
+      ))}
+      {/* Support posts in water */}
+      {[-length / 3, 0, length / 3].map((z, i) => (
+        <group key={i}>
+          <mesh position={[width / 3, -0.15, z]}>
+            <cylinderGeometry args={[0.05, 0.06, 0.3, 6]} />
+            <meshStandardMaterial color="#4e342e" />
+          </mesh>
+          <mesh position={[-width / 3, -0.15, z]}>
+            <cylinderGeometry args={[0.05, 0.06, 0.3, 6]} />
+            <meshStandardMaterial color="#4e342e" />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+/**
+ * Stone Wall - 1x1 chainable segment
+ */
+export function StoneWall({ position, scale = 1 }: StructureProps) {
+  return (
+    <group position={position} scale={scale}>
+      <mesh position={[0, 0.15, 0]}>
+        <boxGeometry args={[0.9, 0.3, 0.2]} />
+        <meshStandardMaterial color="#78909c" />
+      </mesh>
+      {/* Stone detail */}
+      <mesh position={[0.15, 0.18, 0]}>
+        <boxGeometry args={[0.2, 0.15, 0.22]} />
+        <meshStandardMaterial color="#90a4ae" />
+      </mesh>
+      <mesh position={[-0.2, 0.12, 0]}>
+        <boxGeometry args={[0.15, 0.18, 0.22]} />
+        <meshStandardMaterial color="#607d8b" />
+      </mesh>
+    </group>
+  );
+}
+
+/**
+ * Gate - 1x2 structure
+ */
+export function Gate({ position, scale = 1, footprint = [1, 2] }: StructureProps) {
+  const [w, h] = footprint;
+  const tileSize = 0.95;
+  const depth = h * tileSize;
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Posts */}
+      <mesh position={[0, 0.25, -depth / 2 + 0.1]}>
+        <cylinderGeometry args={[0.08, 0.1, 0.5, 6]} />
+        <meshStandardMaterial color="#5d4037" />
+      </mesh>
+      <mesh position={[0, 0.25, depth / 2 - 0.1]}>
+        <cylinderGeometry args={[0.08, 0.1, 0.5, 6]} />
+        <meshStandardMaterial color="#5d4037" />
+      </mesh>
+      {/* Gate doors */}
+      <mesh position={[0, 0.18, 0]}>
+        <boxGeometry args={[0.1, 0.35, depth - 0.3]} />
+        <meshStandardMaterial color="#6d4c41" />
+      </mesh>
+      {/* Crossbeam */}
+      <mesh position={[0, 0.45, 0]}>
+        <boxGeometry args={[0.12, 0.08, depth - 0.15]} />
+        <meshStandardMaterial color="#8d6e63" />
+      </mesh>
+    </group>
+  );
+}

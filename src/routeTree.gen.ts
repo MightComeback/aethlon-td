@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PlayRouteImport } from './routes/play'
 import { Route as EditorRouteImport } from './routes/editor'
 import { Route as CatalogRouteImport } from './routes/catalog'
@@ -18,6 +19,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlayRoute = PlayRouteImport.update({
@@ -46,6 +52,7 @@ export interface FileRoutesByFullPath {
   '/catalog': typeof CatalogRoute
   '/editor': typeof EditorRoute
   '/play': typeof PlayRoute
+  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +60,7 @@ export interface FileRoutesByTo {
   '/catalog': typeof CatalogRoute
   '/editor': typeof EditorRoute
   '/play': typeof PlayRoute
+  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRoutesById {
@@ -61,14 +69,22 @@ export interface FileRoutesById {
   '/catalog': typeof CatalogRoute
   '/editor': typeof EditorRoute
   '/play': typeof PlayRoute
+  '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/catalog' | '/editor' | '/play' | '/settings'
+  fullPaths: '/' | '/catalog' | '/editor' | '/play' | '/profile' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/catalog' | '/editor' | '/play' | '/settings'
-  id: '__root__' | '/' | '/catalog' | '/editor' | '/play' | '/settings'
+  to: '/' | '/catalog' | '/editor' | '/play' | '/profile' | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/catalog'
+    | '/editor'
+    | '/play'
+    | '/profile'
+    | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -76,6 +92,7 @@ export interface RootRouteChildren {
   CatalogRoute: typeof CatalogRoute
   EditorRoute: typeof EditorRoute
   PlayRoute: typeof PlayRoute
+  ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
 }
 
@@ -86,6 +103,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/play': {
@@ -124,6 +148,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatalogRoute: CatalogRoute,
   EditorRoute: EditorRoute,
   PlayRoute: PlayRoute,
+  ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
