@@ -998,6 +998,121 @@ export const IconBack: IconComponent = ({
   </svg>
 );
 
+export const IconFolder: IconComponent = ({
+  size = 16,
+  color = "currentColor",
+  className,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill={color}
+    className={className}
+    style={{ imageRendering: "pixelated" }}
+  >
+    {/* Folder */}
+    <path d={createPixelPath([
+      // Tab
+      [2, 3], [3, 3], [4, 3], [5, 3], [6, 3],
+      [2, 4], [7, 4],
+      // Body
+      [1, 5], [2, 5], [3, 5], [4, 5], [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [13, 5], [14, 5],
+      [1, 6], [14, 6],
+      [1, 7], [14, 7],
+      [1, 8], [14, 8],
+      [1, 9], [14, 9],
+      [1, 10], [14, 10],
+      [1, 11], [14, 11],
+      [1, 12], [2, 12], [3, 12], [4, 12], [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12], [11, 12], [12, 12], [13, 12], [14, 12],
+    ])} />
+  </svg>
+);
+
+export const IconTrash: IconComponent = ({
+  size = 16,
+  color = "currentColor",
+  className,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill={color}
+    className={className}
+    style={{ imageRendering: "pixelated" }}
+  >
+    {/* Trash can */}
+    <path d={createPixelPath([
+      // Lid
+      [5, 2], [6, 2], [9, 2], [10, 2],
+      [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], [8, 3], [9, 3], [10, 3], [11, 3], [12, 3],
+      // Body
+      [4, 4], [11, 4],
+      [4, 5], [6, 5], [8, 5], [10, 5], [11, 5],
+      [4, 6], [6, 6], [8, 6], [10, 6], [11, 6],
+      [4, 7], [6, 7], [8, 7], [10, 7], [11, 7],
+      [4, 8], [6, 8], [8, 8], [10, 8], [11, 8],
+      [4, 9], [6, 9], [8, 9], [10, 9], [11, 9],
+      [4, 10], [6, 10], [8, 10], [10, 10], [11, 10],
+      [4, 11], [6, 11], [8, 11], [10, 11], [11, 11],
+      [5, 12], [6, 12], [7, 12], [8, 12], [9, 12], [10, 12],
+    ])} />
+  </svg>
+);
+
+export const IconPlus: IconComponent = ({
+  size = 16,
+  color = "currentColor",
+  className,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill={color}
+    className={className}
+    style={{ imageRendering: "pixelated" }}
+  >
+    {/* Plus sign */}
+    <path d={createPixelPath([
+      [7, 3], [8, 3],
+      [7, 4], [8, 4],
+      [7, 5], [8, 5],
+      [7, 6], [8, 6],
+      [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [8, 7], [9, 7], [10, 7], [11, 7], [12, 7],
+      [3, 8], [4, 8], [5, 8], [6, 8], [7, 8], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8],
+      [7, 9], [8, 9],
+      [7, 10], [8, 10],
+      [7, 11], [8, 11],
+      [7, 12], [8, 12],
+    ])} />
+  </svg>
+);
+
+export const IconClose: IconComponent = ({
+  size = 16,
+  color = "currentColor",
+  className,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 16 16"
+    fill={color}
+    className={className}
+    style={{ imageRendering: "pixelated" }}
+  >
+    {/* X close */}
+    <path d={createPixelPath([
+      [3, 3], [4, 4], [5, 5], [6, 6], [7, 7], [8, 8], [9, 9], [10, 10], [11, 11], [12, 12],
+      [4, 3], [5, 4], [6, 5], [7, 6], [8, 7], [9, 8], [10, 9], [11, 10], [12, 11],
+      [12, 3], [11, 4], [10, 5], [9, 6], [8, 7], [7, 8], [6, 9], [5, 10], [4, 11], [3, 12],
+      [11, 3], [10, 4], [9, 5], [8, 6], [7, 7], [6, 8], [5, 9], [4, 10], [3, 11],
+    ])} />
+  </svg>
+);
+
 // ============================================================================
 // ICON MAP FOR DYNAMIC ACCESS
 // ============================================================================
@@ -1041,6 +1156,10 @@ export const PixelIcons = {
   undo: IconUndo,
   redo: IconRedo,
   back: IconBack,
+  folder: IconFolder,
+  trash: IconTrash,
+  plus: IconPlus,
+  close: IconClose,
 } as const;
 
 export type PixelIconName = keyof typeof PixelIcons;

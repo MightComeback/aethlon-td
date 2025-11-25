@@ -132,6 +132,10 @@ This architecture enables:
 - [ ] Campaign maps
 - [ ] Online features
 
+## Conventions
+
+- Branch naming according to the git conventions: [Git Conventional Commits](https://conventional-branch.github.io/)
+
 ## License
 
 MIT

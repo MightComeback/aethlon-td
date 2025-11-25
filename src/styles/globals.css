@@ -218,6 +218,13 @@ body {
   opacity: 0.9;
 }
 
+.virtual-cursor-preview-wrapper {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
 /* Hide system cursor when virtual cursor is active */
 .cursor-hidden {
   cursor: none !important;

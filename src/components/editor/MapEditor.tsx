@@ -1,17 +1,21 @@
 import { Canvas } from "@react-three/fiber";
 import { OrthographicCamera } from "@react-three/drei";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
 import { EditorGrid } from "./EditorGrid";
 import { EditorToolbar } from "./EditorToolbar";
 import { TilePalette } from "./TilePalette";
 import { EditorCameraController, CameraControlsUI } from "./CameraControls";
 import { VirtualCursor } from "./VirtualCursor";
+import { MapBrowser } from "./MapBrowser";
 import { useEditorStore } from "@/stores/editorStore";
+import { MapStorage } from "@/services/storage/MapStorage";
+import type { MapMetadata } from "@/types/map";
 import {
   IconBack,
   IconPlay,
   IconSave,
+  IconFolder,
 } from "@/components/ui/PixelIcon";
 
 // Map size presets
@@ -39,6 +43,9 @@ export function MapEditor() {
     exitPoints,
     waypoints,
     currentTool,
+    getMapData,
+    loadMap,
+    newMap,
   } = useEditorStore();
 
   // Disable camera rotation when using drawing tools
@@ -47,6 +54,80 @@ export function MapEditor() {
   const [showSizeDialog, setShowSizeDialog] = useState(false);
   const [customWidth, setCustomWidth] = useState(width);
   const [customHeight, setCustomHeight] = useState(height);
+  const [showMapBrowser, setShowMapBrowser] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [currentMapId, setCurrentMapId] = useState<string | null>(null);
+  const [savedMaps, setSavedMaps] = useState<MapMetadata[]>([]);
+
+  // Load saved maps list
+  const refreshMapList = useCallback(async () => {
+    const maps = await MapStorage.getAllMaps();
+    setSavedMaps(maps);
+  }, []);
+
+  useEffect(() => {
+    refreshMapList();
+  }, [refreshMapList]);
+
+  // Save map handler
+  const handleSave = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      const mapData = getMapData();
+      // If editing existing map, preserve the ID
+      if (currentMapId) {
+        mapData.id = currentMapId;
+      }
+      await MapStorage.saveMap(mapData);
+      setCurrentMapId(mapData.id);
+      // Reset modified state in store
+      useEditorStore.setState({ isModified: false });
+      await refreshMapList();
+    } catch (error) {
+      console.error("Failed to save map:", error);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [getMapData, currentMapId, refreshMapList]);
+
+  // Load map handler
+  const handleLoadMap = useCallback(async (id: string) => {
+    const mapData = await MapStorage.getMap(id);
+    if (mapData) {
+      loadMap(mapData);
+      setCurrentMapId(id);
+      setShowMapBrowser(false);
+    }
+  }, [loadMap]);
+
+  // New map handler
+  const handleNewMap = useCallback(() => {
+    newMap();
+    setCurrentMapId(null);
+    setShowMapBrowser(false);
+  }, [newMap]);
+
+  // Delete map handler
+  const handleDeleteMap = useCallback(async (id: string) => {
+    await MapStorage.deleteMap(id);
+    await refreshMapList();
+    // If we deleted the current map, clear the ID
+    if (currentMapId === id) {
+      setCurrentMapId(null);
+    }
+  }, [currentMapId, refreshMapList]);
+
+  // Keyboard shortcut for save
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+        e.preventDefault();
+        handleSave();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleSave]);
 
   // Calculate some stats
   const tileCount = width * height;
@@ -124,6 +205,16 @@ export function MapEditor() {
 
           {/* Right: Actions */}
           <div className="flex items-center gap-2">
+            {/* Load button */}
+            <button
+              className="pixel-button flex items-center gap-2 text-2xs py-2 px-3"
+              title="Load Map"
+              onClick={() => setShowMapBrowser(true)}
+            >
+              <IconFolder size={12} />
+              <span className="hidden sm:inline">Load</span>
+            </button>
+
             {/* Test button */}
             <button
               className="pixel-button flex items-center gap-2 text-2xs py-2 px-3"
@@ -137,9 +228,11 @@ export function MapEditor() {
             <button
               className="pixel-button flex items-center gap-2 text-2xs py-2 px-3 bg-accent-green"
               title="Save (Ctrl+S)"
+              onClick={handleSave}
+              disabled={isSaving}
             >
               <IconSave size={12} />
-              <span className="hidden sm:inline">Save</span>
+              <span className="hidden sm:inline">{isSaving ? "Saving..." : "Save"}</span>
             </button>
           </div>
         </div>
@@ -276,6 +369,18 @@ export function MapEditor() {
           </div>
         </div>
       </div>
+
+      {/* Map Browser Modal */}
+      {showMapBrowser && (
+        <MapBrowser
+          maps={savedMaps}
+          currentMapId={currentMapId}
+          onClose={() => setShowMapBrowser(false)}
+          onLoadMap={handleLoadMap}
+          onNewMap={handleNewMap}
+          onDeleteMap={handleDeleteMap}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useEditorStore, type PlaceableObjectType } from "@/stores/editorStore";
+import { useEditorStore } from "@/stores/editorStore";
 import { OBJECT_METADATA } from "./EditorObjects";
 
 interface CursorPosition {
@@ -11,12 +11,21 @@ interface CursorPosition {
  * Virtual cursor that shows selected object preview near the mouse
  */
 export function VirtualCursor() {
-  const { currentTool, selectedObjectType } = useEditorStore();
+  const { currentTool, selectedObjectType, setTool } = useEditorStore();
   const [position, setPosition] = useState<CursorPosition>({ x: 0, y: 0 });
   const [isVisible, setIsVisible] = useState(false);
 
   // Only show virtual cursor when placing objects
   const showCursor = currentTool === "object_place" || currentTool === "object_remove";
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setTool("select");
+      }
+    },
+    [setTool]
+  );
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
     setPosition({ x: e.clientX, y: e.clientY });
@@ -36,6 +45,7 @@ export function VirtualCursor() {
       window.addEventListener("mousemove", handleMouseMove);
       window.addEventListener("mouseenter", handleMouseEnter);
       window.addEventListener("mouseleave", handleMouseLeave);
+      window.addEventListener("keydown", handleKeyDown);
       setIsVisible(true);
     } else {
       document.body.classList.remove("cursor-hidden");
@@ -47,8 +57,9 @@ export function VirtualCursor() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseenter", handleMouseEnter);
       window.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [showCursor, handleMouseMove, handleMouseEnter, handleMouseLeave]);
+  }, [showCursor, handleMouseMove, handleMouseEnter, handleMouseLeave, handleKeyDown]);
 
   if (!showCursor || !isVisible) {
     return null;
@@ -70,13 +81,16 @@ export function VirtualCursor() {
 
       {/* Preview label */}
       <div className="virtual-cursor-preview">
-        {isRemoveMode ? (
-          <span className="text-danger">- Remove</span>
-        ) : (
-          <span style={{ color: objectInfo?.color || "#fff" }}>
-            + {objectInfo?.label || selectedObjectType}
-          </span>
-        )}
+        <div className="virtual-cursor-preview-wrapper">
+          {isRemoveMode ? (
+            <span className="text-danger">- Remove</span>
+          ) : (
+            <span style={{ color: objectInfo?.color || "#fff" }}>
+              + {objectInfo?.label || selectedObjectType}
+            </span>
+          )}
+          <span>Press [ESC] to cancel</span>
+        </div>
       </div>
     </div>
   );

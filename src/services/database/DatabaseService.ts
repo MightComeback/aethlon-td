@@ -6,6 +6,7 @@ import {
   INITIAL_TOWER_UNLOCKS,
   SCHEMA_VERSION,
 } from "./schema";
+import { createDefaultMaps } from "./defaultMaps";
 
 const DB_NAME = "aethlon";
 const IDB_STORE = "sqlite-data";
@@ -114,6 +115,33 @@ export class DatabaseService {
        VALUES (?, ?, ?, ?, ?, ?)`,
       [crypto.randomUUID(), "Player", 0, 1, now, now]
     );
+
+    // Insert default maps
+    const defaultMaps = createDefaultMaps();
+    const mapStmt = this.db.prepare(
+      `INSERT OR IGNORE INTO maps (id, name, width, height, data, is_custom, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+    );
+    for (const map of defaultMaps) {
+      mapStmt.run([
+        map.id,
+        map.name,
+        map.width,
+        map.height,
+        JSON.stringify({
+          tiles: map.tiles,
+          heightmap: map.heightmap,
+          waypoints: map.waypoints,
+          spawnPoints: map.spawnPoints,
+          exitPoints: map.exitPoints,
+          objects: map.objects,
+        }),
+        map.isCustom ? 1 : 0,
+        map.createdAt,
+        map.updatedAt,
+      ]);
+    }
+    mapStmt.free();
 
     await this.save();
   }
