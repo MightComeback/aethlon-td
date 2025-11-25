@@ -25,7 +25,10 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { TileCatalog } from "./sections/TileCatalog";
 import { ObjectCatalog } from "./sections/ObjectCatalog";
+import { EffectCatalog } from "./sections/EffectCatalog";
+import { ElementCatalog } from "./sections/ElementCatalog";
 import { EnemyCatalog } from "./sections/EnemyCatalog";
+import { TowerCatalog } from "./sections/TowerCatalog";
 
 /**
  * Catalog section configuration
@@ -52,13 +55,30 @@ const CATALOG_SECTIONS: CatalogSection[] = [
     description: "Decorations and structures",
   },
   {
+    id: "effects",
+    label: "Effects",
+    component: EffectCatalog,
+    description: "Status effects and debuffs",
+  },
+  {
+    id: "elements",
+    label: "Elements",
+    component: ElementCatalog,
+    description: "Elemental system with merge tree",
+  },
+  {
     id: "enemies",
     label: "Enemies",
     component: EnemyCatalog,
     description: "All enemy types and variants",
   },
+  {
+    id: "towers",
+    label: "Towers",
+    component: TowerCatalog,
+    description: "Defense towers with merge paths",
+  },
   // Future sections:
-  // { id: "towers", label: "Towers", component: TowerCatalog, description: "Defense towers" },
   // { id: "abilities", label: "Abilities", component: AbilityCatalog, description: "Player abilities" },
 ];
 

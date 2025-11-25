@@ -35,9 +35,9 @@
 [] Path tiles can be deifned on top of a mountain (i.e. adjacent tiles heightmap Y > 4), but replaced with tunnel tiles
 
 [] Game is Colored
-[] Textures are congruent
+[x] Textures are congruent
 [] Textures are randomized
-[] Tiles blend together
+[x] Tiles blend together
 
 [] Meshes blend together
 
@@ -57,6 +57,11 @@
 [] Towers are mergable
 [] Tower graph is defined
 
+[] Elements are defined
+[] Elemnt affection graph is defined
+
+[] Debuffs/buffs are defined
+
 
 [] Game Mods (Save The Keeper, TD (Basic), Aegis)
 
@@ -74,6 +79,9 @@
 [] Player Characters can move
 [] Player Characters have classes
 
+[] Profile Page is defioned
+[] Stats are defined
+
 [] Catalog
 
 [] Debug system is defined
@@ -85,6 +93,7 @@
 
 [] Online Sync engine
 [] Friend List
+
 
 
 [] Game Loop is defined

@@ -117,11 +117,39 @@ export enum EnemyCategory {
 }
 
 export enum StatusEffectType {
+  // === Existing Effects ===
   Slow = "slow",
   Burn = "burn",
   Freeze = "freeze",
   Poison = "poison",
   Stun = "stun",
+
+  // === New Damage Over Time ===
+  Bleed = "bleed", // Physical DoT (stacks intensity)
+  Corrode = "corrode", // Armor-ignoring DoT
+
+  // === Armor/Defense Modifiers ===
+  ArmorShred = "armor_shred", // Reduces armor by flat amount
+  ArmorBreak = "armor_break", // Disables armor completely
+  MagicVulnerable = "magic_vulnerable", // Reduces magic resistance
+
+  // === Movement Effects ===
+  Root = "root", // Complete movement stop
+  Cripple = "cripple", // Progressive slow (gets worse over time)
+
+  // === Death Triggers ===
+  Marked = "marked", // Explodes on death
+  Contagion = "contagion", // Spreads effects on death
+  SoulHarvest = "soul_harvest", // Bonus currency/score on death
+
+  // === Damage Amplification ===
+  DamageAmp = "damage_amp", // Take increased damage (all sources)
+  PhysicalVulnerable = "physical_vulnerable", // Take increased physical damage
+  Exposed = "exposed", // Next hit deals bonus damage (consumed)
+
+  // === Crowd Control ===
+  Silence = "silence", // Disables special abilities
+  Weaken = "weaken", // Reduces enemy damage
 }
 
 export enum SpecialAbilityType {

@@ -232,8 +232,9 @@ export function CameraControlsUI({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [rotate, zoomIn, zoomOut, resetView, fitToMap, topDownView]);
 
-  // Calculate rotation display (0-360°)
+  // Calculate rotation display (0-360°) and tilt display (0-90°)
   const rotationDegrees = Math.round(((state.azimuth * 180) / Math.PI + 360) % 360);
+  const tiltDegrees = Math.round((state.polar * 180) / Math.PI);
 
   return (
     <div className="pixel-panel flex flex-col gap-2 p-2">
@@ -242,7 +243,7 @@ export function CameraControlsUI({
         Camera
       </span>
 
-      {/* Rotation controls */}
+      {/* Rotation (Azimuth) controls */}
       <div className="flex items-center gap-1">
         <button
           onClick={() => rotate(-Math.PI / 4)}
@@ -251,9 +252,12 @@ export function CameraControlsUI({
         >
           <IconRotateCCW size={16} />
         </button>
-        <span className="font-pixel text-2xs text-foreground-muted w-12 text-center">
-          {rotationDegrees}°
-        </span>
+        <div className="flex-1 text-center">
+          <span className="font-pixel text-3xs text-foreground-muted/50">X </span>
+          <span className="font-pixel text-2xs text-foreground-muted">
+            {rotationDegrees}°
+          </span>
+        </div>
         <button
           onClick={() => rotate(Math.PI / 4)}
           className="pixel-button-icon"
@@ -261,6 +265,25 @@ export function CameraControlsUI({
         >
           <IconRotateCW size={16} />
         </button>
+      </div>
+
+      {/* Tilt (Polar) display */}
+      <div className="flex items-center gap-1">
+        <span className="font-pixel text-3xs text-foreground-muted/50 w-6">Y</span>
+        <input
+          type="range"
+          min={Math.round((POLAR_MIN * 180) / Math.PI)}
+          max={Math.round((POLAR_MAX * 180) / Math.PI)}
+          value={tiltDegrees}
+          onChange={(e) =>
+            onStateChange({ ...state, polar: (Number(e.target.value) * Math.PI) / 180 })
+          }
+          className="flex-1 h-2 bg-background-tertiary appearance-none cursor-pointer accent-primary"
+          title="Camera Tilt"
+        />
+        <span className="font-pixel text-2xs text-foreground-muted w-10 text-right">
+          {tiltDegrees}°
+        </span>
       </div>
 
       {/* Quick rotation presets */}
@@ -345,4 +368,4 @@ export function CameraControlsUI({
   );
 }
 
-export { ZOOM_MIN, ZOOM_MAX, POLAR_MIN };
+export { ZOOM_MIN, ZOOM_MAX, POLAR_MIN, POLAR_MAX };

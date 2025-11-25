@@ -4,6 +4,9 @@ import * as THREE from "three";
 import { TileType } from "@/types/map";
 import { ELEVATION_UNIT, getTileBaseHeight } from "@/constants/grid.constants";
 import { getTileColor } from "@/utils/colors.utils";
+import { computeMapBlendData } from "@/utils/tileBlending";
+import { useTileAtlas } from "@/hooks/useTileAtlas";
+import { createTileAtlasMaterial, setAtlasTexture } from "@/shaders/tileAtlasShader";
 
 interface InstancedTileGridProps {
   width: number;
@@ -39,61 +42,33 @@ function getLODStep(zoom: number): number {
   return 1;
 }
 
-// Pre-create materials for each tile type
-const tileMaterials: Record<TileType, THREE.MeshStandardMaterial> = {
-  [TileType.Ground]: new THREE.MeshStandardMaterial({ color: getTileColor(TileType.Ground, false) }),
-  [TileType.Path]: new THREE.MeshStandardMaterial({ color: getTileColor(TileType.Path, false) }),
-  [TileType.Water]: new THREE.MeshStandardMaterial({ color: getTileColor(TileType.Water, false) }),
-  [TileType.Blocked]: new THREE.MeshStandardMaterial({ color: getTileColor(TileType.Blocked, false) }),
-  [TileType.Spawn]: new THREE.MeshStandardMaterial({ color: getTileColor(TileType.Spawn, false) }),
-  [TileType.Exit]: new THREE.MeshStandardMaterial({ color: getTileColor(TileType.Exit, false) }),
-};
-
-// Cache geometries for different LOD levels
+// Cache geometries for different LOD levels (with UV coordinates)
 const geometryCache = new Map<number, THREE.BoxGeometry>();
 function getGeometryForLOD(step: number): THREE.BoxGeometry {
   if (!geometryCache.has(step)) {
     const size = step * 0.95 + (step - 1) * 0.05;
-    geometryCache.set(step, new THREE.BoxGeometry(size, 1, size));
+    const geometry = new THREE.BoxGeometry(size, 1, size);
+    geometryCache.set(step, geometry);
   }
   return geometryCache.get(step)!;
 }
 
 /**
  * Calculate visible tile bounds based on camera
+ * For now, disabled viewport culling - just use full map bounds
+ * LOD system handles performance for large maps
  */
 function getVisibleBounds(
-  camera: THREE.Camera,
+  _camera: THREE.Camera,
   width: number,
   height: number,
-  padding: number = 2
+  _padding: number = 2
 ): { minX: number; maxX: number; minY: number; maxY: number } {
-  const halfWidth = width / 2;
-  const halfHeight = height / 2;
-
-  if (camera instanceof THREE.OrthographicCamera) {
-    // Get camera's view frustum in world space
-    const frustumHeight = (camera.top - camera.bottom) / camera.zoom;
-    const frustumWidth = (camera.right - camera.left) / camera.zoom;
-
-    // Get camera target (OrbitControls target is at origin by default)
-    const target = new THREE.Vector3(0, 0, 0);
-
-    // Calculate visible range with padding
-    const viewRadius = Math.max(frustumWidth, frustumHeight) / 2 + padding;
-
-    // Convert to grid coordinates
-    const minX = Math.max(0, Math.floor(target.x + halfWidth - viewRadius));
-    const maxX = Math.min(width - 1, Math.ceil(target.x + halfWidth + viewRadius));
-    const minY = Math.max(0, Math.floor(target.z + halfHeight - viewRadius));
-    const maxY = Math.min(height - 1, Math.ceil(target.z + halfHeight + viewRadius));
-
-    return { minX, maxX, minY, maxY };
-  }
-
-  // Fallback: render everything
   return { minX: 0, maxX: width - 1, minY: 0, maxY: height - 1 };
 }
+
+// Pre-create hover material
+const hoverMaterial = new THREE.MeshStandardMaterial();
 
 export function InstancedTileGrid({
   width,
@@ -104,16 +79,21 @@ export function InstancedTileGrid({
   zoom = 50,
 }: InstancedTileGridProps) {
   const { camera } = useThree();
-  const meshRefs = useRef<Record<TileType, THREE.InstancedMesh | null>>({
-    [TileType.Ground]: null,
-    [TileType.Path]: null,
-    [TileType.Water]: null,
-    [TileType.Blocked]: null,
-    [TileType.Spawn]: null,
-    [TileType.Exit]: null,
-  });
-
+  const meshRef = useRef<THREE.InstancedMesh | null>(null);
   const hoveredMeshRef = useRef<THREE.InstancedMesh | null>(null);
+
+  // Load tile atlas texture
+  const atlasTexture = useTileAtlas();
+
+  // Create shader material (memoized)
+  const material = useMemo(() => createTileAtlasMaterial(), []);
+
+  // Update material when atlas texture loads
+  useEffect(() => {
+    if (atlasTexture && material) {
+      setAtlasTexture(material, atlasTexture);
+    }
+  }, [atlasTexture, material]);
 
   // Calculate LOD step based on zoom
   const lodStep = useMemo(() => getLODStep(zoom), [zoom]);
@@ -121,54 +101,35 @@ export function InstancedTileGrid({
   // Get geometry for current LOD
   const geometry = useMemo(() => getGeometryForLOD(lodStep), [lodStep]);
 
-  // Calculate visible bounds - update when zoom changes significantly
-  const visibleBounds = useMemo(() => {
-    return getVisibleBounds(camera, width, height, lodStep * 2);
-  }, [camera, width, height, lodStep, zoom]);
+  // Get visible bounds
+  const visibleBounds = useMemo(
+    () => getVisibleBounds(camera, width, height, lodStep * 2),
+    [camera, width, height, lodStep]
+  );
 
-  // Count tiles per type at current LOD level (only visible tiles)
-  const tileCounts = useMemo(() => {
-    const counts: Record<TileType, number> = {
-      [TileType.Ground]: 0,
-      [TileType.Path]: 0,
-      [TileType.Water]: 0,
-      [TileType.Blocked]: 0,
-      [TileType.Spawn]: 0,
-      [TileType.Exit]: 0,
-    };
+  // Compute blend data (UV offsets) for all tiles
+  const blendData = useMemo(
+    () => computeMapBlendData(tiles, width, height, lodStep),
+    [tiles, width, height, lodStep]
+  );
 
+  // Calculate total tile count at current LOD
+  const tileCount = useMemo(() => {
     const { minX, maxX, minY, maxY } = visibleBounds;
+    const lodWidth = Math.ceil((maxX - minX + 1) / lodStep);
+    const lodHeight = Math.ceil((maxY - minY + 1) / lodStep);
+    return Math.max(1, lodWidth * lodHeight);
+  }, [visibleBounds, lodStep]);
 
-    // Align to LOD grid
-    const startX = Math.floor(minX / lodStep) * lodStep;
-    const startY = Math.floor(minY / lodStep) * lodStep;
-
-    for (let x = startX; x <= maxX; x += lodStep) {
-      for (let y = startY; y <= maxY; y += lodStep) {
-        if (x < 0 || x >= width || y < 0 || y >= height) continue;
-        const type = getDominantTileType(tiles, x, y, lodStep, width, height);
-        counts[type]++;
-      }
-    }
-
-    return counts;
-  }, [tiles, width, height, lodStep, visibleBounds]);
-
-  // Update instance matrices (only visible tiles)
+  // Update instance matrices and UV attributes
   useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+
     const matrix = new THREE.Matrix4();
     const position = new THREE.Vector3();
     const scale = new THREE.Vector3(1, 1, 1);
     const quaternion = new THREE.Quaternion();
-
-    const currentIndices: Record<TileType, number> = {
-      [TileType.Ground]: 0,
-      [TileType.Path]: 0,
-      [TileType.Water]: 0,
-      [TileType.Blocked]: 0,
-      [TileType.Spawn]: 0,
-      [TileType.Exit]: 0,
-    };
 
     const halfWidth = width / 2;
     const halfHeight = height / 2;
@@ -177,6 +138,11 @@ export function InstancedTileGrid({
     const { minX, maxX, minY, maxY } = visibleBounds;
     const startX = Math.floor(minX / lodStep) * lodStep;
     const startY = Math.floor(minY / lodStep) * lodStep;
+
+    // Create UV offset attribute buffer
+    const uvOffsetArray = new Float32Array(tileCount * 2);
+
+    let index = 0;
 
     for (let x = startX; x <= maxX; x += lodStep) {
       for (let y = startY; y <= maxY; y += lodStep) {
@@ -187,35 +153,44 @@ export function InstancedTileGrid({
         const baseHeight = getTileBaseHeight(type);
         const totalHeight = baseHeight + avgHeight * ELEVATION_UNIT;
 
-        position.set(
-          x + halfStep - halfWidth,
-          totalHeight / 2,
-          y + halfStep - halfHeight
-        );
+        position.set(x + halfStep - halfWidth, totalHeight / 2, y + halfStep - halfHeight);
         scale.set(1, totalHeight, 1);
 
         matrix.compose(position, quaternion, scale);
 
-        const mesh = meshRefs.current[type];
-        if (mesh && currentIndices[type] < tileCounts[type]) {
-          mesh.setMatrixAt(currentIndices[type], matrix);
+        if (index < tileCount) {
+          mesh.setMatrixAt(index, matrix);
+
+          // Get UV from blend data
+          const uvIndex = index * 2;
+          if (uvIndex < blendData.uvOffsets.length) {
+            uvOffsetArray[uvIndex] = blendData.uvOffsets[uvIndex] ?? 0;
+            uvOffsetArray[uvIndex + 1] = blendData.uvOffsets[uvIndex + 1] ?? 0;
+          }
         }
 
-        currentIndices[type]++;
+        index++;
       }
     }
 
-    // Update instance counts and mark for update
-    for (const type of TILE_TYPES) {
-      const mesh = meshRefs.current[type];
-      if (mesh) {
-        mesh.count = tileCounts[type];
-        if (mesh.instanceMatrix) {
-          mesh.instanceMatrix.needsUpdate = true;
-        }
-      }
+    // Update mesh count
+    mesh.count = Math.min(index, tileCount);
+
+    // Update instance matrix
+    if (mesh.instanceMatrix) {
+      mesh.instanceMatrix.needsUpdate = true;
     }
-  }, [tiles, heightmap, width, height, lodStep, visibleBounds, tileCounts]);
+
+    // Update or create UV offset attribute
+    const existingAttr = mesh.geometry.getAttribute("uvOffset");
+    if (existingAttr) {
+      (existingAttr as THREE.BufferAttribute).array = uvOffsetArray;
+      existingAttr.needsUpdate = true;
+    } else {
+      const uvOffsetAttribute = new THREE.InstancedBufferAttribute(uvOffsetArray, 2);
+      mesh.geometry.setAttribute("uvOffset", uvOffsetAttribute);
+    }
+  }, [tiles, heightmap, width, height, lodStep, visibleBounds, tileCount, blendData]);
 
   // Update hovered tile (always full resolution)
   useEffect(() => {
@@ -236,49 +211,38 @@ export function InstancedTileGrid({
     const totalHeight = baseHeight + elevation * ELEVATION_UNIT;
 
     const matrix = new THREE.Matrix4();
-    const pos = new THREE.Vector3(
-      x - width / 2 + 0.5,
-      totalHeight / 2,
-      y - height / 2 + 0.5
-    );
+    const pos = new THREE.Vector3(x - width / 2 + 0.5, totalHeight / 2, y - height / 2 + 0.5);
     const scaleVec = new THREE.Vector3(1, totalHeight, 1);
 
     matrix.compose(pos, new THREE.Quaternion(), scaleVec);
     mesh.setMatrixAt(0, matrix);
     mesh.instanceMatrix.needsUpdate = true;
 
-    (mesh.material as THREE.MeshStandardMaterial).color.set(
-      getTileColor(type, true)
-    );
+    (mesh.material as THREE.MeshStandardMaterial).color.set(getTileColor(type, true));
   }, [hoveredTile, tiles, heightmap, width, height]);
 
   const singleTileGeometry = useMemo(() => new THREE.BoxGeometry(0.95, 1, 0.95), []);
 
-  // Calculate max possible tiles for buffer allocation
-  const maxTilesPerType = useMemo(() => {
-    const { minX, maxX, minY, maxY } = visibleBounds;
-    const visibleWidth = Math.ceil((maxX - minX) / lodStep) + 1;
-    const visibleHeight = Math.ceil((maxY - minY) / lodStep) + 1;
-    return Math.max(1, visibleWidth * visibleHeight);
-  }, [visibleBounds, lodStep]);
+  // Wait for atlas to load before rendering
+  if (!atlasTexture) {
+    return null;
+  }
 
   return (
     <group>
-      {TILE_TYPES.map((type) => (
-        <instancedMesh
-          key={`${type}-${lodStep}-${maxTilesPerType}`}
-          ref={(mesh) => {
-            meshRefs.current[type] = mesh;
-          }}
-          args={[geometry, tileMaterials[type], maxTilesPerType]}
-          count={tileCounts[type]}
-          frustumCulled={false}
-        />
-      ))}
+      {/* Main unified tile mesh */}
+      <instancedMesh
+        key={`unified-${lodStep}-${tileCount}`}
+        ref={meshRef}
+        args={[geometry, material, tileCount]}
+        count={0}
+        frustumCulled={false}
+      />
 
+      {/* Hover overlay mesh */}
       <instancedMesh
         ref={hoveredMeshRef}
-        args={[singleTileGeometry, new THREE.MeshStandardMaterial(), 1]}
+        args={[singleTileGeometry, hoverMaterial, 1]}
         count={0}
         frustumCulled={false}
         renderOrder={1}
