@@ -3,29 +3,29 @@
 
 /* Custom theme using Tailwind v4 CSS variables */
 @theme {
-  /* Colors - Black and white minimal palette */
+  /* Colors - Gray/Black/White minimal palette */
   --color-background: #0a0a0a;
   --color-background-secondary: #141414;
-  --color-background-tertiary: #1f1f1f;
+  --color-background-tertiary: #222222;
 
-  --color-foreground: #ffffff;
-  --color-foreground-muted: #888888;
+  --color-foreground: #e0e0e0;
+  --color-foreground-muted: #666666;
 
-  --color-primary: #ffffff;
-  --color-primary-hover: #e0e0e0;
-  --color-primary-muted: #cccccc;
+  --color-primary: #444444;
+  --color-primary-hover: #555555;
+  --color-primary-muted: #333333;
 
-  --color-secondary: #333333;
-  --color-secondary-hover: #444444;
+  --color-secondary: #2a2a2a;
+  --color-secondary-hover: #363636;
 
-  --color-accent-gold: #ffffff;
-  --color-accent-green: #ffffff;
-  --color-accent-blue: #ffffff;
-  --color-accent-purple: #888888;
+  --color-accent-gold: #888888;
+  --color-accent-green: #888888;
+  --color-accent-blue: #888888;
+  --color-accent-purple: #666666;
 
-  --color-danger: #ff4444;
-  --color-warning: #ffaa00;
-  --color-success: #ffffff;
+  --color-danger: #aa4444;
+  --color-warning: #aa8800;
+  --color-success: #888888;
 
   /* Fonts */
   --font-pixel: "Press Start 2P", monospace;
@@ -98,12 +98,14 @@ body {
   letter-spacing: 0.05em;
   background-color: var(--color-primary);
   color: var(--color-foreground);
+  border: 1px solid var(--color-foreground-muted);
   transition: all 0.1s;
   box-shadow: var(--shadow-pixel);
 }
 
 .pixel-button:hover {
   background-color: var(--color-primary-hover);
+  border-color: var(--color-foreground);
 }
 
 .pixel-button:active {

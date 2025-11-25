@@ -112,25 +112,28 @@ export function TilePalette() {
       {/* Content */}
       {activeTab === "tiles" ? (
         <div className="flex flex-col gap-1">
-          {TILE_OPTIONS.map(({ type, label, color, Icon }) => (
-            <button
-              key={type}
-              onClick={() => handleTileSelect(type)}
-              className={`flex items-center gap-2 p-1.5 transition-colors rounded ${
-                selectedTileType === type
-                  ? "bg-primary"
-                  : "hover:bg-background-tertiary"
-              }`}
-            >
-              <div
-                className="flex items-center justify-center h-7 w-7 border border-foreground-muted/30 flex-shrink-0"
-                style={{ backgroundColor: `${color}33` }}
+          {TILE_OPTIONS.map(({ type, label, color, Icon }) => {
+            const isSelected = selectedTileType === type;
+            return (
+              <button
+                key={type}
+                onClick={() => handleTileSelect(type)}
+                className={`flex items-center gap-2 p-1.5 transition-colors rounded border ${
+                  isSelected
+                    ? "bg-primary border-foreground-muted"
+                    : "border-transparent hover:bg-background-tertiary"
+                }`}
               >
-                <Icon size={16} color={color} />
-              </div>
-              <span className="text-2xs text-foreground-muted truncate">{label}</span>
-            </button>
-          ))}
+                <div
+                  className="flex items-center justify-center h-7 w-7 border border-foreground-muted/30 flex-shrink-0"
+                  style={{ backgroundColor: `${color}33` }}
+                >
+                  <Icon size={16} color={color} />
+                </div>
+                <span className={`text-2xs truncate ${isSelected ? "text-foreground" : "text-foreground-muted"}`}>{label}</span>
+              </button>
+            );
+          })}
         </div>
       ) : (
         <div className="flex flex-col gap-1">
@@ -140,10 +143,10 @@ export function TilePalette() {
               <button
                 key={type}
                 onClick={() => handleObjectSelect(type)}
-                className={`flex items-center gap-2 p-1.5 transition-colors rounded ${
+                className={`flex items-center gap-2 p-1.5 transition-colors rounded border ${
                   isSelected
-                    ? "bg-primary"
-                    : "hover:bg-background-tertiary"
+                    ? "bg-primary border-foreground-muted"
+                    : "border-transparent hover:bg-background-tertiary"
                 }`}
               >
                 <div
@@ -152,7 +155,7 @@ export function TilePalette() {
                 >
                   <Icon size={16} color={color} />
                 </div>
-                <span className="text-2xs text-foreground-muted truncate">{label}</span>
+                <span className={`text-2xs truncate ${isSelected ? "text-foreground" : "text-foreground-muted"}`}>{label}</span>
               </button>
             );
           })}
