@@ -17,9 +17,7 @@ export function MainMenu() {
       <nav className="flex flex-col gap-4 w-64">
         <MenuButton to="/play">Play</MenuButton>
         <MenuButton to="/editor">Map Editor</MenuButton>
-        <MenuButton to="/collection" disabled>
-          Collection
-        </MenuButton>
+        <MenuButton to="/catalog">Catalog</MenuButton>
         <MenuButton to="/settings">Settings</MenuButton>
       </nav>
 

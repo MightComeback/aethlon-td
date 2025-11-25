@@ -3,9 +3,9 @@
  * Helper functions for wave management
  */
 
-import type { WaveConfig, WaveGroup, MapWaveOverride, EnemyDefinition } from "@/types/enemy";
+import type { WaveConfig, WaveGroup, MapWaveOverride } from "@/types/enemy";
 import { EnemyType } from "@/types/enemy";
-import { getGlobalWave, GLOBAL_WAVES } from "./globalWaves";
+import { getGlobalWave } from "./globalWaves";
 import { getEnemyDefinition, applyTier } from "@/data/enemies";
 
 /**

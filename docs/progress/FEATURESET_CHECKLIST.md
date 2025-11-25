@@ -28,6 +28,7 @@
 [] Map generator generates multiple spawn/exit points
 [] Maps spawn/exit points can be bound to waves
 [] "Temporary" paths are defined (i.e. towers are not placeable, destroyed/converted into path on scripted wave - configured by seed/map editor)
+[] (Conditional): Paths are deifned based on the amount of players on the map
 
 [] Map generator algo is sequential (rivers -> paths -> heightmap -> objects)
 [] Path tiles can be defined on top a of river, but replaced with bridge tiles
@@ -74,6 +75,8 @@
 [] Player Characters have classes
 
 [] Catalog
+
+[] Debug system is defined
 
 [] Animals are defined
 [] Animals appear on map randomly

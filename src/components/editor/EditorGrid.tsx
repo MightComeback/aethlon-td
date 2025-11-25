@@ -27,6 +27,7 @@ export function EditorGrid() {
     saveToHistory,
     placeObject,
     removeObjectAt,
+    camera,
   } = useEditorStore();
 
   const isDrawing = useRef(false);
@@ -194,13 +195,14 @@ export function EditorGrid() {
         args={[Math.max(width, height), Math.max(width, height), "#333", "#222"]}
       />
 
-      {/* Instanced tile rendering */}
+      {/* Instanced tile rendering with LOD based on zoom */}
       <InstancedTileGrid
         width={width}
         height={height}
         tiles={tiles}
         heightmap={heightmap}
         hoveredTile={hoveredTile}
+        zoom={camera.zoom}
       />
 
       {/* Interaction plane for efficient raycasting */}

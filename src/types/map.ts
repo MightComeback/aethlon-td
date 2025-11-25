@@ -1,3 +1,5 @@
+import type { MapWaveOverride } from "./enemy";
+
 export enum TileType {
   Ground = "ground",
   Path = "path",
@@ -40,6 +42,7 @@ export interface MapData {
   spawnPoints: Array<{ x: number; y: number }>;
   exitPoints: Array<{ x: number; y: number }>;
   objects?: PlacedObject[]; // Optional for backwards compatibility
+  waveOverrides?: MapWaveOverride; // Optional custom wave configuration for this map
   createdAt: number;
   updatedAt: number;
   isCustom: boolean;

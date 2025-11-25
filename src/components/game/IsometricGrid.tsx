@@ -7,6 +7,7 @@ interface IsometricGridProps {
   height: number;
   tiles?: TileType[][];
   heightmap?: number[][];
+  zoom?: number;
 }
 
 export function IsometricGrid({
@@ -14,6 +15,7 @@ export function IsometricGrid({
   height,
   tiles,
   heightmap,
+  zoom = 50,
 }: IsometricGridProps) {
   // Generate default tiles if none provided (demo pattern)
   const gridTiles = useMemo(() => {
@@ -51,6 +53,7 @@ export function IsometricGrid({
         height={height}
         tiles={gridTiles}
         heightmap={gridHeightmap}
+        zoom={zoom}
       />
     </group>
   );
@@ -59,9 +62,10 @@ export function IsometricGrid({
 // Game grid that takes full MapData
 interface GameGridProps {
   mapData: MapData;
+  zoom?: number;
 }
 
-export function GameGrid({ mapData }: GameGridProps) {
+export function GameGrid({ mapData, zoom = 50 }: GameGridProps) {
   // Generate empty heightmap if not provided
   const heightmap = useMemo(() => {
     if (mapData.heightmap) return mapData.heightmap;
@@ -82,6 +86,7 @@ export function GameGrid({ mapData }: GameGridProps) {
       height={mapData.height}
       tiles={mapData.tiles}
       heightmap={heightmap}
+      zoom={zoom}
     />
   );
 }

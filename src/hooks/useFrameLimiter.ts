@@ -17,10 +17,11 @@ export function FrameLimiter() {
   const lastFrameTime = useRef(0);
   const renderedFrames = useRef(0);
   const skippedFrames = useRef(0);
-  const fpsCounter = useRef({ frames: 0, lastTime: performance.now(), fps: 0 });
+
+  // Track actual render FPS (not RAF FPS)
+  const renderFpsCounter = useRef({ frames: 0, lastTime: performance.now(), fps: 0 });
 
   useEffect(() => {
-    // Log initial state
     console.log("[FrameLimiter] Mounted", {
       fpsLimit,
       hasAdvance: typeof advance === "function",
@@ -37,24 +38,6 @@ export function FrameLimiter() {
       const targetFrameTime = fpsLimit === 0 ? 0 : 1000 / fpsLimit;
       const elapsed = now - lastFrameTime.current;
 
-      // FPS calculation
-      fpsCounter.current.frames++;
-      if (now - fpsCounter.current.lastTime >= 1000) {
-        fpsCounter.current.fps = fpsCounter.current.frames;
-        fpsCounter.current.frames = 0;
-        fpsCounter.current.lastTime = now;
-
-        // Log every second in debug mode
-        if (debugMode) {
-          console.log("[FrameLimiter] Stats", {
-            actualFps: fpsCounter.current.fps,
-            targetFps: fpsLimit || "unlimited",
-            rendered: renderedFrames.current,
-            skipped: skippedFrames.current,
-          });
-        }
-      }
-
       let shouldRender = false;
 
       if (fpsLimit === 0) {
@@ -70,6 +53,8 @@ export function FrameLimiter() {
 
       if (shouldRender) {
         renderedFrames.current++;
+        renderFpsCounter.current.frames++;
+
         try {
           advance(now / 1000);
         } catch (e) {
@@ -79,11 +64,27 @@ export function FrameLimiter() {
         skippedFrames.current++;
       }
 
+      // Calculate actual render FPS every second
+      if (now - renderFpsCounter.current.lastTime >= 1000) {
+        renderFpsCounter.current.fps = renderFpsCounter.current.frames;
+        renderFpsCounter.current.frames = 0;
+        renderFpsCounter.current.lastTime = now;
+
+        if (debugMode) {
+          console.log("[FrameLimiter] Stats", {
+            actualRenderFps: renderFpsCounter.current.fps,
+            targetFps: fpsLimit || "unlimited",
+            totalRendered: renderedFrames.current,
+            totalSkipped: skippedFrames.current,
+          });
+        }
+      }
+
       // Update debug store
       setDebug({
         frameLimiterActive: true,
         targetFps: fpsLimit,
-        actualFps: fpsCounter.current.fps,
+        actualFps: renderFpsCounter.current.fps,
         frameTime: elapsed,
         skippedFrames: skippedFrames.current,
         renderedFrames: renderedFrames.current,

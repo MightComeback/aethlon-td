@@ -433,12 +433,6 @@ const GROUND_ENEMIES: EnemyDefinition[] = [
       bounty: 22,
       score: 35,
     },
-    specialAbility: {
-      type: SpecialAbilityType.Slow,
-      cooldown: 8000,
-      duration: 3000,
-      strength: 0.3,
-    },
     meshConfig: {
       baseShape: "insect",
       scale: 1.0,

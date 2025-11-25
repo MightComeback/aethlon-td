@@ -56,10 +56,10 @@ export function FPSCounter() {
           <div className="text-accent-green">-- Debug --</div>
           <div>Limiter: {debugInfo.frameLimiterActive ? "ON" : "OFF"}</div>
           <div>Target: {debugInfo.targetFps || "unlimited"}</div>
-          <div>R3F FPS: {debugInfo.actualFps}</div>
+          <div className="text-accent-gold">Render: {debugInfo.actualFps} fps</div>
           <div>Rendered: {debugInfo.renderedFrames}</div>
           <div>Skipped: {debugInfo.skippedFrames}</div>
-          <div>Frame: {debugInfo.frameTime.toFixed(2)}ms</div>
+          <div>Delta: {debugInfo.frameTime.toFixed(2)}ms</div>
           <div>Clock: {debugInfo.r3fClock.toFixed(2)}s</div>
           {Object.entries(debugInfo.customData).map(([key, value]) => (
             <div key={key}>

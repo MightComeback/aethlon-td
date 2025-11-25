@@ -11,9 +11,9 @@ interface InstancedTileGridProps {
   tiles: TileType[][];
   heightmap: number[][];
   hoveredTile?: { x: number; y: number } | null;
+  zoom?: number;
 }
 
-const TILE_SIZE = 0.95;
 const TILE_TYPES = [
   TileType.Ground,
   TileType.Path,
@@ -23,8 +23,22 @@ const TILE_TYPES = [
   TileType.Exit,
 ] as const;
 
-// Shared geometry - created once
-const tileGeometry = new THREE.BoxGeometry(TILE_SIZE, 1, TILE_SIZE);
+// LOD thresholds - zoom level determines LOD
+// Higher LOD = fewer tiles rendered = better performance at low zoom
+const LOD_THRESHOLDS = [
+  { maxZoom: 5, step: 16 },   // LOD 4: very far - every 16th tile
+  { maxZoom: 8, step: 8 },    // LOD 3: far - every 8th tile
+  { maxZoom: 15, step: 4 },   // LOD 2: medium - every 4th tile
+  { maxZoom: 25, step: 2 },   // LOD 1: close - every 2nd tile
+  { maxZoom: Infinity, step: 1 }, // LOD 0: full detail
+];
+
+function getLODStep(zoom: number): number {
+  for (const { maxZoom, step } of LOD_THRESHOLDS) {
+    if (zoom <= maxZoom) return step;
+  }
+  return 1;
+}
 
 // Pre-create materials for each tile type
 const tileMaterials: Record<TileType, THREE.MeshStandardMaterial> = {
@@ -36,6 +50,15 @@ const tileMaterials: Record<TileType, THREE.MeshStandardMaterial> = {
   [TileType.Exit]: new THREE.MeshStandardMaterial({ color: getTileColor(TileType.Exit, false) }),
 };
 
+// Cache geometries for different LOD levels
+const geometryCache = new Map<number, THREE.BoxGeometry>();
+function getGeometryForLOD(step: number): THREE.BoxGeometry {
+  if (!geometryCache.has(step)) {
+    const size = step * 0.95 + (step - 1) * 0.05; // Account for gaps
+    geometryCache.set(step, new THREE.BoxGeometry(size, 1, size));
+  }
+  return geometryCache.get(step)!;
+}
 
 export function InstancedTileGrid({
   width,
@@ -43,8 +66,8 @@ export function InstancedTileGrid({
   tiles,
   heightmap,
   hoveredTile,
+  zoom = 50,
 }: InstancedTileGridProps) {
-  // Refs for each tile type's instanced mesh
   const meshRefs = useRef<Record<TileType, THREE.InstancedMesh | null>>({
     [TileType.Ground]: null,
     [TileType.Path]: null,
@@ -54,10 +77,15 @@ export function InstancedTileGrid({
     [TileType.Exit]: null,
   });
 
-  // Hovered tile mesh (rendered separately for correct color)
   const hoveredMeshRef = useRef<THREE.InstancedMesh | null>(null);
 
-  // Count tiles per type
+  // Calculate LOD step based on zoom
+  const lodStep = useMemo(() => getLODStep(zoom), [zoom]);
+
+  // Get geometry for current LOD
+  const geometry = useMemo(() => getGeometryForLOD(lodStep), [lodStep]);
+
+  // Count tiles per type at current LOD level
   const tileCounts = useMemo(() => {
     const counts: Record<TileType, number> = {
       [TileType.Ground]: 0,
@@ -68,24 +96,25 @@ export function InstancedTileGrid({
       [TileType.Exit]: 0,
     };
 
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const type = tiles[x]?.[y] ?? TileType.Ground;
+    // Sample tiles based on LOD step
+    for (let x = 0; x < width; x += lodStep) {
+      for (let y = 0; y < height; y += lodStep) {
+        // Get dominant tile type in this LOD cell
+        const type = getDominantTileType(tiles, x, y, lodStep, width, height);
         counts[type]++;
       }
     }
 
     return counts;
-  }, [tiles, width, height]);
+  }, [tiles, width, height, lodStep]);
 
-  // Update instance matrices when tiles/heightmap change
+  // Update instance matrices when tiles/heightmap/LOD change
   useEffect(() => {
     const matrix = new THREE.Matrix4();
     const position = new THREE.Vector3();
     const scale = new THREE.Vector3(1, 1, 1);
     const quaternion = new THREE.Quaternion();
 
-    // Track current index for each type
     const currentIndices: Record<TileType, number> = {
       [TileType.Ground]: 0,
       [TileType.Path]: 0,
@@ -97,16 +126,22 @@ export function InstancedTileGrid({
 
     const halfWidth = width / 2;
     const halfHeight = height / 2;
+    const halfStep = lodStep / 2;
 
-    for (let x = 0; x < width; x++) {
-      for (let y = 0; y < height; y++) {
-        const type = tiles[x]?.[y] ?? TileType.Ground;
-        const elevation = heightmap[x]?.[y] ?? 0;
+    // Sample tiles based on LOD step
+    for (let x = 0; x < width; x += lodStep) {
+      for (let y = 0; y < height; y += lodStep) {
+        const type = getDominantTileType(tiles, x, y, lodStep, width, height);
+        const avgHeight = getAverageHeight(heightmap, x, y, lodStep, width, height);
         const baseHeight = getTileBaseHeight(type);
-        const totalHeight = baseHeight + elevation * ELEVATION_UNIT;
+        const totalHeight = baseHeight + avgHeight * ELEVATION_UNIT;
 
-        // World position (centered)
-        position.set(x - halfWidth, totalHeight / 2, y - halfHeight);
+        // Position at center of LOD cell
+        position.set(
+          x + halfStep - halfWidth,
+          totalHeight / 2,
+          y + halfStep - halfHeight
+        );
         scale.set(1, totalHeight, 1);
 
         matrix.compose(position, quaternion, scale);
@@ -127,15 +162,14 @@ export function InstancedTileGrid({
         mesh.instanceMatrix.needsUpdate = true;
       }
     }
-  }, [tiles, heightmap, width, height]);
+  }, [tiles, heightmap, width, height, lodStep]);
 
-  // Update hovered tile separately
+  // Update hovered tile (always full resolution for interaction)
   useEffect(() => {
     const mesh = hoveredMeshRef.current;
     if (!mesh) return;
 
     if (!hoveredTile) {
-      // Hide the hovered mesh by scaling to 0
       mesh.count = 0;
       return;
     }
@@ -150,41 +184,41 @@ export function InstancedTileGrid({
 
     const matrix = new THREE.Matrix4();
     const position = new THREE.Vector3(
-      x - width / 2,
+      x - width / 2 + 0.5,
       totalHeight / 2,
-      y - height / 2
+      y - height / 2 + 0.5
     );
-    const scale = new THREE.Vector3(1, totalHeight, 1);
+    const scaleVec = new THREE.Vector3(1, totalHeight, 1);
 
-    matrix.compose(position, new THREE.Quaternion(), scale);
+    matrix.compose(position, new THREE.Quaternion(), scaleVec);
     mesh.setMatrixAt(0, matrix);
     mesh.instanceMatrix.needsUpdate = true;
 
-    // Update material color based on hovered tile type
     (mesh.material as THREE.MeshStandardMaterial).color.set(
       getTileColor(type, true)
     );
   }, [hoveredTile, tiles, heightmap, width, height]);
 
+  // Single tile geometry for hover highlight
+  const singleTileGeometry = useMemo(() => new THREE.BoxGeometry(0.95, 1, 0.95), []);
+
   return (
     <group>
-      {/* Render instanced mesh for each tile type */}
       {TILE_TYPES.map((type) => (
         <instancedMesh
-          key={type}
+          key={`${type}-${lodStep}`}
           ref={(mesh) => {
             meshRefs.current[type] = mesh;
           }}
-          args={[tileGeometry, tileMaterials[type], tileCounts[type] || 1]}
+          args={[geometry, tileMaterials[type], tileCounts[type] || 1]}
           count={tileCounts[type]}
           frustumCulled={false}
         />
       ))}
 
-      {/* Hovered tile overlay (rendered on top) */}
       <instancedMesh
         ref={hoveredMeshRef}
-        args={[tileGeometry, new THREE.MeshStandardMaterial(), 1]}
+        args={[singleTileGeometry, new THREE.MeshStandardMaterial(), 1]}
         count={0}
         frustumCulled={false}
         renderOrder={1}
@@ -193,7 +227,93 @@ export function InstancedTileGrid({
   );
 }
 
-// Interaction plane for raycasting (more efficient than per-tile events)
+/**
+ * Get the dominant (most common) tile type in a LOD cell
+ */
+function getDominantTileType(
+  tiles: TileType[][],
+  startX: number,
+  startY: number,
+  step: number,
+  width: number,
+  height: number
+): TileType {
+  if (step === 1) {
+    return tiles[startX]?.[startY] ?? TileType.Ground;
+  }
+
+  const counts: Record<TileType, number> = {
+    [TileType.Ground]: 0,
+    [TileType.Path]: 0,
+    [TileType.Water]: 0,
+    [TileType.Blocked]: 0,
+    [TileType.Spawn]: 0,
+    [TileType.Exit]: 0,
+  };
+
+  // Priority tiles (always shown if present in cell)
+  let hasSpawn = false;
+  let hasExit = false;
+  let hasPath = false;
+
+  for (let dx = 0; dx < step && startX + dx < width; dx++) {
+    for (let dy = 0; dy < step && startY + dy < height; dy++) {
+      const type = tiles[startX + dx]?.[startY + dy] ?? TileType.Ground;
+      counts[type]++;
+
+      if (type === TileType.Spawn) hasSpawn = true;
+      if (type === TileType.Exit) hasExit = true;
+      if (type === TileType.Path) hasPath = true;
+    }
+  }
+
+  // Priority: Spawn > Exit > Path > most common
+  if (hasSpawn) return TileType.Spawn;
+  if (hasExit) return TileType.Exit;
+  if (hasPath) return TileType.Path;
+
+  // Return most common type
+  let maxCount = 0;
+  let dominantType: TileType = TileType.Ground;
+  for (const type of TILE_TYPES) {
+    if (counts[type] > maxCount) {
+      maxCount = counts[type];
+      dominantType = type;
+    }
+  }
+
+  return dominantType;
+}
+
+/**
+ * Get average height in a LOD cell
+ */
+function getAverageHeight(
+  heightmap: number[][],
+  startX: number,
+  startY: number,
+  step: number,
+  width: number,
+  height: number
+): number {
+  if (step === 1) {
+    return heightmap[startX]?.[startY] ?? 0;
+  }
+
+  let sum = 0;
+  let count = 0;
+
+  for (let dx = 0; dx < step && startX + dx < width; dx++) {
+    for (let dy = 0; dy < step && startY + dy < height; dy++) {
+      sum += heightmap[startX + dx]?.[startY + dy] ?? 0;
+      count++;
+    }
+  }
+
+  return count > 0 ? sum / count : 0;
+}
+
+// Interaction plane for raycasting
 interface InteractionPlaneProps {
   width: number;
   height: number;
