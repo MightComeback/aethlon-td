@@ -24,13 +24,13 @@ const TILE_OPTIONS: Array<{
   color: string;
   Icon: React.ComponentType<{ size?: number; color?: string }>;
 }> = [
-  { type: TileType.Ground, label: "Ground", color: "#333333", Icon: IconTileGround },
-  { type: TileType.Path, label: "Path", color: "#666666", Icon: IconTilePath },
-  { type: TileType.Water, label: "Water", color: "#1a1a1a", Icon: IconTileWater },
-  { type: TileType.Blocked, label: "Blocked", color: "#0a0a0a", Icon: IconTileBlocked },
-  { type: TileType.Spawn, label: "Spawn", color: "#ffffff", Icon: IconTileSpawn },
-  { type: TileType.Exit, label: "Exit", color: "#888888", Icon: IconTileExit },
-];
+    { type: TileType.Ground, label: "Ground", color: "#333333", Icon: IconTileGround },
+    { type: TileType.Path, label: "Path", color: "#666666", Icon: IconTilePath },
+    { type: TileType.Water, label: "Water", color: "#1a1a1a", Icon: IconTileWater },
+    { type: TileType.Blocked, label: "Blocked", color: "#0a0a0a", Icon: IconTileBlocked },
+    { type: TileType.Spawn, label: "Spawn", color: "#ffffff", Icon: IconTileSpawn },
+    { type: TileType.Exit, label: "Exit", color: "#888888", Icon: IconTileExit },
+  ];
 
 // Environment objects - B&W theme
 const OBJECT_OPTIONS: Array<{
@@ -39,14 +39,14 @@ const OBJECT_OPTIONS: Array<{
   color: string;
   Icon: React.ComponentType<{ size?: number; color?: string }>;
 }> = [
-  { type: "tree_pine", label: "Pine Tree", color: "#888888", Icon: IconTreePine },
-  { type: "tree_oak", label: "Oak Tree", color: "#555555", Icon: IconTreeOak },
-  { type: "rock", label: "Rock", color: "#888888", Icon: IconRock },
-  { type: "bush", label: "Bush", color: "#555555", Icon: IconBush },
-  { type: "grass", label: "Grass", color: "#888888", Icon: IconGrass },
-  { type: "flower", label: "Flower", color: "#cccccc", Icon: IconFlower },
-  { type: "tower_base", label: "Tower Spot", color: "#444444", Icon: IconTowerBase },
-];
+    { type: "tree_pine", label: "Pine Tree", color: "#888888", Icon: IconTreePine },
+    { type: "tree_oak", label: "Oak Tree", color: "#555555", Icon: IconTreeOak },
+    { type: "rock", label: "Rock", color: "#888888", Icon: IconRock },
+    { type: "bush", label: "Bush", color: "#555555", Icon: IconBush },
+    { type: "grass", label: "Grass", color: "#888888", Icon: IconGrass },
+    { type: "flower", label: "Flower", color: "#cccccc", Icon: IconFlower },
+    { type: "tower_base", label: "Tower Spot", color: "#444444", Icon: IconTowerBase },
+  ];
 
 type PaletteTab = "tiles" | "objects";
 
@@ -89,21 +89,19 @@ export function TilePalette() {
       <div className="grid grid-cols-2 gap-0 border-b border-border mb-3 -mx-4 -mt-4">
         <button
           onClick={() => setActiveTab("tiles")}
-          className={`font-pixel text-2xs py-2 px-1 transition-colors text-center ${
-            activeTab === "tiles"
-              ? "bg-primary text-foreground"
-              : "text-foreground-muted hover:bg-background-tertiary"
-          }`}
+          className={`font-pixel text-2xs py-2 px-1 transition-colors text-center ${activeTab === "tiles"
+            ? "bg-primary text-foreground"
+            : "text-foreground-muted hover:bg-background-tertiary"
+            }`}
         >
           Tiles
         </button>
         <button
           onClick={() => setActiveTab("objects")}
-          className={`font-pixel text-2xs py-2 px-1 transition-colors text-center ${
-            activeTab === "objects"
-              ? "bg-primary text-foreground"
-              : "text-foreground-muted hover:bg-background-tertiary"
-          }`}
+          className={`font-pixel text-2xs py-2 px-1 transition-colors text-center ${activeTab === "objects"
+            ? "bg-primary text-foreground"
+            : "text-foreground-muted hover:bg-background-tertiary"
+            }`}
         >
           Objects
         </button>
@@ -118,11 +116,10 @@ export function TilePalette() {
               <button
                 key={type}
                 onClick={() => handleTileSelect(type)}
-                className={`flex items-center gap-2 p-1.5 transition-colors rounded border ${
-                  isSelected
-                    ? "bg-primary border-foreground-muted"
-                    : "border-transparent hover:bg-background-tertiary"
-                }`}
+                className={`flex items-center gap-2 p-1.5 transition-colors rounded border ${isSelected
+                  ? "bg-primary border-foreground-muted"
+                  : "border-transparent hover:bg-background-tertiary"
+                  }`}
               >
                 <div
                   className="flex items-center justify-center h-7 w-7 border border-foreground-muted/30 flex-shrink-0"
@@ -143,11 +140,10 @@ export function TilePalette() {
               <button
                 key={type}
                 onClick={() => handleObjectSelect(type)}
-                className={`flex items-center gap-2 p-1.5 transition-colors rounded border ${
-                  isSelected
-                    ? "bg-primary border-foreground-muted"
-                    : "border-transparent hover:bg-background-tertiary"
-                }`}
+                className={`flex items-center gap-2 p-1.5 transition-colors rounded border ${isSelected
+                  ? "bg-primary border-foreground-muted"
+                  : "border-transparent hover:bg-background-tertiary"
+                  }`}
               >
                 <div
                   className="flex items-center justify-center h-7 w-7 border border-foreground-muted/30 flex-shrink-0"
