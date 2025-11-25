@@ -39,9 +39,23 @@
 [] Enemy stats are defined (health, speed, damage, dodge, armor, magic res)
 [] Enemies have tiers (visible)
 
+
+[] Towers are defined
+[] Tower types are defined (electric, magic, melee, ranged)
+[] Tower stats are defined (health, attack speed, damage, armor, magic pen)
+[] Towers are mergable
+[] Tower graph is defined
+
+
+[] Game Mods (Save The Keeper, TD (Basic), Aegis)
+
+
 [] Local first
 
 [] Online Sync engine
 [] Friend List
+
+
+# [] Game Loop is defined
 
 
