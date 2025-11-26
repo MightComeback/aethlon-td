@@ -3,14 +3,17 @@
  * Display and manage individual waves
  */
 
+import { useState } from "react";
 import { useEditorStore } from "@/stores/editorStore";
 import { GLOBAL_WAVES } from "@/data/waves/globalWaves";
 import { getEnemyDefinition } from "@/data/enemies";
 import { PixelIcon } from "@/components/ui/PixelIcon";
 import { getDifficultyRating } from "@/data/waves/waveUtils";
+import { SimpleWaveEditor } from "./SimpleWaveEditor";
 
 export function WaveList() {
   const { waveConfig, waveEditorMode, mapId, removeWave } = useEditorStore();
+  const [editingWaveNumber, setEditingWaveNumber] = useState<number | null>(null);
 
   // Determine which waves to display
   const displayWaves = waveEditorMode === "replace"
@@ -24,8 +27,7 @@ export function WaveList() {
       });
 
   const handleEditWave = (waveNumber: number) => {
-    // TODO: Open SimpleWaveEditor
-    console.log("Edit wave", waveNumber);
+    setEditingWaveNumber(waveNumber);
   };
 
   const handleCopyWave = (waveNumber: number) => {
@@ -51,13 +53,21 @@ export function WaveList() {
 
   const handleAddWave = () => {
     const newWaveNumber = (waveConfig?.waves.length ?? 0) + 1;
-    useEditorStore.getState().setSelectedWaveNumber(newWaveNumber);
-    // TODO: Open SimpleWaveEditor
-    console.log("Add wave", newWaveNumber);
+    setEditingWaveNumber(newWaveNumber);
   };
 
   return (
-    <div className="space-y-4">
+    <>
+      {/* Simple Wave Editor Modal */}
+      {editingWaveNumber !== null && (
+        <SimpleWaveEditor
+          waveNumber={editingWaveNumber}
+          onClose={() => setEditingWaveNumber(null)}
+          onSave={() => setEditingWaveNumber(null)}
+        />
+      )}
+
+      <div className="space-y-4">
       {/* Header Actions */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-400 pixel-text">
@@ -119,6 +129,7 @@ export function WaveList() {
         )}
       </div>
     </div>
+    </>
   );
 }
 

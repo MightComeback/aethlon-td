@@ -119,7 +119,14 @@ function TowerMeshPartComponent({ part, elementColor }: MeshPartProps) {
   });
 
   return (
-    <mesh ref={meshRef} position={part.position} rotation={rotation} geometry={geometry}>
+    <mesh
+      ref={meshRef}
+      position={part.position}
+      rotation={rotation}
+      geometry={geometry}
+      castShadow
+      receiveShadow
+    >
       <meshStandardMaterial
         color={color}
         emissive={part.emissive || "#000000"}

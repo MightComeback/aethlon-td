@@ -23,34 +23,20 @@ function getTileColors(biome: BiomeType = DEFAULT_BIOME): Record<TileType, strin
 }
 
 /**
- * Load the tile atlas texture from file
- * Configures for pixel art rendering (nearest neighbor filtering)
+ * Generate tile atlas texture procedurally
+ * No file loading - always generates on demand
  */
 export function useTileAtlas(): THREE.Texture | null {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
 
   useEffect(() => {
-    // Try to load the texture, fall back to generated if not found
-    const loader = new THREE.TextureLoader();
-
-    loader.load(
-      "/textures/tile-atlas.png",
-      (loadedTexture) => {
-        configureTextureForPixelArt(loadedTexture);
-        setTexture(loadedTexture);
-      },
-      undefined,
-      () => {
-        // Texture not found, generate one
-        console.log("Tile atlas not found, generating procedurally...");
-        const generatedTexture = generateTileAtlas();
-        setTexture(generatedTexture);
-      }
-    );
+    // Generate texture immediately - no file loading
+    const generatedTexture = generateTileAtlas();
+    setTexture(generatedTexture);
 
     return () => {
-      if (texture) {
-        texture.dispose();
+      if (generatedTexture) {
+        generatedTexture.dispose();
       }
     };
   }, []);

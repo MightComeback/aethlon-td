@@ -74,37 +74,37 @@ export function CommanderMesh({ isMoving, isSelected = false }: CommanderMeshPro
       {/* Body group */}
       <group ref={bodyRef}>
         {/* Feet/base */}
-        <mesh position={[0, 0.1, 0]}>
+        <mesh position={[0, 0.1, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.12, 0.15, 0.15, 8]} />
           <meshStandardMaterial color={colors.feet} flatShading />
         </mesh>
 
         {/* Body/torso */}
-        <mesh position={[0, 0.32, 0]}>
+        <mesh position={[0, 0.32, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.25, 0.35, 0.15]} />
           <meshStandardMaterial color={colors.body} flatShading />
         </mesh>
 
         {/* Shoulders */}
-        <mesh position={[0, 0.45, 0]}>
+        <mesh position={[0, 0.45, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.35, 0.1, 0.15]} />
           <meshStandardMaterial color={colors.body} flatShading />
         </mesh>
 
         {/* Neck */}
-        <mesh position={[0, 0.52, 0]}>
+        <mesh position={[0, 0.52, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.05, 0.06, 0.08, 6]} />
           <meshStandardMaterial color={colors.head} flatShading />
         </mesh>
 
         {/* Head */}
-        <mesh position={[0, 0.62, 0]}>
+        <mesh position={[0, 0.62, 0]} castShadow receiveShadow>
           <sphereGeometry args={[0.1, 8, 6]} />
           <meshStandardMaterial color={colors.head} flatShading />
         </mesh>
 
         {/* Cape */}
-        <mesh ref={capeRef} position={[0, 0.35, 0.1]} rotation={[0.2, 0, 0]}>
+        <mesh ref={capeRef} position={[0, 0.35, 0.1]} rotation={[0.2, 0, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.3, 0.4, 0.03]} />
           <meshStandardMaterial
             color={colors.cape}
@@ -114,7 +114,7 @@ export function CommanderMesh({ isMoving, isSelected = false }: CommanderMeshPro
         </mesh>
 
         {/* Cape clasp */}
-        <mesh position={[0, 0.48, 0.08]}>
+        <mesh position={[0, 0.48, 0.08]} castShadow receiveShadow>
           <octahedronGeometry args={[0.03, 0]} />
           <meshStandardMaterial
             color="#ffd700"

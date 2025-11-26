@@ -27,9 +27,8 @@ function RootComponent() {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <AppContent />
-        <TanStackRouterDevtools />
         <Scripts />
       </body>
     </html>

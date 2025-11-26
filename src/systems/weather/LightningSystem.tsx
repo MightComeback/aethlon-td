@@ -32,11 +32,9 @@ interface LightningSystemProps {
   mapHeight?: number;
 }
 
-export function LightningSystem({
-  mapWidth = 100,
-  mapHeight = 100,
-}: LightningSystemProps) {
+export function LightningSystem({}: LightningSystemProps) {
   const groupRef = useRef<THREE.Group>(null);
+  const lightRef = useRef<THREE.PointLight>(null);
   const [bolts, setBolts] = useState<LightningBolt[]>([]);
 
   const { camera } = useThree();
@@ -44,7 +42,6 @@ export function LightningSystem({
   // Get weather state
   const currentWeather = useWeatherStore((s) => s.current);
   const lightning = useWeatherStore((s) => s.lightning);
-  const triggerLightning = useWeatherStore((s) => s.triggerLightning);
 
   // Get quality settings
   const graphicsQuality = useSettingsStore((s) => s.graphicsQuality);
@@ -112,7 +109,7 @@ export function LightningSystem({
     }
   }, [lightning.active, bolts.length]);
 
-  // Update material each frame
+  // Update material and point light each frame
   useFrame((state) => {
     if (!material) return;
 
@@ -120,21 +117,37 @@ export function LightningSystem({
       intensity: lightning.intensity,
       time: state.clock.elapsedTime,
     });
+
+    // Update point light position and intensity
+    if (lightRef.current && lightning.active && lightning.strikePosition) {
+      const [x, z] = lightning.strikePosition;
+      lightRef.current.position.set(x, 5, z);
+      lightRef.current.intensity = lightning.intensity * 20; // Dramatic intensity
+      lightRef.current.visible = true;
+    } else if (lightRef.current) {
+      lightRef.current.visible = false;
+    }
   });
 
-  // Don't render if not thunderstorm or no bolts
+  // Don't render if not thunderstorm
   if (currentWeather !== WeatherType.Thunderstorm) {
     return null;
   }
 
-  // Flash-only mode (no bolt geometry)
-  if (!showBoltGeometry) {
-    return null; // Flash is handled by the shader uniforms
-  }
-
   return (
     <group ref={groupRef}>
-      {bolts.map((bolt, index) => (
+      {/* Dramatic point light at lightning strike location - always present for lighting effects */}
+      <pointLight
+        ref={lightRef}
+        color="#a0d8ff"
+        intensity={0}
+        distance={50}
+        decay={2}
+        castShadow={false} // Disable shadows for performance
+      />
+
+      {/* Bolt geometry - only shown at high zoom */}
+      {showBoltGeometry && bolts.map((bolt, index) => (
         <mesh
           key={`${bolt.createdAt}-${index}`}
           geometry={bolt.geometry}

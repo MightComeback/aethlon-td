@@ -88,6 +88,19 @@ export interface WeatherQualityPreset {
   lightningBolts: boolean; // Whether to render bolt geometry
   postProcessing: boolean; // Whether to use post-processing effects
   fogQuality: "simple" | "volumetric";
+
+  // Shadow settings
+  shadowsEnabled: boolean;
+  shadowMapSize: number; // 512, 1024, 2048, 4096
+  shadowMapType: "basic" | "pcf" | "pcfsoft" | "vsm";
+  shadowRadius: number;
+  shadowBias: number;
+  shadowNormalBias: number;
+
+  // Post-processing effects (expanded from boolean)
+  bloomEnabled: boolean;
+  ssaoEnabled: boolean;
+  toneMappingEnabled: boolean;
 }
 
 // Weather transition state

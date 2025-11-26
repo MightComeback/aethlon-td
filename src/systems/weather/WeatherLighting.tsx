@@ -4,11 +4,14 @@
  * Updates both Three.js lights and tile shader uniforms
  */
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { CameraHelper } from "three";
 import { useWeatherStore } from "@/stores/weatherStore";
 import { useTileMaterialStore } from "@/stores/tileMaterialStore";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { WEATHER_QUALITY_PRESETS } from "@/data/weather/qualityPresets";
 import {
   setLighting,
   setWeatherUniforms,
@@ -18,11 +21,17 @@ import {
 export function WeatherLighting() {
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const directionalRef = useRef<THREE.DirectionalLight>(null);
+  const [shadowHelper, setShadowHelper] = useState<CameraHelper | null>(null);
 
   const { scene } = useThree();
 
   // Get tile material from store
   const tileMaterial = useTileMaterialStore((s) => s.material);
+
+  // Get graphics quality for shadow configuration
+  const graphicsQuality = useSettingsStore((s) => s.graphicsQuality);
+  const debugMode = useSettingsStore((s) => s.debugMode);
+  const qualityPreset = WEATHER_QUALITY_PRESETS[graphicsQuality];
 
   // Subscribe to weather store
   const effectiveLighting = useWeatherStore((s) => s.effectiveLighting);
@@ -30,6 +39,60 @@ export function WeatherLighting() {
   const lightning = useWeatherStore((s) => s.lightning);
   const updateTransition = useWeatherStore((s) => s.updateTransition);
   const updateLightning = useWeatherStore((s) => s.updateLightning);
+
+  // Configure directional light shadows
+  useEffect(() => {
+    if (!directionalRef.current) return;
+
+    const light = directionalRef.current;
+
+    if (qualityPreset.shadowsEnabled) {
+      light.castShadow = true;
+      light.shadow.mapSize.width = qualityPreset.shadowMapSize;
+      light.shadow.mapSize.height = qualityPreset.shadowMapSize;
+      light.shadow.bias = qualityPreset.shadowBias;
+      light.shadow.normalBias = qualityPreset.shadowNormalBias;
+      light.shadow.radius = qualityPreset.shadowRadius;
+
+      // Configure orthographic shadow camera for isometric view
+      const shadowSize = 100; // Large enough for all maps
+      light.shadow.camera.left = -shadowSize;
+      light.shadow.camera.right = shadowSize;
+      light.shadow.camera.top = shadowSize;
+      light.shadow.camera.bottom = -shadowSize;
+      light.shadow.camera.near = 0.1;
+      light.shadow.camera.far = 200;
+
+      light.shadow.camera.updateProjectionMatrix();
+
+      console.log('Shadows enabled:', {
+        mapSize: qualityPreset.shadowMapSize,
+        type: qualityPreset.shadowMapType,
+        shadowCameraSize: shadowSize,
+        bias: qualityPreset.shadowBias,
+        normalBias: qualityPreset.shadowNormalBias,
+      });
+
+      // Add shadow camera helper in debug mode
+      if (debugMode && !shadowHelper) {
+        const helper = new CameraHelper(light.shadow.camera);
+        scene.add(helper);
+        setShadowHelper(helper);
+        console.log('Shadow camera helper added');
+      }
+    } else {
+      light.castShadow = false;
+      console.log('Shadows disabled');
+    }
+
+    // Clean up helper when debug mode is disabled
+    return () => {
+      if (shadowHelper) {
+        scene.remove(shadowHelper);
+        setShadowHelper(null);
+      }
+    };
+  }, [qualityPreset, debugMode, shadowHelper, scene]);
 
   // Update scene background color based on weather
   useEffect(() => {
@@ -79,7 +142,7 @@ export function WeatherLighting() {
 
     // Update tile shader uniforms
     if (tileMaterial) {
-      // Update base lighting
+      // Update base lighting (handled by scene lights now, but kept for interface compatibility)
       setLighting(tileMaterial, {
         ambientColor: hexToVector3(effectiveLighting.ambientColor),
         ambientIntensity,
@@ -94,9 +157,21 @@ export function WeatherLighting() {
           ? hexToVector3(effectiveVisuals.screenTint)
           : new THREE.Vector3(1, 1, 1),
         weatherTintStrength: effectiveVisuals.screenTintStrength ?? 0,
-        fogDensity: effectiveVisuals.fogDensity,
-        fogColor: hexToVector3(effectiveVisuals.fogColor),
+        // Fog handled by scene.fog below
       });
+    }
+
+    // Update Scene Fog (Global Fog)
+    if (effectiveVisuals.fogDensity > 0) {
+       if (!scene.fog || !(scene.fog instanceof THREE.Fog)) {
+          scene.fog = new THREE.Fog(effectiveVisuals.fogColor, effectiveVisuals.fogNear, effectiveVisuals.fogFar);
+       }
+       const fog = scene.fog as THREE.Fog;
+       fog.color.set(effectiveVisuals.fogColor);
+       fog.near = effectiveVisuals.fogNear ?? 10;
+       fog.far = effectiveVisuals.fogFar ?? 100;
+    } else {
+       scene.fog = null;
     }
   });
 
@@ -112,6 +187,20 @@ export function WeatherLighting() {
         intensity={effectiveLighting.directionalIntensity}
         color={effectiveLighting.directionalColor}
         position={effectiveLighting.directionalPosition}
+      />
+
+      {/* Hemisphere light for ambient occlusion effect */}
+      <hemisphereLight
+        intensity={0.3}
+        color={effectiveLighting.ambientColor}
+        groundColor="#4a5568"
+      />
+
+      {/* Fill light for rim lighting (opposite direction from main light) */}
+      <directionalLight
+        position={[-5, 8, -8]}
+        intensity={0.2}
+        color="#7fa3d1"
       />
     </>
   );

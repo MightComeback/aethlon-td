@@ -91,6 +91,7 @@ function MeshPartComponent({ part, colorShift }: MeshPartProps) {
       position={part.position}
       rotation={rotation}
       geometry={geometry}
+      castShadow
     >
       <meshStandardMaterial
         color={color}

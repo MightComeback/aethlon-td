@@ -1,8 +1,16 @@
 import { Link } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { useGameStore } from "@/stores/gameStore";
+import { DevConsole } from "./DevConsole";
+import { getBaseTowers } from "@/data/towers/towerDatabase";
+import { getElementColor } from "@/data/elements";
+import type { ExtendedTowerDefinition } from "@/types/tower";
 
 export function GameHUD() {
   const { lives, currency, wave, maxWaves, isPaused, speed } = useGameStore();
+
+  // Get tier-1 (base) towers from catalog
+  const baseTowers = useMemo(() => getBaseTowers(), []);
 
   return (
     <div className="pointer-events-none absolute inset-0">
@@ -43,15 +51,20 @@ export function GameHUD() {
       </div>
 
       {/* Bottom: Tower selection panel */}
-      <div className="pointer-events-auto absolute bottom-0 left-0 right-0 p-4">
-        <div className="pixel-panel mx-auto flex max-w-2xl items-center justify-center gap-4">
-          <TowerSlot name="Arrow" cost={50} />
-          <TowerSlot name="Cannon" cost={100} />
-          <TowerSlot name="Magic" cost={75} />
-          <TowerSlot name="Ice" cost={80} />
-          <TowerSlot name="Lightning" cost={120} locked />
+      <div className="pointer-events-auto absolute bottom-0 left-0 right-0 p-4 pb-0">
+        <div className="pixel-panel mx-auto flex max-w-3xl items-center justify-center gap-2 mb-4 overflow-x-auto py-2">
+          {baseTowers.map((tower) => (
+            <TowerSlot
+              key={tower.id}
+              tower={tower}
+              canAfford={currency >= tower.baseStats.cost}
+            />
+          ))}
         </div>
       </div>
+
+      {/* Dev Console */}
+      <DevConsole />
     </div>
   );
 }
@@ -95,26 +108,38 @@ function PauseButton({ isPaused }: PauseButtonProps) {
 }
 
 interface TowerSlotProps {
-  name: string;
-  cost: number;
-  locked?: boolean;
+  tower: ExtendedTowerDefinition;
+  canAfford: boolean;
 }
 
-function TowerSlot({ name, cost, locked }: TowerSlotProps) {
+function TowerSlot({ tower, canAfford }: TowerSlotProps) {
+  const elementColor = getElementColor(tower.element) ?? "#888888";
+
   return (
     <button
-      disabled={locked}
+      disabled={!canAfford}
       className={`flex flex-col items-center gap-1 p-2 transition-all hover:bg-background-tertiary ${
-        locked ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
+        !canAfford ? "opacity-40 cursor-not-allowed" : "cursor-pointer"
       }`}
+      title={`${tower.name}: ${tower.description}`}
     >
-      <div className="h-12 w-12 bg-background-tertiary border border-foreground-muted flex items-center justify-center">
-        <span className="font-pixel text-2xs text-foreground-muted">
-          {locked ? "?" : name.charAt(0)}
+      <div
+        className="h-10 w-10 border border-foreground-muted flex items-center justify-center"
+        style={{ backgroundColor: elementColor + "33" }}
+      >
+        <span
+          className="font-pixel text-xs font-bold"
+          style={{ color: elementColor }}
+        >
+          {tower.element.charAt(0).toUpperCase()}
         </span>
       </div>
-      <span className="text-2xs text-foreground-muted">{name}</span>
-      <span className="text-2xs text-accent-gold">${cost}</span>
+      <span className="text-2xs text-foreground-muted truncate max-w-[60px]">
+        {tower.name}
+      </span>
+      <span className={`text-2xs ${canAfford ? "text-accent-gold" : "text-danger"}`}>
+        ${tower.baseStats.cost}
+      </span>
     </button>
   );
 }

@@ -47,7 +47,7 @@ function getLODStep(zoom: number): number {
 const geometryCache = new Map<number, THREE.BoxGeometry>();
 function getGeometryForLOD(step: number): THREE.BoxGeometry {
   if (!geometryCache.has(step)) {
-    const size = step * 0.95 + (step - 1) * 0.05;
+    const size = step;
     const geometry = new THREE.BoxGeometry(size, 1, size);
     geometryCache.set(step, geometry);
   }
@@ -192,13 +192,21 @@ export function InstancedTileGrid({
     }
 
     // Update or create UV offset attribute
-    const existingAttr = mesh.geometry.getAttribute("uvOffset");
-    if (existingAttr) {
-      (existingAttr as THREE.BufferAttribute).array = uvOffsetArray;
-      existingAttr.needsUpdate = true;
-    } else {
+    const existingAttr = mesh.geometry.getAttribute("uvOffset") as THREE.InstancedBufferAttribute | undefined;
+
+    // Check if we need to recreate the attribute (size changed or doesn't exist)
+    if (!existingAttr || existingAttr.array.length !== uvOffsetArray.length) {
+      // Dispose old attribute if it exists
+      if (existingAttr) {
+        mesh.geometry.deleteAttribute("uvOffset");
+      }
+      // Create new attribute with correct size
       const uvOffsetAttribute = new THREE.InstancedBufferAttribute(uvOffsetArray, 2);
       mesh.geometry.setAttribute("uvOffset", uvOffsetAttribute);
+    } else {
+      // Same size - can update in place
+      (existingAttr.array as Float32Array).set(uvOffsetArray);
+      existingAttr.needsUpdate = true;
     }
   }, [tiles, heightmap, width, height, lodStep, visibleBounds, tileCount, blendData]);
 
@@ -247,6 +255,7 @@ export function InstancedTileGrid({
         args={[geometry, material, tileCount]}
         count={0}
         frustumCulled={false}
+        receiveShadow
       />
 
       {/* Hover overlay mesh */}

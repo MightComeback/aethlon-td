@@ -7,8 +7,8 @@ import { create } from "zustand";
 import * as THREE from "three";
 
 interface TileMaterialStore {
-  material: THREE.ShaderMaterial | null;
-  setMaterial: (material: THREE.ShaderMaterial | null) => void;
+  material: THREE.Material | null;
+  setMaterial: (material: THREE.Material | null) => void;
 }
 
 export const useTileMaterialStore = create<TileMaterialStore>((set) => ({

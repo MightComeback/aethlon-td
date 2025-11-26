@@ -7,28 +7,67 @@ import { QualityLevel, WeatherQualityPreset } from "@/types/weather";
 
 export const WEATHER_QUALITY_PRESETS: Record<QualityLevel, WeatherQualityPreset> = {
   low: {
-    particleMultiplier: 0.1,
-    maxRainParticles: 2000,
-    maxSnowParticles: 1000,
-    lightningBolts: false,
+    particleMultiplier: 0.3,
+    maxRainParticles: 5000,
+    maxSnowParticles: 2500,
+    lightningBolts: true,
     postProcessing: false,
     fogQuality: "simple",
+
+    // Basic shadows enabled for low quality
+    shadowsEnabled: true,
+    shadowMapSize: 512,
+    shadowMapType: "basic",
+    shadowRadius: 1,
+    shadowBias: -0.001,
+    shadowNormalBias: 0.1,
+
+    // Minimal post-processing
+    bloomEnabled: false,
+    ssaoEnabled: false,
+    toneMappingEnabled: false,
   },
   medium: {
-    particleMultiplier: 0.3,
-    maxRainParticles: 8000,
-    maxSnowParticles: 4000,
-    lightningBolts: false,
+    particleMultiplier: 0.5,
+    maxRainParticles: 15000,
+    maxSnowParticles: 7500,
+    lightningBolts: true,
     postProcessing: false,
     fogQuality: "simple",
+
+    // PCF shadows for medium quality
+    shadowsEnabled: true,
+    shadowMapSize: 1024,
+    shadowMapType: "pcf",
+    shadowRadius: 2,
+    shadowBias: -0.001,
+    shadowNormalBias: 0.1,
+
+    // Tone mapping enabled
+    bloomEnabled: false,
+    ssaoEnabled: false,
+    toneMappingEnabled: true,
   },
   high: {
-    particleMultiplier: 0.6,
-    maxRainParticles: 20000,
-    maxSnowParticles: 10000,
+    particleMultiplier: 0.75,
+    maxRainParticles: 30000,
+    maxSnowParticles: 15000,
     lightningBolts: true,
     postProcessing: true,
     fogQuality: "volumetric",
+
+    // High-quality shadows
+    shadowsEnabled: true,
+    shadowMapSize: 2048,
+    shadowMapType: "pcf",
+    shadowRadius: 3,
+    shadowBias: -0.002,
+    shadowNormalBias: 0.15,
+
+    // Full post-processing
+    bloomEnabled: true,
+    ssaoEnabled: true,
+    toneMappingEnabled: true,
   },
   ultra: {
     particleMultiplier: 1.0,
@@ -37,6 +76,19 @@ export const WEATHER_QUALITY_PRESETS: Record<QualityLevel, WeatherQualityPreset>
     lightningBolts: true,
     postProcessing: true,
     fogQuality: "volumetric",
+
+    // Ultra-quality soft shadows
+    shadowsEnabled: true,
+    shadowMapSize: 4096,
+    shadowMapType: "pcfsoft",
+    shadowRadius: 4,
+    shadowBias: -0.002,
+    shadowNormalBias: 0.2,
+
+    // Full post-processing with highest quality
+    bloomEnabled: true,
+    ssaoEnabled: true,
+    toneMappingEnabled: true,
   },
 };
 
