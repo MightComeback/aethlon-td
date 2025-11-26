@@ -8,6 +8,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { ExtendedTowerDefinition, TowerMeshPart } from "@/types/tower";
 import { getElementColor } from "@/data/elements";
+import { usePixelTexture } from "@/hooks/usePixelTexture";
 
 interface MeshPartProps {
   part: TowerMeshPart;
@@ -19,7 +20,8 @@ interface MeshPartProps {
  */
 function TowerMeshPartComponent({ part, elementColor }: MeshPartProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-
+  const pixelTexture = usePixelTexture();
+  
   // Apply element color tint to grayscale base
   const color = useMemo(() => {
     // Mix grayscale with element color (60% gray, 40% element)
@@ -128,10 +130,13 @@ function TowerMeshPartComponent({ part, elementColor }: MeshPartProps) {
       receiveShadow
     >
       <meshStandardMaterial
+        map={pixelTexture}
         color={color}
         emissive={part.emissive || "#000000"}
         emissiveIntensity={part.emissive ? 0.5 : 0}
-        flatShading={part.flatShading ?? true}
+        flatShading={false} // Disable flat shading to let texture do the work
+        roughness={0.8}
+        metalness={0.1}
       />
     </mesh>
   );

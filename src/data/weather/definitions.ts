@@ -23,10 +23,10 @@ export const WEATHER_DEFINITIONS: Record<WeatherType, WeatherDefinition> = {
     },
     lighting: {
       ambientColor: "#ffffff",
-      ambientIntensity: 0.4,
+      ambientIntensity: 0.15, // Significantly reduced for contrast
       directionalColor: "#fff5e6",
-      directionalIntensity: 1.2,
-      directionalPosition: [15, 25, 12],
+      directionalIntensity: 1.5, // Boosted sun
+      directionalPosition: [25, 40, 20], // Higher angle for better shadows
     },
     modifiers: {},
     transitionDuration: 3,
@@ -52,9 +52,9 @@ export const WEATHER_DEFINITIONS: Record<WeatherType, WeatherDefinition> = {
     },
     lighting: {
       ambientColor: "#aabbcc",
-      ambientIntensity: 0.3,
+      ambientIntensity: 0.1,
       directionalColor: "#8899aa",
-      directionalIntensity: 0.5,
+      directionalIntensity: 0.8,
       directionalPosition: [15, 25, 12],
     },
     modifiers: {

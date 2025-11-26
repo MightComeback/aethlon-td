@@ -8,6 +8,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { EnemyDefinition, MeshPart } from "@/types/enemy";
 import { shiftGrayscale, getTierColorShift } from "@/data/enemies/tiers";
+import { usePixelTexture } from "@/hooks/usePixelTexture";
 
 interface MeshPartProps {
   part: MeshPart;
@@ -18,6 +19,8 @@ interface MeshPartProps {
  * Renders a single mesh part (primitive shape)
  */
 function MeshPartComponent({ part, colorShift }: MeshPartProps) {
+  const pixelTexture = usePixelTexture();
+  
   const color = useMemo(
     () => shiftGrayscale(part.color, colorShift),
     [part.color, colorShift]
@@ -94,8 +97,11 @@ function MeshPartComponent({ part, colorShift }: MeshPartProps) {
       castShadow
     >
       <meshStandardMaterial
+        map={pixelTexture}
         color={color}
-        flatShading={part.flatShading ?? true}
+        flatShading={false}
+        roughness={0.8}
+        metalness={0.1}
       />
     </mesh>
   );

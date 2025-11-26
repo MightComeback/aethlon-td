@@ -55,13 +55,14 @@ export function WeatherLighting() {
       light.shadow.radius = qualityPreset.shadowRadius;
 
       // Configure orthographic shadow camera for isometric view
-      const shadowSize = 100; // Large enough for all maps
+      // INCREASED SIZE to ensure everything is covered
+      const shadowSize = 200;
       light.shadow.camera.left = -shadowSize;
       light.shadow.camera.right = shadowSize;
       light.shadow.camera.top = shadowSize;
       light.shadow.camera.bottom = -shadowSize;
       light.shadow.camera.near = 0.1;
-      light.shadow.camera.far = 200;
+      light.shadow.camera.far = 500; // Increased far plane
 
       light.shadow.camera.updateProjectionMatrix();
 
@@ -108,10 +109,12 @@ export function WeatherLighting() {
   }, [scene, effectiveVisuals.screenTint, effectiveVisuals.screenTintStrength]);
 
   // Main update loop
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     // Update weather transitions
     updateTransition(delta);
     updateLightning(delta);
+
+    const time = state.clock.elapsedTime;
 
     // Calculate effective lighting with lightning boost
     let ambientIntensity = effectiveLighting.ambientIntensity;
@@ -151,6 +154,7 @@ export function WeatherLighting() {
 
       // Update weather effects
       setWeatherUniforms(tileMaterial, {
+        time: time,
         screenDarkening: effectiveVisuals.screenDarkening,
         lightningFlash: lightning.active ? lightning.intensity : 0,
         weatherTint: effectiveVisuals.screenTint
@@ -163,15 +167,15 @@ export function WeatherLighting() {
 
     // Update Scene Fog (Global Fog)
     if (effectiveVisuals.fogDensity > 0) {
-       if (!scene.fog || !(scene.fog instanceof THREE.Fog)) {
-          scene.fog = new THREE.Fog(effectiveVisuals.fogColor, effectiveVisuals.fogNear, effectiveVisuals.fogFar);
-       }
-       const fog = scene.fog as THREE.Fog;
-       fog.color.set(effectiveVisuals.fogColor);
-       fog.near = effectiveVisuals.fogNear ?? 10;
-       fog.far = effectiveVisuals.fogFar ?? 100;
+      if (!scene.fog || !(scene.fog instanceof THREE.Fog)) {
+        scene.fog = new THREE.Fog(effectiveVisuals.fogColor, effectiveVisuals.fogNear, effectiveVisuals.fogFar);
+      }
+      const fog = scene.fog as THREE.Fog;
+      fog.color.set(effectiveVisuals.fogColor);
+      fog.near = effectiveVisuals.fogNear ?? 10;
+      fog.far = effectiveVisuals.fogFar ?? 100;
     } else {
-       scene.fog = null;
+      scene.fog = null;
     }
   });
 

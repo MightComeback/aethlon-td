@@ -25,6 +25,7 @@ export function createTileAtlasMaterial(
   // Store uniforms in userData to be accessible
   material.userData.uniforms = {
     tileUvSize: { value: UV_TILE_SIZE },
+    time: { value: 0.0 },
     screenDarkening: { value: 0.0 },
     lightningFlash: { value: 0.0 },
     weatherTint: { value: new THREE.Vector3(1, 1, 1) },
@@ -46,6 +47,7 @@ export function createTileAtlasMaterial(
       #include <common>
       attribute vec2 uvOffset;
       uniform float tileUvSize;
+      uniform float time;
       `
     );
 
@@ -170,6 +172,9 @@ export function setWeatherUniforms(
   if (!material.userData.uniforms) return;
   const uniforms = material.userData.uniforms;
 
+  if (options.time !== undefined) {
+    uniforms.time.value = options.time;
+  }
   if (options.screenDarkening !== undefined) {
     uniforms.screenDarkening.value = options.screenDarkening;
   }

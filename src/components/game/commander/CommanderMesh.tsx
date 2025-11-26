@@ -72,7 +72,7 @@ export function CommanderMesh({ isMoving, isSelected = false }: CommanderMeshPro
       </mesh>
 
       {/* Body group */}
-      <group ref={bodyRef}>
+      <group ref={bodyRef} scale={0.35}>
         {/* Feet/base */}
         <mesh position={[0, 0.1, 0]} castShadow receiveShadow>
           <cylinderGeometry args={[0.12, 0.15, 0.15, 8]} />
