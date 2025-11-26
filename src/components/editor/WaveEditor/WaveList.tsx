@@ -4,7 +4,6 @@
  */
 
 import { useEditorStore } from "@/stores/editorStore";
-import { getWaveForMap } from "@/data/waves/waveUtils";
 import { GLOBAL_WAVES } from "@/data/waves/globalWaves";
 import { getEnemyDefinition } from "@/data/enemies";
 import { PixelIcon } from "@/components/ui/PixelIcon";

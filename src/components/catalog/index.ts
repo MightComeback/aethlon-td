@@ -42,6 +42,7 @@
 export { CatalogPage } from "./CatalogPage";
 export { TileCatalog } from "./sections/TileCatalog";
 export { ObjectCatalog } from "./sections/ObjectCatalog";
+export { StructureCatalog } from "./sections/StructureCatalog";
 export { EffectCatalog } from "./sections/EffectCatalog";
 export { ElementCatalog } from "./sections/ElementCatalog";
 export { EnemyCatalog } from "./sections/EnemyCatalog";

@@ -11,7 +11,7 @@ import { getEnemyDefinition } from "@/data/enemies";
 import { PixelIcon, IconStar } from "@/components/ui/PixelIcon";
 
 export function BossTemplateLibrary() {
-  const { updateWave, selectedWaveNumber, setSelectedWaveNumber } = useEditorStore();
+  const { updateWave, selectedWaveNumber } = useEditorStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPattern, setSelectedPattern] = useState<string>("all");
 

@@ -2611,6 +2611,41 @@ export const PixelIcons = {
   bone: IconBone,
   mute: IconMute,
   sword: IconSword,
+  wave: IconWind, // Use wind icon as wave substitute
+  plane: IconWind, // Use wind icon as flying substitute
 } as const;
 
 export type PixelIconName = keyof typeof PixelIcons;
+
+// Generic PixelIcon component for dynamic icon rendering
+interface DynamicIconProps {
+  icon: PixelIconName | string;
+  size?: number;
+  color?: string;
+  className?: string;
+}
+
+export function PixelIcon({ icon, size = 16, color, className }: DynamicIconProps) {
+  const IconComponent = PixelIcons[icon as PixelIconName];
+
+  if (!IconComponent) {
+    // Fallback to a simple square if icon not found
+    return (
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={color || "currentColor"}
+        className={className}
+      >
+        <rect x="6" y="6" width="12" height="12" strokeWidth="2" />
+      </svg>
+    );
+  }
+
+  return <IconComponent size={size} color={color} className={className} />;
+}
+
+// Alias for compatibility
+export { IconClose as IconX };

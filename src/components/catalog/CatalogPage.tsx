@@ -25,6 +25,7 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { TileCatalog } from "./sections/TileCatalog";
 import { ObjectCatalog } from "./sections/ObjectCatalog";
+import { StructureCatalog } from "./sections/StructureCatalog";
 import { EffectCatalog } from "./sections/EffectCatalog";
 import { ElementCatalog } from "./sections/ElementCatalog";
 import { EnemyCatalog } from "./sections/EnemyCatalog";
@@ -52,7 +53,13 @@ const CATALOG_SECTIONS: CatalogSection[] = [
     id: "objects",
     label: "Objects",
     component: ObjectCatalog,
-    description: "Decorations and structures",
+    description: "Single-tile decorations and objects",
+  },
+  {
+    id: "structures",
+    label: "Structures",
+    component: StructureCatalog,
+    description: "Multi-tile buildings and infrastructure",
   },
   {
     id: "effects",
