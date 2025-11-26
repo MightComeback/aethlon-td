@@ -189,19 +189,8 @@ export function WeatherLighting() {
         position={effectiveLighting.directionalPosition}
       />
 
-      {/* Hemisphere light for ambient occlusion effect */}
-      <hemisphereLight
-        intensity={0.3}
-        color={effectiveLighting.ambientColor}
-        groundColor="#4a5568"
-      />
-
-      {/* Fill light for rim lighting (opposite direction from main light) */}
-      <directionalLight
-        position={[-5, 8, -8]}
-        intensity={0.2}
-        color="#7fa3d1"
-      />
+      {/* Hemisphere light and Fill light removed to prevent washing out shadows.
+          Relying on ambient + main directional for high contrast pixel art look. */}
     </>
   );
 }

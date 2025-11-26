@@ -16,8 +16,8 @@ export function createTileAtlasMaterial(
 ): THREE.MeshStandardMaterial {
   const material = new THREE.MeshStandardMaterial({
     map: atlas || null,
-    roughness: 0.9,
-    metalness: 0.1,
+    roughness: 0.8,
+    metalness: 0.0,
     side: THREE.FrontSide,
     transparent: false,
   });

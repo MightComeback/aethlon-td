@@ -37,11 +37,11 @@ export const WEATHER_QUALITY_PRESETS: Record<QualityLevel, WeatherQualityPreset>
 
     // PCF shadows for medium quality
     shadowsEnabled: true,
-    shadowMapSize: 1024,
+    shadowMapSize: 2048,
     shadowMapType: "pcf",
     shadowRadius: 2,
-    shadowBias: -0.001,
-    shadowNormalBias: 0.1,
+    shadowBias: -0.0005,
+    shadowNormalBias: 0.05,
 
     // Tone mapping enabled
     bloomEnabled: false,
@@ -58,11 +58,11 @@ export const WEATHER_QUALITY_PRESETS: Record<QualityLevel, WeatherQualityPreset>
 
     // High-quality shadows
     shadowsEnabled: true,
-    shadowMapSize: 2048,
-    shadowMapType: "pcf",
+    shadowMapSize: 4096,
+    shadowMapType: "pcfsoft",
     shadowRadius: 3,
-    shadowBias: -0.002,
-    shadowNormalBias: 0.15,
+    shadowBias: -0.0005,
+    shadowNormalBias: 0.05,
 
     // Full post-processing
     bloomEnabled: true,

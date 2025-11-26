@@ -23,9 +23,9 @@ export const WEATHER_DEFINITIONS: Record<WeatherType, WeatherDefinition> = {
     },
     lighting: {
       ambientColor: "#ffffff",
-      ambientIntensity: 0.6,
+      ambientIntensity: 0.4,
       directionalColor: "#fff5e6",
-      directionalIntensity: 0.8,
+      directionalIntensity: 1.2,
       directionalPosition: [15, 25, 12],
     },
     modifiers: {},
@@ -54,7 +54,7 @@ export const WEATHER_DEFINITIONS: Record<WeatherType, WeatherDefinition> = {
       ambientColor: "#aabbcc",
       ambientIntensity: 0.3,
       directionalColor: "#8899aa",
-      directionalIntensity: 0.2,
+      directionalIntensity: 0.5,
       directionalPosition: [15, 25, 12],
     },
     modifiers: {
@@ -88,7 +88,7 @@ export const WEATHER_DEFINITIONS: Record<WeatherType, WeatherDefinition> = {
       ambientColor: "#8899aa",
       ambientIntensity: 0.2,
       directionalColor: "#667788",
-      directionalIntensity: 0.1,
+      directionalIntensity: 0.3,
       directionalPosition: [15, 25, 12],
     },
     modifiers: {
@@ -123,7 +123,7 @@ export const WEATHER_DEFINITIONS: Record<WeatherType, WeatherDefinition> = {
       ambientColor: "#2d3a4d",
       ambientIntensity: 0.1, // Near-black
       directionalColor: "#4a5a6d",
-      directionalIntensity: 0.05,
+      directionalIntensity: 0.2,
       directionalPosition: [15, 25, 12],
       flashIntensity: 2.0, // Bright lightning flash
       flashColor: "#e6f0ff",
@@ -161,9 +161,9 @@ export const WEATHER_DEFINITIONS: Record<WeatherType, WeatherDefinition> = {
     },
     lighting: {
       ambientColor: "#ddeeff",
-      ambientIntensity: 0.45,
+      ambientIntensity: 0.5,
       directionalColor: "#ccddee",
-      directionalIntensity: 0.3,
+      directionalIntensity: 0.8,
       directionalPosition: [15, 25, 12],
     },
     modifiers: {

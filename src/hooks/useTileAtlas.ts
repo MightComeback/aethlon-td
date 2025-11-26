@@ -252,7 +252,8 @@ function drawEdgeGradient(
 }
 
 /**
- * Add subtle pixel noise to a tile for texture
+ * Add structured pixel noise to a tile for texture
+ * Creates a more cohesive "pixel art" texture feel
  */
 function addPixelNoise(
   ctx: CanvasRenderingContext2D,
@@ -263,20 +264,55 @@ function addPixelNoise(
   intensity: number
 ): void {
   const baseRGB = hexToRGB(baseColor);
-
+  
+  // Create a pattern 4x4 repeating
+  const patternSize = 4;
+  
   for (let py = 0; py < size; py++) {
     for (let px = 0; px < size; px++) {
-      // Random chance to modify pixel
-      if (Math.random() < 0.3) {
-        const variation = (Math.random() - 0.5) * 2 * intensity * 255;
-        const r = Math.max(0, Math.min(255, baseRGB.r + variation));
-        const g = Math.max(0, Math.min(255, baseRGB.g + variation));
-        const b = Math.max(0, Math.min(255, baseRGB.b + variation));
+      // Structured noise based on position
+      const noiseVal = (Math.sin(px * 0.5) + Math.cos(py * 0.5)) * 0.5;
+      
+      // Random variation
+      const randomVal = Math.random() - 0.5;
+      
+      // Mix structured and random
+      const combined = (noiseVal * 0.3 + randomVal * 0.7) * intensity * 255 * 2.0;
+      
+      // Apply to base color
+      const r = Math.max(0, Math.min(255, baseRGB.r + combined));
+      const g = Math.max(0, Math.min(255, baseRGB.g + combined));
+      const b = Math.max(0, Math.min(255, baseRGB.b + combined));
 
-        ctx.fillStyle = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
-        ctx.fillRect(x + px, y + py, 1, 1);
+      // Only draw if different enough to optimize? No, canvas is fast enough.
+      // Draw subtle checkerboard pattern for "ground" feel
+      if ((Math.floor(px / 2) + Math.floor(py / 2)) % 2 === 0) {
+         // Slight darken
+         ctx.fillStyle = `rgb(${Math.round(r * 0.95)}, ${Math.round(g * 0.95)}, ${Math.round(b * 0.95)})`;
+      } else {
+         ctx.fillStyle = `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b)})`;
       }
+      
+      ctx.fillRect(x + px, y + py, 1, 1);
     }
+  }
+  
+  // Add some random "stones" or "dots" (high contrast pixels)
+  const dotCount = Math.floor(size * size * 0.02); // 2% of pixels
+  for(let i=0; i<dotCount; i++) {
+      const dx = Math.floor(Math.random() * size);
+      const dy = Math.floor(Math.random() * size);
+      
+      // 50% light, 50% dark dots
+      const isLight = Math.random() > 0.5;
+      const dotIntensity = isLight ? 1.2 : 0.8;
+      
+      ctx.fillStyle = `rgb(
+        ${Math.min(255, Math.round(baseRGB.r * dotIntensity))}, 
+        ${Math.min(255, Math.round(baseRGB.g * dotIntensity))}, 
+        ${Math.min(255, Math.round(baseRGB.b * dotIntensity))}
+      )`;
+      ctx.fillRect(x + dx, y + dy, 1, 1);
   }
 }
 
