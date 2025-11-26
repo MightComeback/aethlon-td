@@ -1,6 +1,6 @@
 /**
- * Blizzard Element - Tier 3 Towers (Ice + Water mastery)
- * Ultimate Ice element specialization
+ * Glacier Element - Tier 3 Towers (Ice + Water mastery)
+ * Ultimate Water element specialization
  */
 
 import {
@@ -13,14 +13,14 @@ import { MergedElementT2, MergedElementT3, BaseElement } from "@/types/element";
 import { StatusEffectType } from "@/types/enemy";
 import { createTowerId } from "../../mergeGraph";
 
-export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
-  // 1. Blizzard Damage Tower
+export const GLACIER_TIER3_TOWERS: ExtendedTowerDefinition[] = [
+  // 1. Glacier Damage Tower
   {
-    id: createTowerId(MergedElementT3.Blizzard, TowerCategory.Damage, 3),
-    type: "blizzard_damage" as any,
+    id: createTowerId(MergedElementT3.Glacier, TowerCategory.Damage, 3),
+    type: "glacier_damage" as any,
     name: "Arctic Fortress",
-    description: "Unleashes devastating blizzards that freeze and shatter enemies.",
-    element: MergedElementT3.Blizzard,
+    description: "Unleashes devastating ice storms that freeze and shatter enemies.",
+    element: MergedElementT3.Glacier,
     category: TowerCategory.Damage,
     tier: 3,
     rarity: TowerRarity.Rare,
@@ -56,7 +56,7 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
         createTowerId(MergedElementT2.Ice, TowerCategory.Damage, 2),
         createTowerId(BaseElement.Water, TowerCategory.Damage, 1),
       ],
-      output: createTowerId(MergedElementT3.Blizzard, TowerCategory.Damage, 3),
+      output: createTowerId(MergedElementT3.Glacier, TowerCategory.Damage, 3),
       tier: 3,
       rarity: TowerRarity.Rare,
     },
@@ -70,18 +70,17 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
         { type: "octahedron", position: [0, 0.4, 0], size: [0.24], color: "#444444" },
         { type: "octahedron", position: [0, 0.8, 0], size: [0.18], color: "#555555", emissive: "#87ceeb", animated: { type: "rotate", speed: 0.5, axis: "y" } },
         { type: "octahedron", position: [0, 1.15, 0], size: [0.1], color: "#888888", emissive: "#e0ffff", animated: { type: "bob", speed: 1 } },
-        { type: "cone", position: [0.15, 0.6, 0.1], rotation: [0, 0, 0.4], size: [0.04, 0.15], color: "#aaaaaa", emissive: "#e0ffff" },
       ],
     },
   },
 
-  // 2. Blizzard Magic Damage Tower
+  // 2. Glacier Magic Damage Tower
   {
-    id: createTowerId(MergedElementT3.Blizzard, TowerCategory.MagicDamage, 3),
-    type: "blizzard_magic_damage" as any,
+    id: createTowerId(MergedElementT3.Glacier, TowerCategory.MagicDamage, 3),
+    type: "glacier_magic_damage" as any,
     name: "Frostweave Spire",
     description: "Channels ultimate ice magic that shatters magical resistance.",
-    element: MergedElementT3.Blizzard,
+    element: MergedElementT3.Glacier,
     category: TowerCategory.MagicDamage,
     tier: 3,
     rarity: TowerRarity.Rare,
@@ -101,7 +100,7 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
         createTowerId(MergedElementT2.Ice, TowerCategory.MagicDamage, 2),
         createTowerId(BaseElement.Water, TowerCategory.MagicDamage, 1),
       ],
-      output: createTowerId(MergedElementT3.Blizzard, TowerCategory.MagicDamage, 3),
+      output: createTowerId(MergedElementT3.Glacier, TowerCategory.MagicDamage, 3),
       tier: 3,
       rarity: TowerRarity.Rare,
     },
@@ -118,13 +117,13 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
     },
   },
 
-  // 3. Blizzard Physical Damage Tower
+  // 3. Glacier Physical Damage Tower
   {
-    id: createTowerId(MergedElementT3.Blizzard, TowerCategory.PhysicalDamage, 3),
-    type: "blizzard_physical_damage" as any,
-    name: "Glacier Catapult",
+    id: createTowerId(MergedElementT3.Glacier, TowerCategory.PhysicalDamage, 3),
+    type: "glacier_physical_damage" as any,
+    name: "Iceberg Catapult",
     description: "Launches massive ice boulders that shatter on impact.",
-    element: MergedElementT3.Blizzard,
+    element: MergedElementT3.Glacier,
     category: TowerCategory.PhysicalDamage,
     tier: 3,
     rarity: TowerRarity.Rare,
@@ -145,7 +144,7 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
         createTowerId(MergedElementT2.Ice, TowerCategory.PhysicalDamage, 2),
         createTowerId(BaseElement.Water, TowerCategory.PhysicalDamage, 1),
       ],
-      output: createTowerId(MergedElementT3.Blizzard, TowerCategory.PhysicalDamage, 3),
+      output: createTowerId(MergedElementT3.Glacier, TowerCategory.PhysicalDamage, 3),
       tier: 3,
       rarity: TowerRarity.Rare,
     },
@@ -163,13 +162,13 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
     },
   },
 
-  // 4. Blizzard Buff Tower
+  // 4. Glacier Buff Tower
   {
-    id: createTowerId(MergedElementT3.Blizzard, TowerCategory.Buff, 3),
-    type: "blizzard_buff" as any,
+    id: createTowerId(MergedElementT3.Glacier, TowerCategory.Buff, 3),
+    type: "glacier_buff" as any,
     name: "Permafrost Sanctuary",
     description: "Creates a zone of extreme cold that enhances nearby towers' range.",
-    element: MergedElementT3.Blizzard,
+    element: MergedElementT3.Glacier,
     category: TowerCategory.Buff,
     tier: 3,
     rarity: TowerRarity.Rare,
@@ -195,7 +194,7 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
         createTowerId(MergedElementT2.Ice, TowerCategory.Buff, 2),
         createTowerId(BaseElement.Water, TowerCategory.Buff, 1),
       ],
-      output: createTowerId(MergedElementT3.Blizzard, TowerCategory.Buff, 3),
+      output: createTowerId(MergedElementT3.Glacier, TowerCategory.Buff, 3),
       tier: 3,
       rarity: TowerRarity.Rare,
     },
@@ -213,13 +212,13 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
     },
   },
 
-  // 5. Blizzard Debuff Tower
+  // 5. Glacier Debuff Tower
   {
-    id: createTowerId(MergedElementT3.Blizzard, TowerCategory.Debuff, 3),
-    type: "blizzard_debuff" as any,
+    id: createTowerId(MergedElementT3.Glacier, TowerCategory.Debuff, 3),
+    type: "glacier_debuff" as any,
     name: "Absolute Zero",
     description: "Generates temperatures so cold enemies are completely frozen.",
-    element: MergedElementT3.Blizzard,
+    element: MergedElementT3.Glacier,
     category: TowerCategory.Debuff,
     tier: 3,
     rarity: TowerRarity.Rare,
@@ -245,7 +244,7 @@ export const BLIZZARD_TIER3_TOWERS: ExtendedTowerDefinition[] = [
         createTowerId(MergedElementT2.Ice, TowerCategory.Debuff, 2),
         createTowerId(BaseElement.Water, TowerCategory.Debuff, 1),
       ],
-      output: createTowerId(MergedElementT3.Blizzard, TowerCategory.Debuff, 3),
+      output: createTowerId(MergedElementT3.Glacier, TowerCategory.Debuff, 3),
       tier: 3,
       rarity: TowerRarity.Rare,
     },

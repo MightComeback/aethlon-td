@@ -7,6 +7,7 @@ import { getTileColor } from "@/utils/colors.utils";
 import { computeMapBlendData } from "@/utils/tileBlending";
 import { useTileAtlas } from "@/hooks/useTileAtlas";
 import { createTileAtlasMaterial, setAtlasTexture } from "@/shaders/tileAtlasShader";
+import { useTileMaterialStore } from "@/stores/tileMaterialStore";
 
 interface InstancedTileGridProps {
   width: number;
@@ -85,8 +86,17 @@ export function InstancedTileGrid({
   // Load tile atlas texture
   const atlasTexture = useTileAtlas();
 
+  // Get material store setter
+  const setTileMaterial = useTileMaterialStore((s) => s.setMaterial);
+
   // Create shader material (memoized)
   const material = useMemo(() => createTileAtlasMaterial(), []);
+
+  // Register material with store for weather system access
+  useEffect(() => {
+    setTileMaterial(material);
+    return () => setTileMaterial(null);
+  }, [material, setTileMaterial]);
 
   // Update material when atlas texture loads
   useEffect(() => {

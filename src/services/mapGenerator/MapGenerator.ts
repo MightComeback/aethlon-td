@@ -9,6 +9,8 @@ import {
   generateHeightmap,
 } from "./TerrainGenerator";
 import { placeObjects } from "./ObjectPlacer";
+import { placeStructures, getOccupiedTiles } from "./StructurePlacer";
+import { DEFAULT_BIOME } from "@/data/biomes/definitions";
 
 export interface GeneratorConfig {
   seed?: string;
@@ -136,17 +138,36 @@ export function generateMap(config: GeneratorConfig = {}): GeneratedMap {
   // 8. Generate heightmap
   const heightmap = generateHeightmap(rng, tiles, clampedWidth, clampedHeight);
 
-  // 9. Place decorative objects (8-12% density)
+  // 9. Place multi-tile structures (villages, buildings, infrastructure)
+  const structures = placeStructures(
+    rng,
+    tiles,
+    pathTiles,
+    clampedWidth,
+    clampedHeight,
+    DEFAULT_BIOME,
+    scaleFactor
+  );
+
+  // Get occupied tiles from structures to avoid overlap
+  const occupiedByStructures = getOccupiedTiles(structures);
+
+  // 10. Place decorative objects (8-12% density, avoiding structure footprints)
   const objectDensity = 0.08 + rng.next() * 0.04;
   const objects = placeObjects(
     rng,
     tiles,
     clampedWidth,
     clampedHeight,
-    objectDensity
+    objectDensity,
+    DEFAULT_BIOME,
+    occupiedByStructures
   );
 
-  // 10. Build MapData
+  // 11. Combine structures and objects
+  const allObjects = [...structures, ...objects];
+
+  // 12. Build MapData
   const now = Date.now();
   const mapData: MapData = {
     id: crypto.randomUUID(),
@@ -158,7 +179,7 @@ export function generateMap(config: GeneratorConfig = {}): GeneratedMap {
     waypoints,
     spawnPoints: [spawn],
     exitPoints: [exit],
-    objects,
+    objects: allObjects,
     createdAt: now,
     updatedAt: now,
     isCustom: true,

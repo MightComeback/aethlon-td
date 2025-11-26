@@ -20,39 +20,26 @@ export enum BaseElement {
 
 /**
  * Merged elements from two base elements (Tier 2)
+ * One primary mastery path per base element
  */
 export enum MergedElementT2 {
-  Steam = "steam", // Fire + Water
-  Lava = "lava", // Fire + Earth
-  Plasma = "plasma", // Fire + Air
-  Storm = "storm", // Fire + Lightning
-  Ice = "ice", // Water + Earth
-  Mist = "mist", // Water + Air
-  Tempest = "tempest", // Water + Lightning
-  Dust = "dust", // Earth + Air
-  Crystal = "crystal", // Earth + Lightning
-  Thunder = "thunder", // Air + Lightning
+  Lava = "lava", // Fire + Earth (Fire mastery)
+  Ice = "ice", // Water + Earth (Water mastery)
+  Storm = "storm", // Air + Lightning (Air mastery)
+  Magma = "magma", // Earth + Lightning (Earth mastery)
+  Plasma = "plasma", // Fire + Air (balanced)
 }
 
 /**
- * Advanced elements from complex combinations (Tier 3)
+ * Advanced elements from mastery combinations (Tier 3)
+ * Ultimate mastery - one per base element
  */
 export enum MergedElementT3 {
-  Volcano = "volcano", // Lava + Fire (Fire mastery)
-  Inferno = "inferno", // Plasma + Fire
-  Tsunami = "tsunami", // Steam + Water (Water mastery)
-  Blizzard = "blizzard", // Ice + Water
-  Earthquake = "earthquake", // Lava + Earth (Earth mastery)
-  Mountain = "mountain", // Crystal + Earth
-  Hurricane = "hurricane", // Thunder + Air (Air mastery)
-  Cyclone = "cyclone", // Mist + Air
-  Supercell = "supercell", // Storm + Lightning (Lightning mastery)
-  Discharge = "discharge", // Crystal + Lightning
-  Aurora = "aurora", // Ice + Thunder (cross-element)
-  Sandstorm = "sandstorm", // Dust + Storm
-  Geyser = "geyser", // Steam + Ice
-  Monsoon = "monsoon", // Tempest + Mist
-  Meteor = "meteor", // Volcano + Crystal
+  Volcano = "volcano", // Lava + Fire (Ultimate Fire)
+  Glacier = "glacier", // Ice + Water (Ultimate Water)
+  Hurricane = "hurricane", // Storm + Air (Ultimate Air)
+  Mountain = "mountain", // Magma + Earth (Ultimate Earth)
+  Supercell = "supercell", // Storm + Lightning (Ultimate Lightning)
 }
 
 /**

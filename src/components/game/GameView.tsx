@@ -3,6 +3,7 @@ import { OrthographicCamera } from "@react-three/drei";
 import { Suspense } from "react";
 import { GameScene } from "./GameScene";
 import { GameHUD } from "./GameHUD";
+import { WeatherSystem } from "@/systems/weather";
 
 export function GameView() {
   return (
@@ -21,8 +22,8 @@ export function GameView() {
           near={0.1}
           far={1000}
         />
-        <ambientLight intensity={0.6} />
-        <directionalLight position={[5, 10, 5]} intensity={0.8} />
+        {/* Weather System - replaces static lights */}
+        <WeatherSystem />
         <Suspense fallback={null}>
           <GameScene />
         </Suspense>

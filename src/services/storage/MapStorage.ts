@@ -4,9 +4,16 @@ import type { MapData, MapMetadata } from "@/types/map";
 export class MapStorage {
   static async saveMap(map: MapData): Promise<void> {
     const now = Date.now();
+
+    // Serialize weather config if present
+    const weatherJson = map.weather ? JSON.stringify(map.weather) : null;
+
+    // Serialize wave config if present
+    const waveConfigJson = map.waveOverrides ? JSON.stringify(map.waveOverrides) : null;
+
     db.run(
-      `INSERT OR REPLACE INTO maps (id, name, width, height, data, is_custom, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT OR REPLACE INTO maps (id, name, width, height, data, weather, wave_config, is_custom, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         map.id,
         map.name,
@@ -20,6 +27,8 @@ export class MapStorage {
           exitPoints: map.exitPoints,
           objects: map.objects,
         }),
+        weatherJson,
+        waveConfigJson,
         map.isCustom ? 1 : 0,
         map.createdAt || now,
         now,
@@ -34,6 +43,8 @@ export class MapStorage {
       width: number;
       height: number;
       data: string;
+      weather?: string;
+      wave_config?: string;
       is_custom: number;
       created_at: number;
       updated_at: number;
@@ -42,6 +53,13 @@ export class MapStorage {
     if (!row) return null;
 
     const data = JSON.parse(row.data);
+
+    // Parse weather config if present
+    const weather = row.weather ? JSON.parse(row.weather) : undefined;
+
+    // Parse wave config if present
+    const waveOverrides = row.wave_config ? JSON.parse(row.wave_config) : undefined;
+
     return {
       id: row.id,
       name: row.name,
@@ -53,6 +71,8 @@ export class MapStorage {
       spawnPoints: data.spawnPoints,
       exitPoints: data.exitPoints,
       objects: data.objects,
+      weather,
+      waveOverrides,
       createdAt: row.created_at,
       updatedAt: row.updated_at,
       isCustom: row.is_custom === 1,

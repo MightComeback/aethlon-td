@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { GameState, type Tower, type Enemy } from "@/types";
 import type { CommanderState } from "@/types/commander";
+import type { MapWaveOverride } from "@/types/enemy";
+import type { MapData } from "@/types/map";
 import { DEFAULT_COMMANDER_STATE } from "@/types/commander";
 
 interface GameStore {
@@ -16,6 +18,10 @@ interface GameStore {
   speed: number;
   isPaused: boolean;
   elapsedTime: number;
+
+  // Map configuration
+  mapId: string | null;
+  waveOverrides?: MapWaveOverride;
 
   // Entities
   towers: Tower[];
@@ -49,7 +55,7 @@ interface GameStore {
   damageEnemy: (id: string, damage: number) => void;
 
   // Game flow
-  startGame: (mapId: string, waves: number) => void;
+  startGame: (mapId: string, mapData?: MapData) => void;
   resetGame: () => void;
 
   // Commander actions
@@ -70,6 +76,8 @@ const initialState = {
   speed: 1,
   isPaused: false,
   elapsedTime: 0,
+  mapId: null as string | null,
+  waveOverrides: undefined as MapWaveOverride | undefined,
   towers: [] as Tower[],
   enemies: [] as Enemy[],
   selectedTowerId: null as string | null,
@@ -182,11 +190,29 @@ export const useGameStore = create<GameStore>()(
         }
       }),
 
-    startGame: (mapId, waves) =>
+    startGame: (mapId, mapData) =>
       set((s) => {
+        // Load wave configuration from map data
+        const waveOverrides = mapData?.waveOverrides;
+
+        // Calculate max waves
+        let maxWaves = 50; // Default global waves
+        if (waveOverrides?.replaceGlobal) {
+          maxWaves = waveOverrides.metadata?.totalWaves ?? waveOverrides.waves.length;
+        } else if (waveOverrides) {
+          // In selective mode, check if custom waves extend beyond 50
+          const maxCustomWave = Math.max(
+            ...waveOverrides.waves.map((w) => w.waveNumber),
+            0
+          );
+          maxWaves = Math.max(50, maxCustomWave);
+        }
+
         Object.assign(s, {
           ...initialState,
-          maxWaves: waves,
+          mapId,
+          waveOverrides,
+          maxWaves,
           gameState: GameState.Ready,
         });
       }),

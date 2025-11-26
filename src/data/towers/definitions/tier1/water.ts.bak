@@ -1,0 +1,61 @@
+/**
+ * Water Element - Tier 1 Base Towers
+ * 5 towers (one per category: Damage, MagicDamage, PhysicalDamage, Buff, Debuff)
+ */
+
+import {
+  TowerCategory,
+  TowerRarity,
+  BuffType,
+  type ExtendedTowerDefinition,
+} from "@/types/tower";
+import { BaseElement } from "@/types/element";
+import { StatusEffectType } from "@/types/enemy";
+import { createTowerId } from "../../mergeGraph";
+
+export const WATER_TIER1_TOWERS: ExtendedTowerDefinition[] = [
+  // 1. Water Damage Tower - Balanced damage dealer
+  {
+    id: createTowerId(BaseElement.Water, TowerCategory.Damage, 1),
+    type: "water_damage" as any,
+    name: "Tidal Spout",
+    description: "A flowing water tower that pierces through enemy armor with high-pressure jets.",
+    element: BaseElement.Water,
+    category: TowerCategory.Damage,
+    tier: 1,
+    rarity: TowerRarity.Common,
+    baseStats: {
+      damage: 22,
+      attackSpeed: 1.1,
+      range: 3.2,
+      cost: 100,
+      upgradeCost: 50,
+      health: 95,
+      armor: 4,
+      magicPen: 0,
+      armorPen: 8,
+    },
+    meshConfig: {
+      baseShape: "obelisk",
+      scale: 1.0,
+      height: 1.2,
+      effectColor: "#1e90ff",
+      parts: [
+        { type: "cylinder", position: [0, 0, 0], size: [0.18, 0.35], color: "#555555" },
+        { type: "sphere", position: [0, 0.5, 0], size: [0.2], color: "#606060" },
+        {
+          type: "sphere",
+          position: [0, 0.8, 0],
+          size: [0.1],
+          color: "#777777",
+          emissive: "#1e90ff",
+          animated: { type: "bob", speed: 2 },
+        },
+      ],
+    },
+    mergeOutput: [
+      "ice_debuff_t2",
+      "ice_physical_damage_t2",
+    ],
+  },
+];

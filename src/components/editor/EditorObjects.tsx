@@ -1082,7 +1082,7 @@ export function Barn({ position, scale = 1, footprint = [3, 2] }: StructureProps
  * Windmill Structure - 2x2 with rotating blades
  */
 export function WindmillStructure({ position, scale = 1, footprint = [2, 2] }: StructureProps) {
-  const [w, h] = footprint;
+  const [w] = footprint;
   const tileSize = 0.95;
   const baseWidth = w * tileSize * 0.7;
 
@@ -1279,7 +1279,7 @@ export function Church({ position, scale = 1, footprint = [2, 3] }: StructurePro
  * Bridge - 1x3 horizontal structure
  */
 export function Bridge({ position, scale = 1, footprint = [1, 3] }: StructureProps) {
-  const [w, h] = footprint;
+  const [, h] = footprint;
   const tileSize = 0.95;
   const length = h * tileSize;
 
@@ -1375,7 +1375,7 @@ export function StoneWall({ position, scale = 1 }: StructureProps) {
  * Gate - 1x2 structure
  */
 export function Gate({ position, scale = 1, footprint = [1, 2] }: StructureProps) {
-  const [w, h] = footprint;
+  const [, h] = footprint;
   const tileSize = 0.95;
   const depth = h * tileSize;
 

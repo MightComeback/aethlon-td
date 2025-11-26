@@ -52,11 +52,13 @@ function isAdjacentToPath(
  * Get valid tiles for object placement
  * - Must be Ground tile
  * - Must NOT be adjacent to path (leave room for towers)
+ * - Must NOT be occupied by structures
  */
 function getValidObjectTiles(
   tiles: TileType[][],
   width: number,
-  height: number
+  height: number,
+  occupiedByStructures?: Set<string>
 ): Point[] {
   const valid: Point[] = [];
 
@@ -64,6 +66,10 @@ function getValidObjectTiles(
     for (let y = 0; y < height; y++) {
       if (tiles[x]![y] !== TileType.Ground) continue;
       if (isAdjacentToPath(x, y, tiles, width, height)) continue;
+
+      // Check if tile is occupied by structure
+      if (occupiedByStructures && occupiedByStructures.has(`${x},${y}`)) continue;
+
       valid.push({ x, y });
     }
   }
@@ -89,7 +95,7 @@ function selectObjectType(
 
 /**
  * Place decorative objects on the map
- * Now supports biome-aware object placement
+ * Now supports biome-aware object placement and structure avoidance
  */
 export function placeObjects(
   rng: SeededRandom,
@@ -97,10 +103,11 @@ export function placeObjects(
   width: number,
   height: number,
   density?: number,
-  biome: BiomeType = DEFAULT_BIOME
+  biome: BiomeType = DEFAULT_BIOME,
+  occupiedByStructures?: Set<string>
 ): PlacedObject[] {
   const objects: PlacedObject[] = [];
-  const validTiles = getValidObjectTiles(tiles, width, height);
+  const validTiles = getValidObjectTiles(tiles, width, height, occupiedByStructures);
 
   // Use biome-specific density if not provided
   const biomeData = BIOME_DEFINITIONS[biome];

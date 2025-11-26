@@ -1,0 +1,134 @@
+/**
+ * Magma Element - Tier 2 Towers (Earth + Lightning merge)
+ * 5 towers across all categories
+ */
+
+import {
+  TowerCategory,
+  TowerRarity,
+  BuffType,
+  type ExtendedTowerDefinition,
+} from "@/types/tower";
+import { MergedElementT2, BaseElement } from "@/types/element";
+import { createTowerId } from "../../mergeGraph";
+
+export const MAGMA_TIER2_TOWERS: ExtendedTowerDefinition[] = [
+  // 3. Magma Physical Damage Tower
+  {
+    id: createTowerId(MergedElementT2.Magma, TowerCategory.PhysicalDamage, 2),
+    type: "magma_physical_damage" as any,
+    name: "Shard Launcher",
+    description: "Launches razor-sharp crystal shards that pierce through armor.",
+    element: MergedElementT2.Magma,
+    category: TowerCategory.PhysicalDamage,
+    tier: 2,
+    rarity: TowerRarity.Uncommon,
+    baseStats: {
+      damage: 65,
+      attackSpeed: 0.7,
+      range: 3.0,
+      cost: 320,
+      upgradeCost: 160,
+      health: 180,
+      armor: 14,
+      magicPen: 0,
+      armorPen: 8,
+      critChance: 0.12,
+      critMultiplier: 1.9,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(BaseElement.Earth, TowerCategory.Damage, 1),
+        createTowerId(BaseElement.Lightning, TowerCategory.Damage, 1),
+      ],
+      output: createTowerId(MergedElementT2.Magma, TowerCategory.PhysicalDamage, 2),
+      tier: 2,
+      rarity: TowerRarity.Uncommon,
+    },
+    mergeOutput: ["mountain_physical_damage_t3"],
+    meshConfig: {
+      baseShape: "tower",
+      scale: 1.2,
+      height: 1.5,
+      effectColor: "#b19cd9",
+      parts: [
+        { type: "box", position: [0, 0, 0], size: [0.28, 0.2, 0.28], color: "#555555" },
+        { type: "octahedron", position: [0, 0.35, 0], size: [0.18], color: "#606060" },
+        { type: "cylinder", position: [0, 0.55, 0.1], rotation: [0.3, 0, 0], size: [0.08, 0.35], color: "#666666" },
+        {
+          type: "octahedron",
+          position: [0, 0.7, 0.28],
+          size: [0.06],
+          color: "#888888",
+          emissive: "#daa520",
+        },
+      ],
+    },
+  },
+
+  // 4. Magma Buff Tower
+  {
+    id: createTowerId(MergedElementT2.Magma, TowerCategory.Buff, 2),
+    type: "magma_buff" as any,
+    name: "Harmonic Resonator",
+    description: "Emits crystal frequencies that enhance nearby towers' critical strikes.",
+    element: MergedElementT2.Magma,
+    category: TowerCategory.Buff,
+    tier: 2,
+    rarity: TowerRarity.Uncommon,
+    baseStats: {
+      damage: 12,
+      attackSpeed: 0.5,
+      range: 4.0,
+      cost: 340,
+      upgradeCost: 170,
+      health: 170,
+      armor: 14,
+      magicPen: 0,
+      armorPen: 0,
+    },
+    buff: {
+      type: BuffType.ArmorPen,
+      radius: 3.0,
+      strength: 0.2,
+      stackable: false,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(BaseElement.Earth, TowerCategory.Damage, 1),
+        createTowerId(BaseElement.Lightning, TowerCategory.Damage, 1),
+      ],
+      output: createTowerId(MergedElementT2.Magma, TowerCategory.Buff, 2),
+      tier: 2,
+      rarity: TowerRarity.Uncommon,
+    },
+    mergeOutput: ["mountain_buff_t3"],
+    meshConfig: {
+      baseShape: "pedestal",
+      scale: 1.2,
+      height: 1.4,
+      effectColor: "#daa520",
+      parts: [
+        { type: "box", position: [0, 0, 0], size: [0.26, 0.15, 0.26], color: "#555555" },
+        { type: "octahedron", position: [0, 0.35, 0], size: [0.18], color: "#606060" },
+        {
+          type: "dodecahedron",
+          position: [0, 0.65, 0],
+          size: [0.14],
+          color: "#777777",
+          emissive: "#b19cd9",
+          animated: { type: "pulse", speed: 1 },
+        },
+        {
+          type: "torus",
+          position: [0, 0.65, 0],
+          rotation: [1.57, 0, 0],
+          size: [0.28, 0.015],
+          color: "#b19cd944",
+          animated: { type: "rotate", speed: 0.8, axis: "y" },
+        },
+      ],
+    },
+  },
+
+];

@@ -262,6 +262,12 @@ export interface WaveGroup {
   spawnPoint?: number; // Optional specific spawn index
 }
 
+export interface WaveEditorMetadata {
+  autoCalculated?: boolean; // True if spawn timing was auto-calculated
+  sourcePreset?: string; // ID of preset this wave was created from
+  notes?: string; // User notes for this wave
+}
+
 export interface WaveConfig {
   id: string;
   waveNumber: number;
@@ -269,12 +275,23 @@ export interface WaveConfig {
   isBossWave: boolean;
   bonusReward: number;
   difficulty: number; // Calculated from enemy composition
+  editorMetadata?: WaveEditorMetadata;
+}
+
+export interface WaveOverrideMetadata {
+  createdAt: number;
+  updatedAt: number;
+  totalWaves?: number; // Expected total waves if replaceGlobal=true
+  customWaveNumbers: number[]; // Quick lookup for which waves are customized
+  presetId?: string; // If created from a preset
 }
 
 export interface MapWaveOverride {
   mapId: string;
   waves: WaveConfig[];
   replaceGlobal: boolean; // true = replace, false = merge
+  version?: number; // Schema version for future migrations (default: 1)
+  metadata?: WaveOverrideMetadata;
 }
 
 // Legacy interfaces for backward compatibility

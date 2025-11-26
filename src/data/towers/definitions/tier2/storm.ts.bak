@@ -1,0 +1,137 @@
+/**
+ * Storm Element - Tier 2 Towers (Fire + Lightning merge)
+ * 5 towers across all categories
+ */
+
+import {
+  TowerCategory,
+  TowerRarity,
+  BuffType,
+  type ExtendedTowerDefinition,
+} from "@/types/tower";
+import { MergedElementT2, BaseElement } from "@/types/element";
+import { StatusEffectType } from "@/types/enemy";
+import { createTowerId } from "../../mergeGraph";
+
+export const STORM_TIER2_TOWERS: ExtendedTowerDefinition[] = [
+  // 2. Storm Magic Damage Tower
+  {
+    id: createTowerId(MergedElementT2.Storm, TowerCategory.MagicDamage, 2),
+    type: "storm_magic_damage" as any,
+    name: "Chaos Conduit",
+    description: "Channels the raw magical energy of storms.",
+    element: MergedElementT2.Storm,
+    category: TowerCategory.MagicDamage,
+    tier: 2,
+    rarity: TowerRarity.Uncommon,
+    baseStats: {
+      damage: 40,
+      attackSpeed: 1.1,
+      range: 3.8,
+      cost: 300,
+      upgradeCost: 150,
+      health: 105,
+      armor: 5,
+      magicPen: 11,
+      armorPen: 0,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(BaseElement.Air, TowerCategory.Damage, 1),
+        createTowerId(BaseElement.Lightning, TowerCategory.Damage, 1),
+      ],
+      output: createTowerId(MergedElementT2.Storm, TowerCategory.MagicDamage, 2),
+      tier: 2,
+      rarity: TowerRarity.Uncommon,
+    },
+    meshConfig: {
+      baseShape: "crystal",
+      scale: 1.1,
+      height: 1.3,
+      effectColor: "#ffd700",
+      parts: [
+        { type: "octahedron", position: [0, 0.2, 0], size: [0.16], color: "#555555" },
+        {
+          type: "dodecahedron",
+          position: [0, 0.55, 0],
+          size: [0.13],
+          color: "#666666",
+          emissive: "#483d8b",
+          animated: { type: "rotate", speed: 1.5, axis: "y" },
+        },
+        {
+          type: "cone",
+          position: [0, 0.78, 0],
+          size: [0.05, 0.15],
+          color: "#888888",
+          emissive: "#ffff00",
+          animated: { type: "pulse", speed: 5 },
+        },
+      ],
+    },
+  },
+
+  // 5. Storm Debuff Tower
+  {
+    id: createTowerId(MergedElementT2.Storm, TowerCategory.Debuff, 2),
+    type: "storm_debuff" as any,
+    name: "Chaos Trap",
+    description: "Creates zones of chaotic storm energy that burn and stun enemies.",
+    element: MergedElementT2.Storm,
+    category: TowerCategory.Debuff,
+    tier: 2,
+    rarity: TowerRarity.Uncommon,
+    baseStats: {
+      damage: 24,
+      attackSpeed: 1.1,
+      range: 3.2,
+      cost: 280,
+      upgradeCost: 140,
+      health: 110,
+      armor: 5,
+      magicPen: 0,
+      armorPen: 0,
+    },
+    statusEffect: {
+      type: StatusEffectType.Burn,
+      chance: 0.55,
+      duration: 3,
+      strength: 10,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(BaseElement.Air, TowerCategory.Damage, 1),
+        createTowerId(BaseElement.Lightning, TowerCategory.Damage, 1),
+      ],
+      output: createTowerId(MergedElementT2.Storm, TowerCategory.Debuff, 2),
+      tier: 2,
+      rarity: TowerRarity.Uncommon,
+    },
+    meshConfig: {
+      baseShape: "statue",
+      scale: 1.1,
+      height: 1.0,
+      effectColor: "#483d8b",
+      parts: [
+        { type: "box", position: [0, 0, 0], size: [0.25, 0.1, 0.25], color: "#555555" },
+        { type: "cone", position: [0, 0.2, 0], size: [0.15, 0.3], color: "#606060" },
+        {
+          type: "sphere",
+          position: [0, 0.5, 0],
+          size: [0.1],
+          color: "#777777",
+          emissive: "#ff4500",
+          animated: { type: "pulse", speed: 3 },
+        },
+        {
+          type: "cone",
+          position: [0, 0.65, 0],
+          size: [0.04, 0.1],
+          color: "#888888",
+          emissive: "#ffff00",
+          animated: { type: "pulse", speed: 5 },
+        },
+      ],
+    },
+  },
+];

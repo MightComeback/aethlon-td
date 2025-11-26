@@ -5,10 +5,13 @@ import { Link } from "@tanstack/react-router";
 import { EditorGrid } from "./EditorGrid";
 import { EditorToolbar } from "./EditorToolbar";
 import { TilePalette } from "./TilePalette";
+import { WeatherPanel } from "./WeatherPanel";
+import { DraggablePanel } from "./DraggablePanel";
 import { EditorCameraController, CameraControlsUI, calculateFitZoom } from "./CameraControls";
 import { VirtualCursor } from "./VirtualCursor";
 import { MapBrowser } from "./MapBrowser";
 import { GenerateMapDialog } from "./GenerateMapDialog";
+import { WaveEditorDialog } from "./WaveEditor/WaveEditorDialog";
 import { useEditorStore } from "@/stores/editorStore";
 import { MapStorage } from "@/services/storage/MapStorage";
 import type { MapMetadata, MapData } from "@/types/map";
@@ -18,6 +21,7 @@ import {
   IconSave,
   IconFolder,
   IconDice,
+  PixelIcon,
 } from "@/components/ui/PixelIcon";
 
 // Map size presets
@@ -46,6 +50,7 @@ export function MapEditor() {
     exitPoints,
     waypoints,
     currentTool,
+    waveConfig,
     getMapData,
     loadMap,
     newMap,
@@ -54,11 +59,11 @@ export function MapEditor() {
   // Disable camera rotation when using drawing tools
   const enableCameraRotate = !DRAWING_TOOLS.includes(currentTool);
 
-  const [showSizeDialog, setShowSizeDialog] = useState(false);
   const [customWidth, setCustomWidth] = useState(width);
   const [customHeight, setCustomHeight] = useState(height);
   const [showMapBrowser, setShowMapBrowser] = useState(false);
   const [showGenerateDialog, setShowGenerateDialog] = useState(false);
+  const [showWaveEditor, setShowWaveEditor] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [currentMapId, setCurrentMapId] = useState<string | null>(null);
   const [savedMaps, setSavedMaps] = useState<MapMetadata[]>([]);
@@ -160,13 +165,28 @@ export function MapEditor() {
     setMapSize(newWidth, newHeight);
     setCustomWidth(newWidth);
     setCustomHeight(newHeight);
-    setShowSizeDialog(false);
     // Auto-fit camera for large maps
     if (Math.max(newWidth, newHeight) > 50) {
       const { zoom, polar } = calculateFitZoom(newWidth, newHeight);
       setCamera({ azimuth: 0, polar, zoom });
     }
   };
+
+  // Calculate responsive panel positions
+  const getPanelPositions = () => {
+    const viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1920;
+    const rightOffset = Math.max(viewportWidth - 260, viewportWidth * 0.85);
+
+    return {
+      tilePalette: { x: 12, y: 80 },
+      camera: { x: rightOffset, y: 80 },
+      weather: { x: rightOffset, y: 200 },
+      mapSize: { x: rightOffset, y: 320 },
+      status: { x: rightOffset, y: 440 },
+    };
+  };
+
+  const positions = getPanelPositions();
 
   return (
     <div className="relative h-full w-full">
@@ -241,6 +261,19 @@ export function MapEditor() {
               <span className="hidden sm:inline">Generate</span>
             </button>
 
+            {/* Waves button */}
+            <button
+              className="pixel-button flex items-center gap-2 text-2xs py-2 px-3 relative"
+              title="Configure Waves"
+              onClick={() => setShowWaveEditor(true)}
+            >
+              <PixelIcon icon="wave" size={12} />
+              <span className="hidden sm:inline">Waves</span>
+              {waveConfig && waveConfig.waves.length > 0 && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full" />
+              )}
+            </button>
+
             {/* Load button */}
             <button
               className="pixel-button flex items-center gap-2 text-2xs py-2 px-3"
@@ -273,38 +306,55 @@ export function MapEditor() {
           </div>
         </div>
 
-        {/* Left: Tile Palette */}
-        <div className="pointer-events-auto absolute left-3 top-20 bottom-3 flex flex-col gap-3">
-          <TilePalette />
-        </div>
+        {/* Draggable Panels - Use pointer-events-auto wrapper */}
+        <div className="pointer-events-auto">
+          {/* Tile Palette */}
+          <DraggablePanel
+            title="Tiles & Objects"
+            defaultPosition={positions.tilePalette}
+            defaultCollapsed={false}
+            width="auto"
+          >
+            <TilePalette />
+          </DraggablePanel>
 
-        {/* Right: Properties & Camera Controls */}
-        <div className="pointer-events-auto absolute right-3 top-20 flex flex-col gap-3 max-h-[calc(100vh-6rem)] overflow-y-auto">
           {/* Camera Controls */}
-          <CameraControlsUI state={camera} onStateChange={setCamera} mapWidth={width} mapHeight={height} />
+          <DraggablePanel
+            title="Camera"
+            defaultPosition={positions.camera}
+            defaultCollapsed={true}
+            width="auto"
+          >
+            <div className="flex flex-col gap-2">
+              <CameraControlsUI state={camera} onStateChange={setCamera} mapWidth={width} mapHeight={height} />
+            </div>
+          </DraggablePanel>
+
+          {/* Weather Panel */}
+          <DraggablePanel
+            title="Weather"
+            defaultPosition={positions.weather}
+            defaultCollapsed={true}
+            width="200px"
+          >
+            <WeatherPanel />
+          </DraggablePanel>
 
           {/* Map Size Panel */}
-          <div className="pixel-panel w-48">
-            <div className="flex items-center justify-between mb-3">
-              <span className="font-pixel text-3xs text-foreground-muted/50 uppercase tracking-wide">
-                Map Size
-              </span>
-              <button
-                onClick={() => setShowSizeDialog(!showSizeDialog)}
-                className="font-pixel text-3xs text-primary hover:text-primary-hover"
-              >
-                {showSizeDialog ? "Close" : "Edit"}
-              </button>
-            </div>
+          <DraggablePanel
+            title="Map Size"
+            defaultPosition={positions.mapSize}
+            defaultCollapsed={true}
+            width="200px"
+          >
+            <div className="space-y-3">
+              <div className="text-2xs text-foreground">
+                <span className="text-foreground-muted">Current: </span>
+                <span className="font-pixel">{width} x {height}</span>
+                <span className="text-foreground-muted ml-1">({tileCount} tiles)</span>
+              </div>
 
-            <div className="text-2xs text-foreground mb-2">
-              <span className="text-foreground-muted">Current: </span>
-              <span className="font-pixel">{width} x {height}</span>
-              <span className="text-foreground-muted ml-1">({tileCount} tiles)</span>
-            </div>
-
-            {showSizeDialog && (
-              <div className="mt-3 pt-3 border-t border-border space-y-3">
+              <div className="space-y-3 pt-3 border-t border-border">
                 {/* Presets */}
                 <div className="grid grid-cols-2 gap-1">
                   {SIZE_PRESETS.map((preset) => (
@@ -354,15 +404,17 @@ export function MapEditor() {
                   </button>
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          </DraggablePanel>
 
-          {/* Properties Panel */}
-          <div className="pixel-panel w-48">
-            <span className="font-pixel text-3xs text-foreground-muted/50 uppercase tracking-wide">
-              Status
-            </span>
-            <div className="space-y-2 text-2xs mt-3">
+          {/* Properties/Status Panel */}
+          <DraggablePanel
+            title="Status"
+            defaultPosition={positions.status}
+            defaultCollapsed={true}
+            width="200px"
+          >
+            <div className="space-y-2 text-2xs">
               <div className="flex justify-between text-foreground-muted">
                 <span>Spawn:</span>
                 <span className={hasSpawn ? "text-accent-green" : "text-danger"}>
@@ -389,7 +441,7 @@ export function MapEditor() {
                 <ValidationItem label="Path defined" valid={waypointCount >= 2} />
               </div>
             </div>
-          </div>
+          </DraggablePanel>
         </div>
 
         {/* Bottom: Status bar */}
@@ -423,6 +475,14 @@ export function MapEditor() {
         <GenerateMapDialog
           onClose={() => setShowGenerateDialog(false)}
           onGenerate={handleGenerateMap}
+        />
+      )}
+
+      {/* Wave Editor Dialog */}
+      {showWaveEditor && (
+        <WaveEditorDialog
+          isOpen={showWaveEditor}
+          onClose={() => setShowWaveEditor(false)}
         />
       )}
     </div>

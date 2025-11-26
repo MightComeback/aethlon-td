@@ -1,4 +1,5 @@
 import type { MapWaveOverride } from "./enemy";
+import type { MapWeatherConfig } from "./weather";
 
 export enum TileType {
   Ground = "ground",
@@ -44,6 +45,7 @@ export interface MapData {
   exitPoints: Array<{ x: number; y: number }>;
   objects?: PlacedObject[]; // Optional for backwards compatibility
   waveOverrides?: MapWaveOverride; // Optional custom wave configuration for this map
+  weather?: MapWeatherConfig; // Optional weather configuration for this map
   createdAt: number;
   updatedAt: number;
   isCustom: boolean;

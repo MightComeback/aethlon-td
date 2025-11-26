@@ -14,19 +14,28 @@ import {
 import { getElementDefinition } from "./utils";
 
 // ============================================================================
-// TIER 2 MERGE RECIPES (Base + Base)
+// TIER 2 MERGE RECIPES (Base + Base → Mastery Paths)
 // ============================================================================
 
 const TIER2_RECIPES: ElementMergeRecipe[] = [
-  // Fire combinations
-  {
-    inputs: [BaseElement.Fire, BaseElement.Water],
-    output: MergedElementT2.Steam,
-    tier: ElementTier.Merged2,
-  },
   {
     inputs: [BaseElement.Fire, BaseElement.Earth],
     output: MergedElementT2.Lava,
+    tier: ElementTier.Merged2,
+  },
+  {
+    inputs: [BaseElement.Water, BaseElement.Earth],
+    output: MergedElementT2.Ice,
+    tier: ElementTier.Merged2,
+  },
+  {
+    inputs: [BaseElement.Air, BaseElement.Lightning],
+    output: MergedElementT2.Storm,
+    tier: ElementTier.Merged2,
+  },
+  {
+    inputs: [BaseElement.Earth, BaseElement.Lightning],
+    output: MergedElementT2.Magma,
     tier: ElementTier.Merged2,
   },
   {
@@ -34,154 +43,42 @@ const TIER2_RECIPES: ElementMergeRecipe[] = [
     output: MergedElementT2.Plasma,
     tier: ElementTier.Merged2,
   },
-  {
-    inputs: [BaseElement.Fire, BaseElement.Lightning],
-    output: MergedElementT2.Storm,
-    tier: ElementTier.Merged2,
-  },
-
-  // Water combinations (excluding Fire which is above)
-  {
-    inputs: [BaseElement.Water, BaseElement.Earth],
-    output: MergedElementT2.Ice,
-    tier: ElementTier.Merged2,
-  },
-  {
-    inputs: [BaseElement.Water, BaseElement.Air],
-    output: MergedElementT2.Mist,
-    tier: ElementTier.Merged2,
-  },
-  {
-    inputs: [BaseElement.Water, BaseElement.Lightning],
-    output: MergedElementT2.Tempest,
-    tier: ElementTier.Merged2,
-  },
-
-  // Earth combinations (excluding Fire, Water which are above)
-  {
-    inputs: [BaseElement.Earth, BaseElement.Air],
-    output: MergedElementT2.Dust,
-    tier: ElementTier.Merged2,
-  },
-  {
-    inputs: [BaseElement.Earth, BaseElement.Lightning],
-    output: MergedElementT2.Crystal,
-    tier: ElementTier.Merged2,
-  },
-
-  // Air + Lightning (last combination)
-  {
-    inputs: [BaseElement.Air, BaseElement.Lightning],
-    output: MergedElementT2.Thunder,
-    tier: ElementTier.Merged2,
-  },
 ];
 
 // ============================================================================
-// TIER 3 MERGE RECIPES (Mastery Paths + Cross-Element)
+// TIER 3 MERGE RECIPES (Tier2 + Base → Ultimate Mastery)
 // ============================================================================
 
 const TIER3_RECIPES: ElementMergeRecipe[] = [
-  // Fire Mastery Paths
   {
     inputs: [MergedElementT2.Lava, BaseElement.Fire],
     output: MergedElementT3.Volcano,
-    tier: ElementTier.Merged3,
-    isSpecial: true, // Mastery paths are special
-  },
-  {
-    inputs: [MergedElementT2.Plasma, BaseElement.Fire],
-    output: MergedElementT3.Inferno,
-    tier: ElementTier.Merged3,
-    isSpecial: true,
-  },
-
-  // Water Mastery Paths
-  {
-    inputs: [MergedElementT2.Steam, BaseElement.Water],
-    output: MergedElementT3.Tsunami,
     tier: ElementTier.Merged3,
     isSpecial: true,
   },
   {
     inputs: [MergedElementT2.Ice, BaseElement.Water],
-    output: MergedElementT3.Blizzard,
-    tier: ElementTier.Merged3,
-    isSpecial: true,
-  },
-
-  // Earth Mastery Paths
-  {
-    inputs: [MergedElementT2.Lava, BaseElement.Earth],
-    output: MergedElementT3.Earthquake,
+    output: MergedElementT3.Glacier,
     tier: ElementTier.Merged3,
     isSpecial: true,
   },
   {
-    inputs: [MergedElementT2.Crystal, BaseElement.Earth],
-    output: MergedElementT3.Mountain,
-    tier: ElementTier.Merged3,
-    isSpecial: true,
-  },
-
-  // Air Mastery Paths
-  {
-    inputs: [MergedElementT2.Thunder, BaseElement.Air],
+    inputs: [MergedElementT2.Storm, BaseElement.Air],
     output: MergedElementT3.Hurricane,
     tier: ElementTier.Merged3,
     isSpecial: true,
   },
   {
-    inputs: [MergedElementT2.Mist, BaseElement.Air],
-    output: MergedElementT3.Cyclone,
+    inputs: [MergedElementT2.Magma, BaseElement.Earth],
+    output: MergedElementT3.Mountain,
     tier: ElementTier.Merged3,
     isSpecial: true,
   },
-
-  // Lightning Mastery Paths
   {
     inputs: [MergedElementT2.Storm, BaseElement.Lightning],
     output: MergedElementT3.Supercell,
     tier: ElementTier.Merged3,
     isSpecial: true,
-  },
-  {
-    inputs: [MergedElementT2.Crystal, BaseElement.Lightning],
-    output: MergedElementT3.Discharge,
-    tier: ElementTier.Merged3,
-    isSpecial: true,
-  },
-
-  // Cross-Element Combinations
-  {
-    inputs: [MergedElementT2.Ice, MergedElementT2.Thunder],
-    output: MergedElementT3.Aurora,
-    tier: ElementTier.Merged3,
-    isSpecial: true, // Legendary cross-element
-  },
-  {
-    inputs: [MergedElementT2.Dust, MergedElementT2.Storm],
-    output: MergedElementT3.Sandstorm,
-    tier: ElementTier.Merged3,
-    isSpecial: true,
-  },
-  {
-    inputs: [MergedElementT2.Steam, MergedElementT2.Ice],
-    output: MergedElementT3.Geyser,
-    tier: ElementTier.Merged3,
-    isSpecial: true,
-  },
-  {
-    inputs: [MergedElementT2.Tempest, MergedElementT2.Mist],
-    output: MergedElementT3.Monsoon,
-    tier: ElementTier.Merged3,
-    isSpecial: true,
-  },
-  {
-    inputs: [MergedElementT3.Volcano, MergedElementT2.Crystal],
-    output: MergedElementT3.Meteor,
-    tier: ElementTier.Merged3,
-    isSpecial: true, // Ultimate legendary
   },
 ];
 

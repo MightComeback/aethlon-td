@@ -1,0 +1,133 @@
+/**
+ * Ice Element - Tier 2 Towers (Water + Earth merge)
+ * 5 towers across all categories
+ */
+
+import {
+  TowerCategory,
+  TowerRarity,
+  BuffType,
+  type ExtendedTowerDefinition,
+} from "@/types/tower";
+import { MergedElementT2, BaseElement } from "@/types/element";
+import { StatusEffectType } from "@/types/enemy";
+import { createTowerId } from "../../mergeGraph";
+
+export const ICE_TIER2_TOWERS: ExtendedTowerDefinition[] = [
+  // 3. Ice Physical Damage Tower
+  {
+    id: createTowerId(MergedElementT2.Ice, TowerCategory.PhysicalDamage, 2),
+    type: "ice_physical_damage" as any,
+    name: "Avalanche Engine",
+    description: "Hurls massive ice boulders with crushing force.",
+    element: MergedElementT2.Ice,
+    category: TowerCategory.PhysicalDamage,
+    tier: 2,
+    rarity: TowerRarity.Uncommon,
+    baseStats: {
+      damage: 68,
+      attackSpeed: 0.6,
+      range: 2.8,
+      cost: 300,
+      upgradeCost: 150,
+      health: 190,
+      armor: 14,
+      magicPen: 0,
+      armorPen: 5,
+      splashRadius: 0.8,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(BaseElement.Water, TowerCategory.Damage, 1),
+        createTowerId(BaseElement.Earth, TowerCategory.Damage, 1),
+      ],
+      output: createTowerId(MergedElementT2.Ice, TowerCategory.PhysicalDamage, 2),
+      tier: 2,
+      rarity: TowerRarity.Uncommon,
+    },
+    mergeOutput: ["glacier_buff_t3"],
+    meshConfig: {
+      baseShape: "tower",
+      scale: 1.2,
+      height: 1.4,
+      effectColor: "#87ceeb",
+      parts: [
+        { type: "box", position: [0, 0, 0], size: [0.3, 0.25, 0.3], color: "#555555" },
+        { type: "box", position: [0, 0.3, 0], size: [0.22, 0.2, 0.22], color: "#606060" },
+        { type: "cylinder", position: [0, 0.5, 0.08], rotation: [0.3, 0, 0], size: [0.1, 0.35], color: "#666666" },
+        {
+          type: "sphere",
+          position: [0, 0.65, 0.25],
+          size: [0.1],
+          color: "#888888",
+          emissive: "#e0ffff",
+        },
+      ],
+    },
+  },
+
+  // 5. Ice Debuff Tower
+  {
+    id: createTowerId(MergedElementT2.Ice, TowerCategory.Debuff, 2),
+    type: "ice_debuff" as any,
+    name: "Frostbite Trap",
+    description: "Encases enemies in ice, freezing and slowing them severely.",
+    element: MergedElementT2.Ice,
+    category: TowerCategory.Debuff,
+    tier: 2,
+    rarity: TowerRarity.Uncommon,
+    baseStats: {
+      damage: 18,
+      attackSpeed: 0.95,
+      range: 3.0,
+      cost: 260,
+      upgradeCost: 130,
+      health: 150,
+      armor: 10,
+      magicPen: 0,
+      armorPen: 0,
+    },
+    statusEffect: {
+      type: StatusEffectType.Freeze,
+      chance: 0.25,
+      duration: 1.5,
+      strength: 1,
+    },
+    mergeRecipe: {
+      inputs: [
+        createTowerId(BaseElement.Water, TowerCategory.Damage, 1),
+        createTowerId(BaseElement.Earth, TowerCategory.Damage, 1),
+      ],
+      output: createTowerId(MergedElementT2.Ice, TowerCategory.Debuff, 2),
+      tier: 2,
+      rarity: TowerRarity.Uncommon,
+    },
+    mergeOutput: ["glacier_debuff_t3"],
+    meshConfig: {
+      baseShape: "statue",
+      scale: 1.1,
+      height: 1.1,
+      effectColor: "#87ceeb",
+      parts: [
+        { type: "box", position: [0, 0, 0], size: [0.25, 0.1, 0.25], color: "#555555" },
+        { type: "octahedron", position: [0, 0.3, 0], size: [0.15], color: "#606060" },
+        {
+          type: "octahedron",
+          position: [0, 0.55, 0],
+          size: [0.1],
+          color: "#777777",
+          emissive: "#e0ffff",
+          animated: { type: "pulse", speed: 1 },
+        },
+        {
+          type: "cone",
+          position: [0.08, 0.4, 0.06],
+          rotation: [0, 0, 0.4],
+          size: [0.03, 0.1],
+          color: "#888888",
+          emissive: "#87ceeb",
+        },
+      ],
+    },
+  },
+];

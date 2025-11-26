@@ -84,9 +84,9 @@ export function TilePalette() {
   };
 
   return (
-    <div className="pixel-panel w-36 flex flex-col">
+    <div className="w-36 flex flex-col">
       {/* Tabs - using grid for equal width */}
-      <div className="grid grid-cols-2 gap-0 border-b border-border mb-3 -mx-4 -mt-4">
+      <div className="grid grid-cols-2 gap-0 border-b border-border mb-3">
         <button
           onClick={() => setActiveTab("tiles")}
           className={`font-pixel text-2xs py-2 px-1 transition-colors text-center ${activeTab === "tiles"

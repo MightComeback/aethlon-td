@@ -10,6 +10,7 @@ import {
   getEffectsByCategory,
 } from "@/data/effects";
 import type { EffectDefinition } from "@/types/effects";
+import { PixelIcons, type PixelIconName } from "@/components/ui/PixelIcon";
 
 const CATEGORY_FILTERS = [
   { id: "all", label: "All" },
@@ -112,10 +113,10 @@ function EffectCard({ effect }: { effect: EffectDefinition }) {
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-2">
           <div
-            className="w-10 h-10 rounded flex items-center justify-center text-2xl"
+            className="w-10 h-10 rounded flex items-center justify-center"
             style={{ backgroundColor: effect.color + "33", color: effect.color }}
           >
-            {getEffectIcon(effect.icon)}
+            {renderEffectIcon(effect.icon, 24)}
           </div>
           <div>
             <h3 className="font-pixel text-sm text-foreground">{effect.name}</h3>
@@ -176,30 +177,37 @@ function EffectCard({ effect }: { effect: EffectDefinition }) {
   );
 }
 
-function getEffectIcon(icon: string): string {
-  const icons: Record<string, string> = {
-    flame: "🔥",
-    skull: "💀",
-    droplet: "💧",
-    acid: "⚗️",
-    snail: "🐌",
-    snowflake: "❄️",
-    zap: "⚡",
-    anchor: "⚓",
-    "broken-leg": "🦴",
-    mute: "🔇",
-    "shield-off": "🛡️",
-    "shield-x": "🚫",
-    "crystal-crack": "💎",
-    target: "🎯",
-    "sword-crack": "⚔️",
-    crosshair: "✖️",
-    "broken-sword": "🗡️",
-    "crosshair-explosion": "💥",
-    virus: "🦠",
-    gem: "💎",
-  };
-  return icons[icon] || "●";
+// Map effect icon strings to PixelIcon keys
+const EFFECT_ICON_MAP: Record<string, PixelIconName> = {
+  flame: "fire",
+  skull: "skull",
+  droplet: "water",
+  acid: "water",
+  snail: "snail",
+  snowflake: "snowflake",
+  zap: "lightning-bolt",
+  anchor: "anchor",
+  "broken-leg": "bone",
+  mute: "mute",
+  "shield-off": "shield",
+  "shield-x": "shield",
+  "crystal-crack": "crystal",
+  target: "target",
+  "sword-crack": "sword",
+  crosshair: "target",
+  "broken-sword": "sword",
+  "crosshair-explosion": "explosion",
+  virus: "virus",
+  gem: "gem",
+};
+
+function renderEffectIcon(icon: string, size: number): React.ReactNode {
+  const iconName = EFFECT_ICON_MAP[icon] || "target";
+  const IconComponent = PixelIcons[iconName];
+  if (IconComponent) {
+    return <IconComponent size={size} />;
+  }
+  return <PixelIcons.target size={size} />;
 }
 
 function getCategoryLabel(category: EffectCategory): string {

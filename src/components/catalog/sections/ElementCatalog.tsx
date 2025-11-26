@@ -13,6 +13,7 @@ import {
   getElementColor,
 } from "@/data/elements";
 import type { ElementDefinition } from "@/types/element";
+import { PixelIcons, type PixelIconName, IconClose } from "@/components/ui/PixelIcon";
 
 const TIER_FILTERS = [
   { id: "all", label: "All Tiers" },
@@ -113,7 +114,7 @@ function ElementCard({
             : element.color,
         }}
       >
-        <span className="text-4xl">{getElementIcon(element.icon)}</span>
+        {renderElementIcon(element.icon, 32)}
       </div>
 
       {/* Info */}
@@ -163,7 +164,7 @@ function ElementDetail({
           <p className="text-sm text-foreground-muted mt-1">{element.description}</p>
         </div>
         <button onClick={onClose} className="text-foreground-muted hover:text-foreground">
-          ✕
+          <IconClose size={16} />
         </button>
       </div>
 
@@ -252,39 +253,46 @@ function ElementDetail({
   );
 }
 
-function getElementIcon(icon: string): string {
-  const icons: Record<string, string> = {
-    fire: "🔥",
-    water: "💧",
-    mountain: "🪨",
-    wind: "💨",
-    "lightning-bolt": "⚡",
-    "cloud-steam": "☁️",
-    "volcano-lava": "🌋",
-    plasma: "⚛️",
-    "storm-cloud": "⛈️",
-    snowflake: "❄️",
-    fog: "🌫️",
-    "lightning-rain": "🌊",
-    "dust-cloud": "💨",
-    crystal: "💎",
-    thunder: "⚡",
-    volcano: "🌋",
-    inferno: "🔥",
-    wave: "🌊",
-    snowstorm: "🌨️",
-    earthquake: "🏔️",
-    "mountain-peak": "⛰️",
-    hurricane: "🌀",
-    tornado: "🌀",
-    supercell: "⛈️",
-    "electric-crystal": "⚡",
-    aurora: "🌌",
-    sandstorm: "🏜️",
-    geyser: "♨️",
-    monsoon: "🌧️",
-    meteor: "☄️",
-  };
-  return icons[icon] || "⭐";
+// Map element icon strings to PixelIcon keys
+const ELEMENT_ICON_MAP: Record<string, PixelIconName> = {
+  fire: "fire",
+  water: "water",
+  mountain: "mountain",
+  wind: "wind",
+  "lightning-bolt": "lightning-bolt",
+  "cloud-steam": "cloud-rain",
+  "volcano-lava": "volcano",
+  plasma: "fire",
+  "storm-cloud": "storm-cloud",
+  snowflake: "snowflake",
+  fog: "cloud-rain",
+  "lightning-rain": "cloud-lightning",
+  "dust-cloud": "wind",
+  crystal: "crystal",
+  thunder: "lightning-bolt",
+  volcano: "volcano",
+  inferno: "fire",
+  wave: "water",
+  snowstorm: "snowflake",
+  earthquake: "mountain",
+  "mountain-peak": "mountain",
+  hurricane: "hurricane",
+  tornado: "hurricane",
+  supercell: "storm-cloud",
+  "electric-crystal": "lightning-bolt",
+  aurora: "star",
+  sandstorm: "wind",
+  geyser: "water",
+  monsoon: "cloud-rain",
+  meteor: "fire",
+};
+
+function renderElementIcon(icon: string, size: number): React.ReactNode {
+  const iconName = ELEMENT_ICON_MAP[icon] || "star";
+  const IconComponent = PixelIcons[iconName];
+  if (IconComponent) {
+    return <IconComponent size={size} />;
+  }
+  return <PixelIcons.star size={size} />;
 }
 

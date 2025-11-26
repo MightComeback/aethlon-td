@@ -155,6 +155,16 @@ export const GameEvents = {
   UI_TILE_CLICK: "ui:tile_click",
 } as const;
 
+// Weather Events
+export const WeatherEvents = {
+  WEATHER_CHANGE: "weather:change",
+  WEATHER_TRANSITION_START: "weather:transition_start",
+  WEATHER_TRANSITION_COMPLETE: "weather:transition_complete",
+  LIGHTNING_STRIKE: "weather:lightning_strike",
+} as const;
+
+export type WeatherEventType = (typeof WeatherEvents)[keyof typeof WeatherEvents];
+
 export type GameEventType = (typeof GameEvents)[keyof typeof GameEvents];
 
 // Singleton instance

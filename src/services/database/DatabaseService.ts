@@ -128,6 +128,37 @@ export class DatabaseService {
         );
       }
 
+      // Migration from v2 to v3: Add weather and wave config columns to maps
+      if (currentVersion < 3) {
+        console.log("Migrating to v3: Adding weather and wave_config columns");
+
+        // Add weather column
+        try {
+          this.db.run("ALTER TABLE maps ADD COLUMN weather TEXT");
+        } catch (e) {
+          // Column might already exist, ignore error
+          console.log("Weather column might already exist:", e);
+        }
+
+        // Add wave_config column
+        try {
+          this.db.run("ALTER TABLE maps ADD COLUMN wave_config TEXT");
+        } catch (e) {
+          // Column might already exist, ignore error
+          console.log("Wave_config column might already exist:", e);
+        }
+
+        // Create index for faster wave config queries
+        try {
+          this.db.run(`
+            CREATE INDEX IF NOT EXISTS idx_maps_wave_config
+            ON maps(id) WHERE wave_config IS NOT NULL
+          `);
+        } catch (e) {
+          console.log("Index might already exist:", e);
+        }
+      }
+
       this.db.run(`UPDATE schema_version SET version = ${SCHEMA_VERSION}`);
       await this.save();
     }

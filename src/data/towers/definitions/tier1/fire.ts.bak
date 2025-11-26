@@ -1,0 +1,69 @@
+/**
+ * Fire Element - Tier 1 Base Towers
+ * 5 towers (one per category: Damage, MagicDamage, PhysicalDamage, Buff, Debuff)
+ */
+
+import {
+  TowerCategory,
+  TowerRarity,
+  BuffType,
+  type ExtendedTowerDefinition,
+} from "@/types/tower";
+import { BaseElement } from "@/types/element";
+import { StatusEffectType } from "@/types/enemy";
+import { createTowerId } from "../../mergeGraph";
+
+// ============================================================================
+// FIRE TIER 1 TOWERS
+// ============================================================================
+
+export const FIRE_TIER1_TOWERS: ExtendedTowerDefinition[] = [
+  // 1. Fire Damage Tower - Balanced damage dealer
+  {
+    id: createTowerId(BaseElement.Fire, TowerCategory.Damage, 1),
+    type: "fire_damage" as any,
+    name: "Flame Spire",
+    description: "A basic fire tower that deals balanced damage. Has increased critical strike chance.",
+    element: BaseElement.Fire,
+    category: TowerCategory.Damage,
+    tier: 1,
+    rarity: TowerRarity.Common,
+    baseStats: {
+      damage: 25,
+      attackSpeed: 1.0,
+      range: 3.0,
+      cost: 100,
+      upgradeCost: 50,
+      health: 100,
+      armor: 5,
+      magicPen: 0,
+      armorPen: 0,
+      critChance: 0.15,
+      critMultiplier: 2.0,
+    },
+    meshConfig: {
+      baseShape: "obelisk",
+      scale: 1.0,
+      height: 1.2,
+      effectColor: "#ff4400",
+      parts: [
+        { type: "cylinder", position: [0, 0, 0], size: [0.15, 0.4], color: "#555555" }, // Base
+        { type: "cone", position: [0, 0.4, 0], size: [0.12, 0.6], color: "#666666" }, // Spire
+        {
+          type: "sphere",
+          position: [0, 0.9, 0],
+          size: [0.08],
+          color: "#777777",
+          emissive: "#ff4400",
+          animated: { type: "pulse", speed: 2 },
+        }, // Flame orb
+      ],
+    },
+    mergeOutput: [
+      "lava_physical_damage_t2",
+      "lava_damage_t2",
+      "plasma_magic_damage_t2",
+      "plasma_damage_t2",
+    ],
+  },
+];

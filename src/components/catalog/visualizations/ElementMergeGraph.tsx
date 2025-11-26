@@ -12,6 +12,7 @@ import {
   getPossibleMerges,
   getRecipeForElement,
 } from "@/data/elements";
+import { PixelIcons, type PixelIconName } from "@/components/ui/PixelIcon";
 
 interface GraphNode {
   id: Element;
@@ -196,10 +197,10 @@ export function ElementMergeGraph() {
                   T{node.tier}
                 </text>
 
-                {/* Element emoji */}
-                <text x={0} y={6} textAnchor="middle" fontSize="24">
-                  {getElementEmoji(node.id)}
-                </text>
+                {/* Element icon */}
+                <foreignObject x={-12} y={-12} width={24} height={24}>
+                  {renderElementIcon(node.id, 24)}
+                </foreignObject>
 
                 {/* Element name */}
                 <text
@@ -301,38 +302,47 @@ function ElementInfo({ element }: { element: Element }) {
   );
 }
 
-function getElementEmoji(element: Element): string {
-  const emojis: Record<string, string> = {
-    fire: "🔥",
-    water: "💧",
-    earth: "🪨",
-    air: "💨",
-    lightning: "⚡",
-    steam: "☁️",
-    lava: "🌋",
-    plasma: "⚛️",
-    storm: "⛈️",
-    ice: "❄️",
-    mist: "🌫️",
-    tempest: "🌊",
-    dust: "💨",
-    crystal: "💎",
-    thunder: "⚡",
-    volcano: "🌋",
-    inferno: "🔥",
-    tsunami: "🌊",
-    blizzard: "🌨️",
-    earthquake: "🏔️",
-    mountain: "⛰️",
-    hurricane: "🌀",
-    cyclone: "🌀",
-    supercell: "⛈️",
-    discharge: "⚡",
-    aurora: "🌌",
-    sandstorm: "🏜️",
-    geyser: "♨️",
-    monsoon: "🌧️",
-    meteor: "☄️",
-  };
-  return emojis[element] || "⭐";
+// Map element names to PixelIcon keys
+const ELEMENT_ICON_MAP: Record<string, PixelIconName> = {
+  fire: "fire",
+  water: "water",
+  earth: "mountain",
+  air: "wind",
+  lightning: "lightning-bolt",
+  steam: "cloud-rain",
+  lava: "volcano",
+  plasma: "fire",
+  storm: "storm-cloud",
+  ice: "snowflake",
+  mist: "cloud-rain",
+  tempest: "water",
+  dust: "wind",
+  crystal: "crystal",
+  thunder: "lightning-bolt",
+  volcano: "volcano",
+  inferno: "fire",
+  tsunami: "water",
+  blizzard: "snowflake",
+  earthquake: "mountain",
+  mountain: "mountain",
+  hurricane: "hurricane",
+  cyclone: "hurricane",
+  supercell: "storm-cloud",
+  discharge: "lightning-bolt",
+  aurora: "star",
+  sandstorm: "wind",
+  geyser: "water",
+  monsoon: "cloud-rain",
+  meteor: "fire",
+  magma: "volcano",
+  glacier: "snowflake",
+};
+
+function renderElementIcon(element: Element, size: number): React.ReactNode {
+  const iconName = ELEMENT_ICON_MAP[element] || "star";
+  const IconComponent = PixelIcons[iconName];
+  if (IconComponent) {
+    return <IconComponent size={size} color="#ffffff" />;
+  }
+  return <PixelIcons.star size={size} color="#ffffff" />;
 }

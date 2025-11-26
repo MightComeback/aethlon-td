@@ -16,6 +16,8 @@ import {
 } from "@/data/towers";
 import { TowerMeshPreview } from "@/components/game/towers";
 import type { ExtendedTowerDefinition } from "@/types/tower";
+import { IconClose } from "@/components/ui/PixelIcon";
+import { BaseElement } from "@/types/element";
 
 const CATEGORY_FILTERS = [
   { id: "all", label: "All" },
@@ -191,9 +193,16 @@ function TowerCard({
       {/* Info */}
       <div className="flex-1">
         <h3 className="font-pixel text-sm text-foreground">{tower.name}</h3>
-        <span className="text-2xs px-2 py-0.5 bg-background-secondary rounded capitalize">
-          {tower.category}
-        </span>
+        <div className="flex gap-2 mt-1">
+          <span className="text-2xs px-2 py-0.5 bg-background-secondary rounded capitalize">
+            {tower.category}
+          </span>
+          {tower.tier === 1 && (
+            <span className="text-2xs px-2 py-0.5 bg-accent-gold/20 text-accent-gold rounded">
+              {getT1PassiveName(tower.element as BaseElement)}
+            </span>
+          )}
+        </div>
         <p className="text-2xs text-foreground-muted mt-2 line-clamp-2">{tower.description}</p>
       </div>
 
@@ -227,7 +236,7 @@ function TowerDetailModal({
             <p className="text-sm text-foreground-muted mt-1">{tower.description}</p>
           </div>
           <button onClick={onClose} className="text-foreground-muted hover:text-foreground p-1">
-            ✕
+            <IconClose size={16} />
           </button>
         </div>
 
@@ -331,4 +340,15 @@ function StatRow({ label, value }: { label: string; value: string | number }) {
       <span className="text-foreground font-mono">{value}</span>
     </div>
   );
+}
+
+function getT1PassiveName(element: BaseElement): string {
+  const passives = {
+    [BaseElement.Fire]: "Crit",
+    [BaseElement.Water]: "Pierce",
+    [BaseElement.Earth]: "Splash",
+    [BaseElement.Air]: "Speed",
+    [BaseElement.Lightning]: "Range",
+  };
+  return passives[element] || "Passive";
 }

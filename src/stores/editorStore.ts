@@ -1,6 +1,9 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { TileType, type Waypoint, type MapData } from "@/types/map";
+import { WeatherType, type MapWeatherConfig } from "@/types/weather";
+import type { MapWaveOverride, WaveConfig } from "@/types/enemy";
+import type { WavePreset, PresetOptions } from "@/types/wavePreset";
 
 // Editor tool types - defined here to avoid circular imports
 export type EditorTool =
@@ -96,6 +99,7 @@ interface EditorStore {
   selectedObjectType: PlaceableObjectType;
   isModified: boolean;
   mapName: string;
+  mapId: string | null;
 
   // Camera state
   camera: EditorCameraState;
@@ -107,6 +111,14 @@ interface EditorStore {
   // History for undo/redo
   history: TileType[][][];
   historyIndex: number;
+
+  // Weather config
+  weatherConfig: MapWeatherConfig;
+
+  // Wave configuration state
+  waveConfig: MapWaveOverride | null;
+  selectedWaveNumber: number | null;
+  waveEditorMode: "replace" | "selective";
 
   // Actions
   setTool: (tool: EditorTool) => void;
@@ -141,6 +153,18 @@ interface EditorStore {
   loadMap: (data: MapData) => void;
   getMapData: () => MapData;
 
+  // Weather actions
+  setWeatherConfig: (config: MapWeatherConfig) => void;
+
+  // Wave configuration actions
+  setWaveConfig: (config: MapWaveOverride | null) => void;
+  setWaveEditorMode: (mode: "replace" | "selective") => void;
+  setSelectedWaveNumber: (waveNumber: number | null) => void;
+  updateWave: (waveNumber: number, wave: WaveConfig) => void;
+  removeWave: (waveNumber: number) => void;
+  applyPreset: (preset: WavePreset, options?: PresetOptions) => void;
+  clearWaveConfig: () => void;
+
   // History actions
   undo: () => void;
   redo: () => void;
@@ -165,6 +189,16 @@ const HEIGHT_MAX = 5;
 const DEFAULT_WIDTH = 20;
 const DEFAULT_HEIGHT = 15;
 
+const DEFAULT_WEATHER_CONFIG: MapWeatherConfig = {
+  defaultWeather: WeatherType.Sunny,
+  dynamicWeather: {
+    enabled: false,
+    changeInterval: [60, 180],
+    allowedTypes: Object.values(WeatherType),
+    transitionDuration: 5,
+  },
+};
+
 export const useEditorStore = create<EditorStore>()(
   immer((set, get) => ({
     width: DEFAULT_WIDTH,
@@ -180,11 +214,16 @@ export const useEditorStore = create<EditorStore>()(
     selectedObjectType: "tree_pine" as PlaceableObjectType,
     isModified: false,
     mapName: "Untitled Map",
+    mapId: null,
     camera: { azimuth: 0, polar: Math.PI / 4, zoom: 50 }, // 45° default tilt
     selectedTile: null,
     hoveredTile: null,
     history: [],
     historyIndex: -1,
+    weatherConfig: { ...DEFAULT_WEATHER_CONFIG },
+    waveConfig: null,
+    selectedWaveNumber: null,
+    waveEditorMode: "selective",
 
     setTool: (tool) =>
       set((s) => {
@@ -385,6 +424,11 @@ export const useEditorStore = create<EditorStore>()(
         s.exitPoints = [];
         s.objects = [];
         s.mapName = "Untitled Map";
+        s.mapId = null;
+        s.weatherConfig = { ...DEFAULT_WEATHER_CONFIG };
+        s.waveConfig = null;
+        s.selectedWaveNumber = null;
+        s.waveEditorMode = "selective";
         s.isModified = false;
         s.history = [];
         s.historyIndex = -1;
@@ -401,6 +445,11 @@ export const useEditorStore = create<EditorStore>()(
         s.exitPoints = data.exitPoints;
         s.objects = data.objects ?? [];
         s.mapName = data.name;
+        s.mapId = data.id;
+        s.weatherConfig = data.weather ?? { ...DEFAULT_WEATHER_CONFIG };
+        s.waveConfig = data.waveOverrides ?? null;
+        s.selectedWaveNumber = null;
+        s.waveEditorMode = data.waveOverrides?.replaceGlobal ? "replace" : "selective";
         s.isModified = false;
         s.history = [];
         s.historyIndex = -1;
@@ -408,8 +457,13 @@ export const useEditorStore = create<EditorStore>()(
 
     getMapData: () => {
       const s = get();
+      // Only include weather config if it's not the default (sunny, no dynamic)
+      const includeWeather =
+        s.weatherConfig.defaultWeather !== WeatherType.Sunny ||
+        s.weatherConfig.dynamicWeather.enabled;
+
       return {
-        id: crypto.randomUUID(),
+        id: s.mapId ?? crypto.randomUUID(),
         name: s.mapName,
         width: s.width,
         height: s.height,
@@ -419,11 +473,119 @@ export const useEditorStore = create<EditorStore>()(
         spawnPoints: s.spawnPoints,
         exitPoints: s.exitPoints,
         objects: s.objects,
+        weather: includeWeather ? s.weatherConfig : undefined,
+        waveOverrides: s.waveConfig ?? undefined,
         createdAt: Date.now(),
         updatedAt: Date.now(),
         isCustom: true,
       };
     },
+
+    setWeatherConfig: (config) =>
+      set((s) => {
+        s.weatherConfig = config;
+        s.isModified = true;
+      }),
+
+    // Wave configuration actions
+    setWaveConfig: (config) =>
+      set((s) => {
+        s.waveConfig = config;
+        s.isModified = true;
+      }),
+
+    setWaveEditorMode: (mode) =>
+      set((s) => {
+        s.waveEditorMode = mode;
+        if (s.waveConfig) {
+          s.waveConfig.replaceGlobal = mode === "replace";
+          s.isModified = true;
+        }
+      }),
+
+    setSelectedWaveNumber: (waveNumber) =>
+      set((s) => {
+        s.selectedWaveNumber = waveNumber;
+      }),
+
+    updateWave: (waveNumber, wave) =>
+      set((s) => {
+        if (!s.waveConfig) {
+          // Create new wave config if it doesn't exist
+          s.waveConfig = {
+            mapId: s.mapId ?? crypto.randomUUID(),
+            waves: [wave],
+            replaceGlobal: s.waveEditorMode === "replace",
+            version: 1,
+            metadata: {
+              createdAt: Date.now(),
+              updatedAt: Date.now(),
+              customWaveNumbers: [waveNumber],
+            },
+          };
+        } else {
+          const existingIndex = s.waveConfig.waves.findIndex(
+            (w) => w.waveNumber === waveNumber
+          );
+          if (existingIndex >= 0) {
+            s.waveConfig.waves[existingIndex] = wave;
+          } else {
+            s.waveConfig.waves.push(wave);
+          }
+          // Update metadata
+          if (s.waveConfig.metadata) {
+            s.waveConfig.metadata.updatedAt = Date.now();
+            s.waveConfig.metadata.customWaveNumbers = s.waveConfig.waves.map(
+              (w) => w.waveNumber
+            );
+          }
+        }
+        s.isModified = true;
+      }),
+
+    removeWave: (waveNumber) =>
+      set((s) => {
+        if (s.waveConfig) {
+          s.waveConfig.waves = s.waveConfig.waves.filter(
+            (w) => w.waveNumber !== waveNumber
+          );
+          // Update metadata
+          if (s.waveConfig.metadata) {
+            s.waveConfig.metadata.updatedAt = Date.now();
+            s.waveConfig.metadata.customWaveNumbers = s.waveConfig.waves.map(
+              (w) => w.waveNumber
+            );
+          }
+          s.isModified = true;
+        }
+      }),
+
+    applyPreset: (preset, options) =>
+      set((s) => {
+        const waves = preset.generateWaves(options);
+        s.waveConfig = {
+          mapId: s.mapId ?? crypto.randomUUID(),
+          waves,
+          replaceGlobal: preset.suggestedMode === "replace",
+          version: 1,
+          metadata: {
+            createdAt: Date.now(),
+            updatedAt: Date.now(),
+            totalWaves: waves.length,
+            customWaveNumbers: waves.map((w) => w.waveNumber),
+            presetId: preset.id,
+          },
+        };
+        s.waveEditorMode = preset.suggestedMode;
+        s.isModified = true;
+      }),
+
+    clearWaveConfig: () =>
+      set((s) => {
+        s.waveConfig = null;
+        s.selectedWaveNumber = null;
+        s.isModified = true;
+      }),
 
     saveToHistory: () =>
       set((s) => {

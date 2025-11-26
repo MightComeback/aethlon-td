@@ -1,6 +1,6 @@
 // SQL schema definitions for the game database
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
 export const CREATE_TABLES_SQL = `
 -- Player profile table

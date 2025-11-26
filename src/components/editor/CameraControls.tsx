@@ -237,12 +237,7 @@ export function CameraControlsUI({
   const tiltDegrees = Math.round((state.polar * 180) / Math.PI);
 
   return (
-    <div className="pixel-panel flex flex-col gap-2 p-2">
-      {/* Title */}
-      <span className="font-pixel text-3xs text-foreground-muted/50 uppercase tracking-wide">
-        Camera
-      </span>
-
+    <div className="flex flex-col gap-2">
       {/* Rotation (Azimuth) controls */}
       <div className="flex items-center gap-1">
         <button
