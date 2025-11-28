@@ -7,6 +7,8 @@ import { useState, useMemo, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { TowerCategory } from "@/types/tower";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { ModelUploadDialog, getTowerPrompt } from "@/components/catalog/ModelUploadDialog";
 import {
   getAllTowers,
   getTowersByCategory,
@@ -40,6 +42,8 @@ export function TowerCatalog() {
   const [tierFilter, setTierFilter] = useState<string | number>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTower, setSelectedTower] = useState<ExtendedTowerDefinition | null>(null);
+  const [modelDialogTower, setModelDialogTower] = useState<ExtendedTowerDefinition | null>(null);
+  const isDebugMode = useSettingsStore((s) => s.debugMode);
 
   const filteredTowers = useMemo(() => {
     let towers = getAllTowers();
@@ -77,6 +81,7 @@ export function TowerCatalog() {
             <h2 className="font-pixel text-lg text-foreground mb-2">Towers</h2>
             <p className="text-sm text-foreground-muted">
               {filteredTowers.length} of {getAllTowers().length} towers
+              {isDebugMode && <span className="text-accent-gold ml-2">(Debug: Click items to upload models)</span>}
             </p>
           </div>
         </div>
@@ -134,6 +139,8 @@ export function TowerCatalog() {
             key={tower.id}
             tower={tower}
             onClick={() => setSelectedTower(tower)}
+            isDebugMode={isDebugMode}
+            onModelClick={() => setModelDialogTower(tower)}
           />
         ))}
       </div>
@@ -149,6 +156,18 @@ export function TowerCatalog() {
       {selectedTower && (
         <TowerDetailModal tower={selectedTower} onClose={() => setSelectedTower(null)} />
       )}
+
+      {/* Model upload dialog */}
+      {modelDialogTower && isDebugMode && (
+        <ModelUploadDialog
+          isOpen={true}
+          onClose={() => setModelDialogTower(null)}
+          modelId={modelDialogTower.id}
+          modelName={modelDialogTower.name}
+          category="towers"
+          prompt={getTowerPrompt(modelDialogTower.id, modelDialogTower.name, modelDialogTower.description, String(modelDialogTower.element), modelDialogTower.tier)}
+        />
+      )}
     </div>
   );
 }
@@ -156,9 +175,13 @@ export function TowerCatalog() {
 function TowerCard({
   tower,
   onClick,
+  isDebugMode,
+  onModelClick,
 }: {
   tower: ExtendedTowerDefinition;
   onClick: () => void;
+  isDebugMode: boolean;
+  onModelClick: () => void;
 }) {
   return (
     <button
@@ -175,6 +198,20 @@ function TowerCard({
             <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={1.5} />
           </Suspense>
         </Canvas>
+
+        {/* Debug model button */}
+        {isDebugMode && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onModelClick();
+            }}
+            className="absolute bottom-2 right-2 px-2 py-1 text-2xs rounded bg-accent-gold/80 hover:bg-accent-gold text-background transition-colors z-10"
+            title="Generate/Upload 3D Model"
+          >
+            3D
+          </button>
+        )}
 
         {/* Tier badge */}
         <div className="absolute top-2 left-2 px-2 py-0.5 bg-background/80 text-foreground text-2xs rounded">
@@ -204,6 +241,9 @@ function TowerCard({
           )}
         </div>
         <p className="text-2xs text-foreground-muted mt-2 line-clamp-2">{tower.description}</p>
+        {isDebugMode && (
+          <p className="text-2xs text-foreground-muted/50 mt-1 font-mono">{tower.id}.glb</p>
+        )}
       </div>
 
       {/* Quick stats */}

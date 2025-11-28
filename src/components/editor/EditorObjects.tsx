@@ -3,8 +3,9 @@
  * Low-poly/voxel style objects with colored variants
  */
 
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 import { usePixelTexture } from "@/hooks/usePixelTexture";
 
 interface ObjectProps {
@@ -14,9 +15,63 @@ interface ObjectProps {
 }
 
 // Helper for textured material
-function TexturedMaterial({ color, ...props }: any) {
+function TexturedMaterial({ color, waving = false, ...props }: any) {
   const texture = usePixelTexture();
-  return <meshStandardMaterial map={texture} color={color} roughness={0.9} metalness={0.1} flatShading={false} {...props} />;
+  const materialRef = useRef<THREE.MeshStandardMaterial>(null);
+
+  // Handle wind animation updates
+  useFrame(({ clock }) => {
+    if (waving && materialRef.current && materialRef.current.userData.shader) {
+      materialRef.current.userData.shader.uniforms.time.value = clock.elapsedTime;
+    }
+  });
+
+  const onBeforeCompile = (shader: THREE.Shader) => {
+    if (!waving) return;
+
+    shader.uniforms.time = { value: 0 };
+    materialRef.current!.userData.shader = shader;
+
+    shader.vertexShader = 'uniform float time;\n' + shader.vertexShader;
+    
+    // Wind animation for vegetation
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      `
+      #include <begin_vertex>
+      
+      // Wind Animation
+      // Only affect top vertices (y > 0 in local space)
+      if (position.y > 0.1) {
+        float windStrength = 0.15; // Stronger for grass
+        float windSpeed = 2.5;
+        
+        // Use world position approximation from instance or just local position for variety
+        // For simple meshes, local position x/z works for phase
+        float phase = position.x * 5.0 + position.z * 3.0; 
+        float wave = sin(time * windSpeed + phase);
+        
+        // Simple shear based on height
+        float heightFactor = position.y;
+        transformed.x += wave * windStrength * heightFactor;
+        transformed.z += wave * windStrength * 0.5 * heightFactor;
+      }
+      `
+    );
+  };
+
+  return (
+    <meshStandardMaterial 
+      ref={materialRef}
+      map={texture} 
+      color={color} 
+      roughness={0.9} 
+      metalness={0.1} 
+      flatShading={false} 
+      onBeforeCompile={waving ? onBeforeCompile : undefined}
+      {...props} 
+    />
+  );
 }
 
 // ============================================
@@ -39,17 +94,17 @@ export function PineTree({ position, scale = 1, color }: ObjectProps) {
       {/* Bottom layer */}
       <mesh position={[0, 0.4, 0]} castShadow receiveShadow>
         <coneGeometry args={[0.35, 0.4, 6]} />
-        <TexturedMaterial color={foliageBase} />
+        <TexturedMaterial color={foliageBase} waving={true} />
       </mesh>
       {/* Middle layer */}
       <mesh position={[0, 0.65, 0]} castShadow receiveShadow>
         <coneGeometry args={[0.28, 0.35, 6]} />
-        <TexturedMaterial color="#388e3c" />
+        <TexturedMaterial color="#388e3c" waving={true} />
       </mesh>
       {/* Top layer */}
       <mesh position={[0, 0.88, 0]} castShadow receiveShadow>
         <coneGeometry args={[0.18, 0.3, 6]} />
-        <TexturedMaterial color="#43a047" />
+        <TexturedMaterial color="#43a047" waving={true} />
       </mesh>
     </group>
   );
@@ -71,15 +126,15 @@ export function OakTree({ position, scale = 1, color }: ObjectProps) {
       {/* Canopy - multiple spheres */}
       <mesh position={[0, 0.55, 0]} castShadow receiveShadow>
         <sphereGeometry args={[0.35, 8, 6]} />
-        <TexturedMaterial color={foliageBase} />
+        <TexturedMaterial color={foliageBase} waving={true} />
       </mesh>
       <mesh position={[0.15, 0.5, 0.1]} castShadow receiveShadow>
         <sphereGeometry args={[0.25, 8, 6]} />
-        <TexturedMaterial color="#2e7d32" />
+        <TexturedMaterial color="#2e7d32" waving={true} />
       </mesh>
       <mesh position={[-0.12, 0.5, -0.08]} castShadow receiveShadow>
         <sphereGeometry args={[0.22, 8, 6]} />
-        <TexturedMaterial color="#43a047" />
+        <TexturedMaterial color="#43a047" waving={true} />
       </mesh>
     </group>
   );
@@ -99,11 +154,11 @@ export function BirchTree({ position, scale = 1 }: ObjectProps) {
       {/* Sparse foliage */}
       <mesh position={[0, 0.65, 0]} castShadow receiveShadow>
         <sphereGeometry args={[0.25, 8, 6]} />
-        <TexturedMaterial color="#8bc34a" />
+        <TexturedMaterial color="#8bc34a" waving={true} />
       </mesh>
       <mesh position={[0.12, 0.7, 0.05]} castShadow receiveShadow>
         <sphereGeometry args={[0.18, 6, 5]} />
-        <TexturedMaterial color="#9ccc65" />
+        <TexturedMaterial color="#9ccc65" waving={true} />
       </mesh>
     </group>
   );
@@ -132,13 +187,13 @@ export function WillowTree({ position, scale = 1 }: ObjectProps) {
           rotation={[0.3, 0, (angle * Math.PI) / 180]}
         >
           <coneGeometry args={[0.12, 0.5, 5]} />
-          <TexturedMaterial color="#558b2f" />
+          <TexturedMaterial color="#558b2f" waving={true} />
         </mesh>
       ))}
       {/* Top */}
       <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
         <sphereGeometry args={[0.2, 6, 5]} />
-        <TexturedMaterial color="#689f38" />
+        <TexturedMaterial color="#689f38" waving={true} />
       </mesh>
     </group>
   );
@@ -317,15 +372,15 @@ export function GrassTuft({ position, scale = 1, color }: ObjectProps) {
     <group position={position} scale={scale}>
       <mesh position={[0, 0.08, 0]} rotation={[0, 0, 0.1]} castShadow receiveShadow>
         <coneGeometry args={[0.02, 0.16, 4]} />
-        <TexturedMaterial color={grassColor} />
+        <TexturedMaterial color={grassColor} waving={true} />
       </mesh>
       <mesh position={[0.03, 0.07, 0.02]} rotation={[0, 0.5, -0.15]} castShadow receiveShadow>
         <coneGeometry args={[0.015, 0.14, 4]} />
-        <TexturedMaterial color="#8bc34a" />
+        <TexturedMaterial color="#8bc34a" waving={true} />
       </mesh>
       <mesh position={[-0.02, 0.06, -0.01]} rotation={[0, -0.3, 0.2]} castShadow receiveShadow>
         <coneGeometry args={[0.018, 0.12, 4]} />
-        <TexturedMaterial color="#689f38" />
+        <TexturedMaterial color="#689f38" waving={true} />
       </mesh>
     </group>
   );
@@ -341,7 +396,7 @@ export function Flower({ position, scale = 1, color }: ObjectProps) {
       {/* Stem */}
       <mesh position={[0, 0.08, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.01, 0.015, 0.16, 4]} />
-        <TexturedMaterial color="#558b2f" />
+        <TexturedMaterial color="#558b2f" waving={true} />
       </mesh>
       {/* Center */}
       <mesh position={[0, 0.18, 0]} castShadow receiveShadow>
@@ -376,12 +431,12 @@ export function Sunflower({ position, scale = 1 }: ObjectProps) {
       {/* Stem */}
       <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.02, 0.025, 0.4, 4]} />
-        <TexturedMaterial color="#558b2f" />
+        <TexturedMaterial color="#558b2f" waving={true} />
       </mesh>
       {/* Leaf */}
       <mesh position={[0.08, 0.15, 0]} rotation={[0, 0, -0.5]} castShadow receiveShadow>
         <sphereGeometry args={[0.06, 4, 4]} />
-        <TexturedMaterial color="#7cb342" />
+        <TexturedMaterial color="#7cb342" waving={true} />
       </mesh>
       {/* Center */}
       <mesh position={[0, 0.42, 0]} castShadow receiveShadow>
@@ -400,7 +455,7 @@ export function Sunflower({ position, scale = 1 }: ObjectProps) {
           rotation={[Math.PI / 2, 0, (angle * Math.PI) / 180]}
         >
           <coneGeometry args={[0.02, 0.08, 4]} />
-          <TexturedMaterial color="#fdd835" />
+          <TexturedMaterial color="#fdd835" waving={true} />
         </mesh>
       ))}
     </group>
@@ -416,16 +471,16 @@ export function Cactus({ position, scale = 1 }: ObjectProps) {
       {/* Main body */}
       <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.08, 0.1, 0.4, 8]} />
-        <TexturedMaterial color="#66bb6a" />
+        <TexturedMaterial color="#66bb6a" waving={false} /> 
       </mesh>
       {/* Arms */}
       <mesh position={[0.12, 0.22, 0]} rotation={[0, 0, -0.8]} castShadow receiveShadow>
         <cylinderGeometry args={[0.04, 0.05, 0.2, 6]} />
-        <TexturedMaterial color="#4caf50" />
+        <TexturedMaterial color="#4caf50" waving={false} />
       </mesh>
       <mesh position={[-0.1, 0.18, 0]} rotation={[0, 0, 0.9]} castShadow receiveShadow>
         <cylinderGeometry args={[0.035, 0.045, 0.15, 6]} />
-        <TexturedMaterial color="#4caf50" />
+        <TexturedMaterial color="#4caf50" waving={false} />
       </mesh>
     </group>
   );
@@ -466,20 +521,20 @@ export function Cattail({ position, scale = 1 }: ObjectProps) {
       {/* Stems */}
       <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.01, 0.015, 0.4, 4]} />
-        <TexturedMaterial color="#8bc34a" />
+        <TexturedMaterial color="#8bc34a" waving={true} />
       </mesh>
       <mesh position={[0.03, 0.18, 0.02]} castShadow receiveShadow>
         <cylinderGeometry args={[0.008, 0.012, 0.36, 4]} />
-        <TexturedMaterial color="#9ccc65" />
+        <TexturedMaterial color="#9ccc65" waving={true} />
       </mesh>
       {/* Brown tops */}
       <mesh position={[0, 0.38, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.025, 0.02, 0.08, 6]} />
-        <TexturedMaterial color="#5d4037" />
+        <TexturedMaterial color="#5d4037" waving={true} />
       </mesh>
       <mesh position={[0.03, 0.34, 0.02]} castShadow receiveShadow>
         <cylinderGeometry args={[0.02, 0.015, 0.06, 6]} />
-        <TexturedMaterial color="#6d4c41" />
+        <TexturedMaterial color="#6d4c41" waving={true} />
       </mesh>
     </group>
   );

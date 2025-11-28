@@ -6,6 +6,8 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Suspense, useState } from "react";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { ModelUploadDialog, getStructurePrompt } from "@/components/catalog/ModelUploadDialog";
 import {
   LargeHouse,
   Farmhouse,
@@ -151,6 +153,8 @@ const CATEGORIES: { id: CategoryFilter; label: string }[] = [
 
 export function StructureCatalog() {
   const [filter, setFilter] = useState<CategoryFilter>("all");
+  const [selectedStructure, setSelectedStructure] = useState<StructureInfo | null>(null);
+  const isDebugMode = useSettingsStore((s) => s.debugMode);
 
   const filteredStructures =
     filter === "all"
@@ -168,6 +172,7 @@ export function StructureCatalog() {
           <p className="text-sm text-foreground-muted">
             {filteredStructures.length} of {STRUCTURES.length} structures
             spanning multiple tiles
+            {isDebugMode && <span className="text-accent-gold ml-2">(Debug: Click items to upload models)</span>}
           </p>
         </div>
 
@@ -196,20 +201,41 @@ export function StructureCatalog() {
       {/* Grid of structures */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredStructures.map((structure) => (
-          <StructureCard key={structure.id} structure={structure} />
+          <StructureCard
+            key={structure.id}
+            structure={structure}
+            isDebugMode={isDebugMode}
+            onModelClick={() => setSelectedStructure(structure)}
+          />
         ))}
       </div>
+
+      {/* Model upload dialog */}
+      {selectedStructure && isDebugMode && (
+        <ModelUploadDialog
+          isOpen={true}
+          onClose={() => setSelectedStructure(null)}
+          modelId={selectedStructure.id}
+          modelName={selectedStructure.label}
+          category="structures"
+          prompt={getStructurePrompt(selectedStructure.id, selectedStructure.label, selectedStructure.description, selectedStructure.footprint)}
+        />
+      )}
     </div>
   );
 }
 
-function StructureCard({ structure }: { structure: StructureInfo }) {
+function StructureCard({ structure, isDebugMode, onModelClick }: {
+  structure: StructureInfo;
+  isDebugMode: boolean;
+  onModelClick: () => void;
+}) {
   const [w, h] = structure.footprint;
 
   return (
     <div className="pixel-panel flex flex-col">
       {/* 3D Preview */}
-      <div className="h-40 bg-background-secondary rounded mb-3 overflow-hidden">
+      <div className="h-40 bg-background-secondary rounded mb-3 overflow-hidden relative">
         <Canvas camera={{ position: [3, 3, 3], fov: 50 }}>
           <Suspense fallback={null}>
             <ambientLight intensity={0.6} />
@@ -227,6 +253,16 @@ function StructureCard({ structure }: { structure: StructureInfo }) {
             />
           </Suspense>
         </Canvas>
+        {/* Debug model button */}
+        {isDebugMode && (
+          <button
+            onClick={onModelClick}
+            className="absolute top-2 right-2 px-2 py-1 text-2xs rounded bg-accent-gold/80 hover:bg-accent-gold text-background transition-colors"
+            title="Generate/Upload 3D Model"
+          >
+            3D
+          </button>
+        )}
       </div>
 
       {/* Info */}
@@ -260,6 +296,9 @@ function StructureCard({ structure }: { structure: StructureInfo }) {
             ))}
           </div>
         </div>
+        {isDebugMode && (
+          <p className="text-2xs text-foreground-muted/50 mt-1 font-mono">{structure.id}.glb</p>
+        )}
       </div>
     </div>
   );

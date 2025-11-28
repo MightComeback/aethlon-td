@@ -7,6 +7,8 @@ import { useState, useMemo, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { EnemyCategory } from "@/types/enemy";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { ModelUploadDialog, getEnemyPrompt } from "@/components/catalog/ModelUploadDialog";
 import {
   ENEMY_DATABASE,
   getEnemiesByCategory,
@@ -31,6 +33,8 @@ export function EnemyCatalog() {
   const [selectedTier, setSelectedTier] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedEnemy, setSelectedEnemy] = useState<EnemyDefinition | null>(null);
+  const [modelDialogEnemy, setModelDialogEnemy] = useState<EnemyDefinition | null>(null);
+  const isDebugMode = useSettingsStore((s) => s.debugMode);
 
   const filteredEnemies = useMemo(() => {
     let enemies = Array.from(ENEMY_DATABASE.values());
@@ -62,6 +66,7 @@ export function EnemyCatalog() {
           <h2 className="font-pixel text-lg text-foreground mb-2">Enemies</h2>
           <p className="text-sm text-foreground-muted">
             {filteredEnemies.length} of {ENEMY_DATABASE.size} enemies
+            {isDebugMode && <span className="text-accent-gold ml-2">(Debug: Upload GLB models)</span>}
           </p>
         </div>
 
@@ -139,6 +144,8 @@ export function EnemyCatalog() {
             enemy={enemy}
             tier={selectedTier}
             onClick={() => setSelectedEnemy(enemy)}
+            isDebugMode={isDebugMode}
+            onModelClick={() => setModelDialogEnemy(enemy)}
           />
         ))}
       </div>
@@ -158,6 +165,18 @@ export function EnemyCatalog() {
           onClose={() => setSelectedEnemy(null)}
         />
       )}
+
+      {/* Model upload dialog */}
+      {modelDialogEnemy && isDebugMode && (
+        <ModelUploadDialog
+          isOpen={true}
+          onClose={() => setModelDialogEnemy(null)}
+          modelId={modelDialogEnemy.type}
+          modelName={modelDialogEnemy.name}
+          category="enemies"
+          prompt={getEnemyPrompt(modelDialogEnemy.type, modelDialogEnemy.name, modelDialogEnemy.description, modelDialogEnemy.category, modelDialogEnemy.isBoss)}
+        />
+      )}
     </div>
   );
 }
@@ -166,10 +185,14 @@ function EnemyCard({
   enemy,
   tier,
   onClick,
+  isDebugMode,
+  onModelClick,
 }: {
   enemy: EnemyDefinition;
   tier: number;
   onClick: () => void;
+  isDebugMode: boolean;
+  onModelClick: () => void;
 }) {
   const stats = applyTier(enemy.baseStats, tier);
 
@@ -194,6 +217,20 @@ function EnemyCard({
           </Suspense>
         </Canvas>
 
+        {/* Debug model button */}
+        {isDebugMode && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onModelClick();
+            }}
+            className="absolute top-2 left-2 px-2 py-1 text-2xs rounded bg-accent-gold/80 hover:bg-accent-gold text-background transition-colors z-10"
+            title="Generate/Upload 3D Model"
+          >
+            3D
+          </button>
+        )}
+
         {/* Boss badge */}
         {enemy.isBoss && (
           <div className="absolute top-2 right-2 px-2 py-0.5 bg-accent-gold text-background text-2xs font-pixel rounded">
@@ -213,6 +250,9 @@ function EnemyCard({
         <p className="text-2xs text-foreground-muted mt-1 line-clamp-2">
           {enemy.description}
         </p>
+        {isDebugMode && (
+          <p className="text-2xs text-foreground-muted/50 mt-1 font-mono">{enemy.type}.glb</p>
+        )}
       </div>
 
       {/* Quick stats */}

@@ -6,6 +6,8 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import { Suspense, useState } from "react";
+import { useSettingsStore } from "@/stores/settingsStore";
+import { ModelUploadDialog, getObjectPrompt } from "@/components/catalog/ModelUploadDialog";
 import {
   // Trees
   PineTree,
@@ -339,6 +341,8 @@ const CATEGORIES: { id: CategoryFilter; label: string }[] = [
 
 export function ObjectCatalog() {
   const [filter, setFilter] = useState<CategoryFilter>("all");
+  const [selectedObject, setSelectedObject] = useState<ObjectInfo | null>(null);
+  const isDebugMode = useSettingsStore((s) => s.debugMode);
 
   const filteredObjects = filter === "all"
     ? OBJECTS
@@ -352,6 +356,7 @@ export function ObjectCatalog() {
           <h2 className="font-pixel text-lg text-foreground mb-2">Map Objects</h2>
           <p className="text-sm text-foreground-muted">
             {filteredObjects.length} of {OBJECTS.length} placeable objects
+            {isDebugMode && <span className="text-accent-gold ml-2">(Debug: Click items to upload models)</span>}
           </p>
         </div>
 
@@ -376,18 +381,39 @@ export function ObjectCatalog() {
       {/* Grid of objects */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredObjects.map((obj) => (
-          <ObjectCard key={obj.id} object={obj} />
+          <ObjectCard
+            key={obj.id}
+            object={obj}
+            isDebugMode={isDebugMode}
+            onModelClick={() => setSelectedObject(obj)}
+          />
         ))}
       </div>
+
+      {/* Model upload dialog */}
+      {selectedObject && isDebugMode && (
+        <ModelUploadDialog
+          isOpen={true}
+          onClose={() => setSelectedObject(null)}
+          modelId={selectedObject.id}
+          modelName={selectedObject.label}
+          category="objects"
+          prompt={getObjectPrompt(selectedObject.id, selectedObject.label, selectedObject.description)}
+        />
+      )}
     </div>
   );
 }
 
-function ObjectCard({ object }: { object: ObjectInfo }) {
+function ObjectCard({ object, isDebugMode, onModelClick }: {
+  object: ObjectInfo;
+  isDebugMode: boolean;
+  onModelClick: () => void;
+}) {
   return (
     <div className="pixel-panel flex flex-col">
       {/* 3D Preview */}
-      <div className="h-32 bg-background-secondary rounded mb-3 overflow-hidden">
+      <div className="h-32 bg-background-secondary rounded mb-3 overflow-hidden relative">
         <Canvas camera={{ position: [2, 2, 2], fov: 50 }}>
           <Suspense fallback={null}>
             <ambientLight intensity={0.6} />
@@ -401,6 +427,16 @@ function ObjectCard({ object }: { object: ObjectInfo }) {
             />
           </Suspense>
         </Canvas>
+        {/* Debug model button */}
+        {isDebugMode && (
+          <button
+            onClick={onModelClick}
+            className="absolute top-2 right-2 px-2 py-1 text-2xs rounded bg-accent-gold/80 hover:bg-accent-gold text-background transition-colors"
+            title="Generate/Upload 3D Model"
+          >
+            3D
+          </button>
+        )}
       </div>
 
       {/* Info */}
@@ -412,6 +448,9 @@ function ObjectCard({ object }: { object: ObjectInfo }) {
           </span>
         </div>
         <p className="text-xs text-foreground-muted">{object.description}</p>
+        {isDebugMode && (
+          <p className="text-2xs text-foreground-muted/50 mt-1 font-mono">{object.id}.glb</p>
+        )}
       </div>
     </div>
   );
