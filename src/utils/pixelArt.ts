@@ -5,25 +5,43 @@
  */
 
 // Common color palettes for consistent art style
+// Inspired by Heroes of Hammerwatch / classic pixel art RPGs
 export const PALETTES = {
   // Nature palette (grass, trees, dirt)
   nature: {
     transparent: "transparent",
+    // Greens for grass - vibrant, natural greens
+    grassDarkest: "#1a3d16",
+    grassDark: "#2d5a1e",
+    grass: "#4a8c2a",
+    grassMid: "#5fa035",
+    grassLight: "#7cb844",
+    grassHighlight: "#9fd05a",
+    grassYellow: "#c4e066", // Yellow-green highlights
+    // Browns for dirt/paths - warm earthy tones
+    dirtDarkest: "#2a1a0a",
+    dirtDark: "#3d2a14",
+    dirt: "#5c4022",
+    dirtMid: "#7a5a36",
+    dirtLight: "#9a7a52",
+    dirtHighlight: "#b89a70",
+    // Blues for water - deep to light
+    waterDarkest: "#0a1a2e",
+    waterDark: "#1a3050",
+    water: "#2a5080",
+    waterMid: "#3a70a0",
+    waterLight: "#5090c0",
+    waterHighlight: "#70b0e0",
+    waterFoam: "#a0d0f0",
+    // Grays for stone
+    stoneDarkest: "#2a2a30",
+    stoneDark: "#3a3a44",
+    stone: "#5a5a66",
+    stoneMid: "#7a7a88",
+    stoneLight: "#9a9aaa",
+    stoneHighlight: "#babac0",
+    // Misc
     black: "#1a1c2c",
-    darkBrown: "#41362a",
-    brown: "#5d4e37",
-    lightBrown: "#8a7056",
-    tan: "#c2a67a",
-    darkGreen: "#1e4d2b",
-    green: "#2d6e3f",
-    lightGreen: "#4da65a",
-    paleGreen: "#8fce7e",
-    darkBlue: "#1b3b5a",
-    blue: "#2d5a87",
-    lightBlue: "#5b8bb4",
-    paleBlue: "#9ecae1",
-    gray: "#5a5a6e",
-    lightGray: "#8b8b9e",
     white: "#e8e8eb",
   },
 
@@ -31,12 +49,12 @@ export const PALETTES = {
   stone: {
     transparent: "transparent",
     black: "#1a1c2c",
-    darkGray: "#333344",
-    gray: "#555566",
-    mediumGray: "#777788",
-    lightGray: "#999aab",
-    paleGray: "#bbbccd",
-    white: "#ddddef",
+    darkGray: "#3a3a44",
+    gray: "#5a5a66",
+    mediumGray: "#7a7a88",
+    lightGray: "#9a9aaa",
+    paleGray: "#bababc",
+    white: "#dadade",
     darkBrown: "#3d2b1f",
     brown: "#5c4333",
     rust: "#8b5a3c",
@@ -46,6 +64,18 @@ export const PALETTES = {
   fantasy: {
     transparent: "transparent",
     black: "#1a1c2c",
+    // Reds for spawn
+    spawnDark: "#6a1a1a",
+    spawn: "#8a2a2a",
+    spawnMid: "#aa3a3a",
+    spawnLight: "#ca5a5a",
+    // Golds for exit
+    exitDark: "#6a5a1a",
+    exit: "#8a7a2a",
+    exitMid: "#aaaa3a",
+    exitLight: "#caca5a",
+    exitHighlight: "#eaea7a",
+    // Other fantasy colors
     purple: "#5d3a7a",
     magenta: "#9b4dca",
     pink: "#e056a0",

@@ -1,3 +1,4 @@
+// Use pixel art billboard sprites instead of 3D meshes
 import {
   // Trees
   PineTree,
@@ -54,7 +55,7 @@ import {
   Pier,
   StoneWall,
   Gate,
-} from "@/components/editor/EditorObjects";
+} from "@/components/sprites/PixelArtObjects";
 
 // Object type mapping for easy instantiation
 export const OBJECT_COMPONENTS = {

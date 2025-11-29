@@ -8,16 +8,21 @@ import type { SpriteData } from "@/utils/pixelArt";
 
 // Shorthand aliases for nature palette
 const _ = "_" as const;
-const dG = "darkGreen" as const;
-const G = "green" as const;
-const lG = "lightGreen" as const;
-const pG = "paleGreen" as const;
-const dB = "darkBrown" as const;
-const B = "brown" as const;
-const lB = "lightBrown" as const;
-// const T = "tan" as const; // available for future use
-const gr = "gray" as const;
-const lGr = "lightGray" as const;
+// Greens (foliage)
+const gD = "grassDark" as const;
+const g = "grass" as const;
+const gL = "grassLight" as const;
+const gH = "grassHighlight" as const;
+// Browns (wood/bark)
+const dD = "dirtDark" as const;
+const d = "dirt" as const;
+const dM = "dirtMid" as const;
+// Grays (stone)
+const sD = "stoneDark" as const;
+const s = "stone" as const;
+const sM = "stoneMid" as const;
+const sL = "stoneLight" as const;
+// Basic
 const bk = "black" as const;
 const wh = "white" as const;
 
@@ -25,98 +30,98 @@ const wh = "white" as const;
  * Pine Tree - 16x24 pixels
  */
 export const PINE_TREE: SpriteData<"nature"> = [
-  [_, _, _, _, _, _, _, dG, dG, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, dG, G,  G,  dG, _, _, _, _, _, _],
-  [_, _, _, _, _, dG, G,  lG, lG, G,  dG, _, _, _, _, _],
-  [_, _, _, _, dG, G,  G,  lG, G,  G,  G,  dG, _, _, _, _],
-  [_, _, _, dG, G,  lG, G,  G,  G,  lG, G,  G,  dG, _, _, _],
-  [_, _, dG, G,  G,  G,  lG, lG, lG, G,  G,  G,  dG, _, _, _],
-  [_, _, _, dG, G,  G,  G,  G,  G,  G,  G,  dG, _, _, _, _],
-  [_, _, _, _, dG, G,  lG, lG, lG, G,  dG, _, _, _, _, _],
-  [_, _, _, dG, G,  G,  G,  G,  G,  G,  G,  dG, _, _, _, _],
-  [_, _, dG, G,  lG, G,  G,  G,  G,  lG, G,  G,  dG, _, _, _],
-  [_, dG, G,  G,  G,  lG, lG, lG, lG, G,  G,  G,  dG, _, _, _],
-  [_, _, dG, G,  G,  G,  G,  G,  G,  G,  G,  dG, _, _, _, _],
-  [_, _, _, dG, G,  G,  lG, lG, G,  G,  dG, _, _, _, _, _],
-  [_, _, dG, G,  G,  G,  G,  G,  G,  G,  G,  dG, _, _, _, _],
-  [_, dG, G,  lG, G,  G,  G,  G,  G,  G,  lG, G,  dG, _, _, _],
-  [dG, G,  G,  G,  lG, G,  G,  G,  lG, G,  G,  G,  dG, _, _, _],
-  [_, dG, G,  G,  G,  G,  G,  G,  G,  G,  G,  dG, _, _, _, _],
-  [_, _, dG, dG, G,  G,  G,  G,  G,  dG, dG, _, _, _, _, _],
-  [_, _, _, _, _, _, dB, B,  B,  dB, _, _, _, _, _, _],
-  [_, _, _, _, _, _, dB, B,  B,  dB, _, _, _, _, _, _],
-  [_, _, _, _, _, _, dB, B,  B,  dB, _, _, _, _, _, _],
-  [_, _, _, _, _, _, dB, B,  B,  dB, _, _, _, _, _, _],
-  [_, _, _, _, _, dB, dB, B,  B,  dB, dB, _, _, _, _, _],
-  [_, _, _, _, _, _, dB, dB, dB, dB, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, gD, gD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, gD, g,  g,  gD, _, _, _, _, _, _],
+  [_, _, _, _, _, gD, g,  gL, gL, g,  gD, _, _, _, _, _],
+  [_, _, _, _, gD, g,  g,  gL, g,  g,  g,  gD, _, _, _, _],
+  [_, _, _, gD, g,  gL, g,  g,  g,  gL, g,  g,  gD, _, _, _],
+  [_, _, gD, g,  g,  g,  gL, gL, gL, g,  g,  g,  gD, _, _, _],
+  [_, _, _, gD, g,  g,  g,  g,  g,  g,  g,  gD, _, _, _, _],
+  [_, _, _, _, gD, g,  gL, gL, gL, g,  gD, _, _, _, _, _],
+  [_, _, _, gD, g,  g,  g,  g,  g,  g,  g,  gD, _, _, _, _],
+  [_, _, gD, g,  gL, g,  g,  g,  g,  gL, g,  g,  gD, _, _, _],
+  [_, gD, g,  g,  g,  gL, gL, gL, gL, g,  g,  g,  gD, _, _, _],
+  [_, _, gD, g,  g,  g,  g,  g,  g,  g,  g,  gD, _, _, _, _],
+  [_, _, _, gD, g,  g,  gL, gL, g,  g,  gD, _, _, _, _, _],
+  [_, _, gD, g,  g,  g,  g,  g,  g,  g,  g,  gD, _, _, _, _],
+  [_, gD, g,  gL, g,  g,  g,  g,  g,  g,  gL, g,  gD, _, _, _],
+  [gD, g,  g,  g,  gL, g,  g,  g,  gL, g,  g,  g,  gD, _, _, _],
+  [_, gD, g,  g,  g,  g,  g,  g,  g,  g,  g,  gD, _, _, _, _],
+  [_, _, gD, gD, g,  g,  g,  g,  g,  gD, gD, _, _, _, _, _],
+  [_, _, _, _, _, _, dD, d,  d,  dD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, dD, d,  d,  dD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, dD, d,  d,  dD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, dD, d,  d,  dD, _, _, _, _, _, _],
+  [_, _, _, _, _, dD, dD, d,  d,  dD, dD, _, _, _, _, _],
+  [_, _, _, _, _, _, dD, dD, dD, dD, _, _, _, _, _, _],
 ];
 
 /**
  * Oak Tree - rounder, fuller tree 20x24
  */
 export const OAK_TREE: SpriteData<"nature"> = [
-  [_, _, _, _, _, _, _, _, dG, dG, dG, dG, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, _, dG, G,  G,  G,  G,  dG, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, dG, G,  lG, lG, lG, G,  G,  dG, _, _, _, _, _, _],
-  [_, _, _, _, _, dG, G,  lG, pG, pG, lG, lG, G,  G,  dG, _, _, _, _, _],
-  [_, _, _, _, dG, G,  lG, pG, lG, lG, pG, lG, G,  G,  dG, _, _, _, _, _],
-  [_, _, _, dG, G,  G,  lG, lG, G,  G,  lG, lG, G,  G,  G,  dG, _, _, _, _],
-  [_, _, dG, G,  G,  G,  G,  G,  G,  G,  G,  G,  G,  G,  G,  G,  dG, _, _, _],
-  [_, dG, G,  lG, G,  G,  lG, lG, G,  G,  lG, lG, G,  G,  lG, G,  G,  dG, _, _],
-  [_, dG, G,  G,  lG, lG, pG, lG, lG, lG, lG, pG, lG, lG, G,  G,  G,  dG, _, _],
-  [dG, G,  G,  G,  lG, pG, pG, pG, lG, lG, pG, pG, pG, lG, G,  G,  G,  G,  dG, _],
-  [dG, G,  lG, G,  G,  lG, pG, lG, G,  G,  lG, pG, lG, G,  G,  lG, G,  G,  dG, _],
-  [dG, G,  G,  G,  G,  G,  lG, G,  G,  G,  G,  lG, G,  G,  G,  G,  G,  G,  dG, _],
-  [_, dG, G,  G,  lG, G,  G,  G,  G,  G,  G,  G,  G,  lG, G,  G,  G,  dG, _, _],
-  [_, dG, G,  G,  G,  G,  G,  G,  lG, lG, G,  G,  G,  G,  G,  G,  G,  dG, _, _],
-  [_, _, dG, G,  G,  G,  lG, lG, G,  G,  lG, lG, G,  G,  G,  G,  dG, _, _, _],
-  [_, _, dG, dG, G,  G,  G,  G,  G,  G,  G,  G,  G,  G,  dG, dG, _, _, _, _],
-  [_, _, _, dG, dG, G,  G,  G,  G,  G,  G,  G,  G,  dG, dG, _, _, _, _, _],
-  [_, _, _, _, dG, dG, dG, G,  G,  G,  G,  dG, dG, dG, _, _, _, _, _, _],
-  [_, _, _, _, _, _, _, dB, B,  B,  B,  dB, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, _, dB, B,  lB, B,  dB, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, _, dB, B,  B,  B,  dB, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, dB, dB, B,  B,  dB, dB, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, dB, dB, B,  B,  dB, dB, _, _, _, _, _, _, _, _],
-  [_, _, _, _, _, _, _, dB, dB, dB, dB, _, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, _, gD, gD, gD, gD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, gD, g,  g,  g,  g,  gD, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, gD, g,  gL, gL, gL, g,  g,  gD, _, _, _, _, _, _],
+  [_, _, _, _, _, gD, g,  gL, gH, gH, gL, gL, g,  g,  gD, _, _, _, _, _],
+  [_, _, _, _, gD, g,  gL, gH, gL, gL, gH, gL, g,  g,  gD, _, _, _, _, _],
+  [_, _, _, gD, g,  g,  gL, gL, g,  g,  gL, gL, g,  g,  g,  gD, _, _, _, _],
+  [_, _, gD, g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  gD, _, _, _],
+  [_, gD, g,  gL, g,  g,  gL, gL, g,  g,  gL, gL, g,  g,  gL, g,  g,  gD, _, _],
+  [_, gD, g,  g,  gL, gL, gH, gL, gL, gL, gL, gH, gL, gL, g,  g,  g,  gD, _, _],
+  [gD, g,  g,  g,  gL, gH, gH, gH, gL, gL, gH, gH, gH, gL, g,  g,  g,  g,  gD, _],
+  [gD, g,  gL, g,  g,  gL, gH, gL, g,  g,  gL, gH, gL, g,  g,  gL, g,  g,  gD, _],
+  [gD, g,  g,  g,  g,  g,  gL, g,  g,  g,  g,  gL, g,  g,  g,  g,  g,  g,  gD, _],
+  [_, gD, g,  g,  gL, g,  g,  g,  g,  g,  g,  g,  g,  gL, g,  g,  g,  gD, _, _],
+  [_, gD, g,  g,  g,  g,  g,  g,  gL, gL, g,  g,  g,  g,  g,  g,  g,  gD, _, _],
+  [_, _, gD, g,  g,  g,  gL, gL, g,  g,  gL, gL, g,  g,  g,  g,  gD, _, _, _],
+  [_, _, gD, gD, g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  gD, gD, _, _, _, _],
+  [_, _, _, gD, gD, g,  g,  g,  g,  g,  g,  g,  g,  gD, gD, _, _, _, _, _],
+  [_, _, _, _, gD, gD, gD, g,  g,  g,  g,  gD, gD, gD, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, dD, d,  d,  d,  dD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, dD, d,  dM, d,  dD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, dD, d,  d,  d,  dD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, dD, dD, d,  d,  dD, dD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, dD, dD, d,  d,  dD, dD, _, _, _, _, _, _, _, _],
+  [_, _, _, _, _, _, _, dD, dD, dD, dD, _, _, _, _, _, _, _, _, _],
 ];
 
 /**
  * Bush - small decorative 12x8
  */
 export const BUSH: SpriteData<"nature"> = [
-  [_, _, _, _, dG, dG, dG, dG, _, _, _, _],
-  [_, _, _, dG, G,  lG, lG, G,  dG, _, _, _],
-  [_, _, dG, G,  lG, pG, pG, lG, G,  dG, _, _],
-  [_, dG, G,  lG, pG, lG, lG, pG, lG, G,  dG, _],
-  [dG, G,  G,  lG, lG, G,  G,  lG, lG, G,  G,  dG],
-  [dG, G,  G,  G,  G,  G,  G,  G,  G,  G,  G,  dG],
-  [_, dG, G,  G,  G,  G,  G,  G,  G,  G,  dG, _],
-  [_, _, dG, dG, dG, dG, dG, dG, dG, dG, _, _],
+  [_, _, _, _, gD, gD, gD, gD, _, _, _, _],
+  [_, _, _, gD, g,  gL, gL, g,  gD, _, _, _],
+  [_, _, gD, g,  gL, gH, gH, gL, g,  gD, _, _],
+  [_, gD, g,  gL, gH, gL, gL, gH, gL, g,  gD, _],
+  [gD, g,  g,  gL, gL, g,  g,  gL, gL, g,  g,  gD],
+  [gD, g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  gD],
+  [_, gD, g,  g,  g,  g,  g,  g,  g,  g,  gD, _],
+  [_, _, gD, gD, gD, gD, gD, gD, gD, gD, _, _],
 ];
 
 /**
  * Rock - medium decorative 10x8
  */
 export const ROCK: SpriteData<"nature"> = [
-  [_, _, _, _, gr, gr, gr, _, _, _],
-  [_, _, _, gr, lGr,lGr,gr, gr, _, _],
-  [_, _, gr, lGr,wh, lGr,lGr,gr, gr, _],
-  [_, gr, lGr,lGr,lGr,lGr,gr, gr, gr, _],
-  [gr, lGr,lGr,gr, gr, gr, gr, bk, gr, gr],
-  [gr, gr, gr, gr, bk, gr, gr, gr, gr, gr],
-  [_, gr, gr, gr, gr, gr, gr, gr, gr, _],
-  [_, _, gr, bk, gr, gr, bk, gr, _, _],
+  [_, _, _, _, s,  s,  s,  _, _, _],
+  [_, _, _, s,  sL, sL, s,  s,  _, _],
+  [_, _, s,  sL, wh, sL, sL, s,  s,  _],
+  [_, s,  sL, sL, sL, sL, s,  s,  s,  _],
+  [s,  sL, sL, s,  s,  s,  s,  sD, s,  s],
+  [s,  s,  s,  s,  sD, s,  s,  s,  s,  s],
+  [_, s,  s,  s,  s,  s,  s,  s,  s,  _],
+  [_, _, s,  sD, s,  s,  sD, s,  _, _],
 ];
 
 /**
  * Small Rock - tiny decorative 6x4
  */
 export const SMALL_ROCK: SpriteData<"nature"> = [
-  [_, _, gr, gr, _, _],
-  [_, gr, lGr,lGr,gr, _],
-  [gr, lGr,gr, gr, gr, gr],
-  [_, gr, gr, gr, gr, _],
+  [_, _, s,  s,  _, _],
+  [_, s,  sL, sL, s,  _],
+  [s,  sL, s,  s,  s,  s],
+  [_, s,  s,  s,  s,  _],
 ];
 
 /**
@@ -151,42 +156,42 @@ export const FLOWER_PURPLE: SpriteData<"fantasy"> = [
  * Grass tuft - small decoration 8x6
  */
 export const GRASS_TUFT: SpriteData<"nature"> = [
-  [_, _, lG, _, _, lG, _, _],
-  [_, lG, G,  lG, lG, G,  lG, _],
-  [_, G,  G,  G,  G,  G,  G,  _],
-  [lG, G,  dG, G,  G,  dG, G,  lG],
-  [G,  dG, dG, G,  G,  dG, dG, G],
-  [_, dG, dG, dG, dG, dG, dG, _],
+  [_, _, gL, _, _, gL, _, _],
+  [_, gL, g,  gL, gL, g,  gL, _],
+  [_, g,  g,  g,  g,  g,  g,  _],
+  [gL, g,  gD, g,  g,  gD, g,  gL],
+  [g,  gD, gD, g,  g,  gD, gD, g],
+  [_, gD, gD, gD, gD, gD, gD, _],
 ];
 
 /**
  * Wooden fence post 4x12
  */
 export const FENCE_POST: SpriteData<"nature"> = [
-  [_, dB, B,  _],
-  [dB, B,  lB, dB],
-  [dB, B,  lB, dB],
-  [dB, B,  B,  dB],
-  [dB, B,  B,  dB],
-  [dB, B,  B,  dB],
-  [dB, B,  B,  dB],
-  [dB, B,  B,  dB],
-  [dB, B,  B,  dB],
-  [dB, B,  B,  dB],
-  [dB, B,  B,  dB],
-  [dB, dB, dB, dB],
+  [_, dD, d,  _],
+  [dD, d,  dM, dD],
+  [dD, d,  dM, dD],
+  [dD, d,  d,  dD],
+  [dD, d,  d,  dD],
+  [dD, d,  d,  dD],
+  [dD, d,  d,  dD],
+  [dD, d,  d,  dD],
+  [dD, d,  d,  dD],
+  [dD, d,  d,  dD],
+  [dD, d,  d,  dD],
+  [dD, dD, dD, dD],
 ];
 
 /**
  * Wooden fence horizontal section 16x6
  */
 export const FENCE_HORIZONTAL: SpriteData<"nature"> = [
-  [dB, B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  dB],
-  [dB, lB, lB, B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  lB, lB, dB],
-  [dB, B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  dB],
+  [dD, d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  dD],
+  [dD, dM, dM, d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  dM, dM, dD],
+  [dD, d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  dD],
   [_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _],
-  [dB, B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  B,  dB],
-  [dB, dB, dB, dB, dB, dB, dB, dB, dB, dB, dB, dB, dB, dB, dB, dB],
+  [dD, d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  d,  dD],
+  [dD, dD, dD, dD, dD, dD, dD, dD, dD, dD, dD, dD, dD, dD, dD, dD],
 ];
 
 /**

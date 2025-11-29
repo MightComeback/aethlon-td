@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { TileType, MapData } from "@/types/map";
-import { InstancedTileGrid } from "@/components/shared/InstancedTileGrid";
+import { PixelTileGrid } from "@/components/shared/PixelTileGrid";
 
 interface IsometricGridProps {
   width: number;
@@ -18,6 +18,21 @@ export function IsometricGrid({
   zoom = 50,
 }: IsometricGridProps) {
 
+  // Generate default tiles if none provided
+  const gridTiles = useMemo(() => {
+    if (tiles && tiles.length > 0) return tiles;
+
+    // Generate default grass tiles
+    const result: TileType[][] = [];
+    for (let x = 0; x < width; x++) {
+      result[x] = [];
+      for (let z = 0; z < height; z++) {
+        result[x]![z] = TileType.Ground;
+      }
+    }
+    return result;
+  }, [width, height, tiles]);
+
   // Generate default heightmap if none provided
   const gridHeightmap = useMemo(() => {
     if (heightmap) return heightmap;
@@ -34,10 +49,10 @@ export function IsometricGrid({
 
   return (
     <group>
-      <InstancedTileGrid
+      <PixelTileGrid
         width={width}
         height={height}
-        tiles={tiles ?? []}
+        tiles={gridTiles}
         heightmap={gridHeightmap}
         zoom={zoom}
       />
@@ -67,7 +82,7 @@ export function GameGrid({ mapData, zoom = 50 }: GameGridProps) {
   }, [mapData.heightmap, mapData.width, mapData.height]);
 
   return (
-    <InstancedTileGrid
+    <PixelTileGrid
       width={mapData.width}
       height={mapData.height}
       tiles={mapData.tiles}

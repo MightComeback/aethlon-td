@@ -5,176 +5,197 @@
 
 import type { SpriteData } from "@/utils/pixelArt";
 
-// Shorthand aliases for readability
-// Nature palette colors
-// Transparent is represented as "_" directly in sprite arrays
-const dG = "darkGreen" as const;
-const G = "green" as const;
-const lG = "lightGreen" as const;
-const pG = "paleGreen" as const;
-const dB = "darkBrown" as const;
-const B = "brown" as const;
-const lB = "lightBrown" as const;
-const T = "tan" as const;
-const bl = "blue" as const;
-const lBl = "lightBlue" as const;
-const pBl = "paleBlue" as const;
-const gr = "gray" as const;
-const lGr = "lightGray" as const;
-const bk = "black" as const;
+// Nature palette shorthand - GRASS (greens)
+const gD = "grassDark" as const;
+const g = "grass" as const;
+const gM = "grassMid" as const;
+const gL = "grassLight" as const;
+const gH = "grassHighlight" as const;
+
+// Nature palette shorthand - DIRT (browns)
+const dD = "dirtDark" as const;
+const d = "dirt" as const;
+const dM = "dirtMid" as const;
+const dL = "dirtLight" as const;
+
+// Nature palette shorthand - WATER (blues)
+const wD = "waterDark" as const;
+const w = "water" as const;
+const wM = "waterMid" as const;
+const wL = "waterLight" as const;
+const wH = "waterHighlight" as const;
+
+// Nature palette shorthand - STONE (grays)
+const sD = "stoneDark" as const;
+const s = "stone" as const;
+const sM = "stoneMid" as const;
+const sL = "stoneLight" as const;
+
+// Fantasy palette shorthand - SPAWN (reds)
+const spD = "spawnDark" as const;
+const sp = "spawn" as const;
+const spM = "spawnMid" as const;
+const spL = "spawnLight" as const;
+
+// Fantasy palette shorthand - EXIT (golds)
+const exD = "exitDark" as const;
+const ex = "exit" as const;
+const exM = "exitMid" as const;
+const exL = "exitLight" as const;
+const exH = "exitHighlight" as const;
 
 /**
- * Grass tile - base ground
+ * Grass tile - lush green ground with subtle variation
  */
 export const GRASS_TILE: SpriteData<"nature"> = [
-  [G,  G,  G,  lG, G,  G,  dG, G,  G,  lG, G,  G,  G,  dG, G,  G ],
-  [G,  lG, G,  G,  G,  dG, G,  G,  lG, G,  G,  G,  lG, G,  G,  dG],
-  [dG, G,  G,  G,  lG, G,  G,  G,  G,  G,  dG, G,  G,  G,  lG, G ],
-  [G,  G,  dG, G,  G,  G,  pG, lG, G,  G,  G,  lG, G,  G,  G,  G ],
-  [G,  lG, G,  G,  G,  lG, lG, G,  G,  dG, G,  G,  G,  dG, G,  lG],
-  [G,  G,  G,  dG, G,  G,  G,  G,  lG, G,  G,  G,  lG, G,  G,  G ],
-  [dG, G,  G,  G,  G,  G,  dG, G,  G,  G,  G,  dG, G,  G,  G,  dG],
-  [G,  G,  lG, G,  lG, G,  G,  G,  G,  lG, G,  G,  G,  G,  lG, G ],
-  [G,  G,  G,  G,  G,  G,  G,  dG, G,  G,  G,  G,  dG, G,  G,  G ],
-  [lG, G,  dG, G,  G,  dG, G,  G,  G,  G,  lG, G,  G,  G,  G,  lG],
-  [G,  G,  G,  G,  lG, G,  G,  lG, G,  G,  G,  G,  G,  lG, G,  G ],
-  [G,  lG, G,  G,  G,  G,  G,  G,  G,  dG, G,  G,  G,  G,  G,  dG],
-  [dG, G,  G,  lG, G,  dG, G,  G,  G,  G,  G,  lG, G,  G,  G,  G ],
-  [G,  G,  G,  G,  G,  G,  G,  G,  lG, G,  G,  G,  G,  dG, G,  G ],
-  [G,  dG, G,  G,  G,  lG, dG, G,  G,  G,  G,  G,  G,  G,  lG, G ],
-  [G,  G,  lG, G,  G,  G,  G,  G,  dG, G,  lG, G,  dG, G,  G,  G ],
+  [g,  gM, g,  g,  gM, g,  g,  gL, g,  g,  gM, g,  g,  g,  gM, g ],
+  [g,  g,  g,  gL, g,  g,  g,  g,  g,  gM, g,  g,  gL, g,  g,  g ],
+  [gM, g,  g,  g,  g,  gD, g,  g,  g,  g,  g,  g,  g,  gM, g,  gD],
+  [g,  g,  gD, g,  g,  g,  gM, g,  gL, g,  gD, g,  g,  g,  g,  g ],
+  [g,  gL, g,  g,  g,  g,  g,  g,  g,  g,  g,  gM, g,  g,  gL, g ],
+  [g,  g,  g,  gM, g,  gL, g,  gD, g,  g,  g,  g,  g,  gD, g,  g ],
+  [gD, g,  g,  g,  g,  g,  g,  g,  g,  gL, g,  g,  g,  g,  g,  gM],
+  [g,  g,  gM, g,  gD, g,  g,  g,  g,  g,  g,  gD, g,  gM, g,  g ],
+  [g,  g,  g,  g,  g,  g,  gM, g,  gD, g,  g,  g,  g,  g,  g,  g ],
+  [gM, g,  gD, g,  g,  g,  g,  g,  g,  g,  gM, g,  gL, g,  gD, g ],
+  [g,  g,  g,  g,  gL, g,  g,  gL, g,  g,  g,  g,  g,  g,  g,  g ],
+  [g,  gL, g,  g,  g,  g,  gD, g,  g,  gM, g,  g,  gD, g,  gM, g ],
+  [gD, g,  g,  gM, g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  g,  gD],
+  [g,  g,  g,  g,  g,  gM, g,  gD, g,  g,  gL, g,  gM, g,  g,  g ],
+  [g,  gM, g,  gD, g,  g,  g,  g,  g,  g,  g,  g,  g,  gD, g,  g ],
+  [g,  g,  g,  g,  g,  g,  gL, g,  gM, g,  gD, g,  g,  g,  gL, g ],
 ];
 
 /**
- * Dirt tile - path base
+ * Dirt tile - brown earthy path
  */
 export const DIRT_TILE: SpriteData<"nature"> = [
-  [B,  B,  lB, B,  B,  dB, B,  B,  lB, B,  B,  B,  dB, B,  B,  lB],
-  [B,  dB, B,  B,  B,  B,  lB, B,  B,  B,  dB, B,  B,  B,  lB, B ],
-  [lB, B,  B,  B,  dB, B,  B,  B,  B,  lB, B,  B,  B,  B,  B,  B ],
-  [B,  B,  B,  lB, B,  B,  B,  T,  lB, B,  B,  B,  dB, B,  B,  dB],
-  [B,  lB, dB, B,  B,  B,  lB, lB, B,  B,  B,  lB, B,  B,  B,  B ],
-  [dB, B,  B,  B,  B,  B,  B,  B,  B,  dB, B,  B,  B,  B,  lB, B ],
-  [B,  B,  B,  B,  lB, dB, B,  B,  B,  B,  B,  B,  dB, B,  B,  B ],
-  [B,  dB, B,  B,  B,  B,  B,  B,  lB, B,  B,  B,  B,  B,  B,  dB],
-  [lB, B,  B,  dB, B,  B,  B,  B,  B,  B,  dB, B,  B,  lB, B,  B ],
-  [B,  B,  B,  B,  B,  lB, B,  dB, B,  B,  B,  B,  B,  B,  B,  B ],
-  [B,  B,  lB, B,  B,  B,  B,  B,  B,  B,  B,  lB, dB, B,  B,  lB],
-  [dB, B,  B,  B,  dB, B,  B,  B,  B,  lB, B,  B,  B,  B,  B,  B ],
-  [B,  B,  B,  B,  B,  B,  lB, B,  B,  B,  B,  B,  B,  B,  dB, B ],
-  [B,  lB, B,  B,  B,  B,  B,  B,  dB, B,  B,  B,  lB, B,  B,  B ],
-  [B,  B,  B,  dB, B,  lB, B,  B,  B,  B,  B,  dB, B,  B,  B,  B ],
-  [lB, B,  B,  B,  B,  B,  B,  B,  B,  lB, B,  B,  B,  B,  lB, dB],
+  [d,  d,  dM, d,  d,  dD, d,  d,  dM, d,  d,  d,  dD, d,  d,  dM],
+  [d,  dD, d,  d,  d,  d,  dM, d,  d,  d,  dD, d,  d,  d,  dM, d ],
+  [dM, d,  d,  d,  dD, d,  d,  d,  d,  dM, d,  d,  d,  d,  d,  d ],
+  [d,  d,  d,  dM, d,  d,  d,  dL, dM, d,  d,  d,  dD, d,  d,  dD],
+  [d,  dM, dD, d,  d,  d,  dM, dM, d,  d,  d,  dM, d,  d,  d,  d ],
+  [dD, d,  d,  d,  d,  d,  d,  d,  d,  dD, d,  d,  d,  d,  dM, d ],
+  [d,  d,  d,  d,  dM, dD, d,  d,  d,  d,  d,  d,  dD, d,  d,  d ],
+  [d,  dD, d,  d,  d,  d,  d,  d,  dM, d,  d,  d,  d,  d,  d,  dD],
+  [dM, d,  d,  dD, d,  d,  d,  d,  d,  d,  dD, d,  d,  dM, d,  d ],
+  [d,  d,  d,  d,  d,  dM, d,  dD, d,  d,  d,  d,  d,  d,  d,  d ],
+  [d,  d,  dM, d,  d,  d,  d,  d,  d,  d,  d,  dM, dD, d,  d,  dM],
+  [dD, d,  d,  d,  dD, d,  d,  d,  d,  dM, d,  d,  d,  d,  d,  d ],
+  [d,  d,  d,  d,  d,  d,  dM, d,  d,  d,  d,  d,  d,  d,  dD, d ],
+  [d,  dM, d,  d,  d,  d,  d,  d,  dD, d,  d,  d,  dM, d,  d,  d ],
+  [d,  d,  d,  dD, d,  dM, d,  d,  d,  d,  d,  dD, d,  d,  d,  d ],
+  [dM, d,  d,  d,  d,  d,  d,  d,  d,  dM, d,  d,  d,  d,  dM, dD],
 ];
 
 /**
- * Stone tile - for paths and structures
+ * Stone tile - gray cobblestone
  */
 export const STONE_TILE: SpriteData<"nature"> = [
-  [gr, gr, lGr,gr, gr, gr, bk, gr, gr, lGr,gr, gr, gr, gr, bk, gr],
-  [gr, lGr,gr, gr, gr, gr, gr, gr, gr, gr, gr, lGr,gr, gr, gr, gr],
-  [bk, gr, gr, gr, gr, bk, gr, lGr,gr, gr, gr, gr, gr, gr, gr, bk],
-  [gr, gr, gr, lGr,gr, gr, gr, gr, gr, bk, gr, gr, gr, lGr,gr, gr],
-  [gr, gr, bk, gr, gr, gr, gr, gr, gr, gr, gr, gr, bk, gr, gr, gr],
-  [gr, lGr,gr, gr, gr, gr, lGr,gr, gr, gr, lGr,gr, gr, gr, gr, gr],
-  [bk, gr, gr, gr, bk, gr, gr, gr, gr, gr, gr, gr, gr, bk, gr, lGr],
-  [gr, gr, gr, gr, gr, gr, gr, bk, gr, lGr,gr, gr, gr, gr, gr, gr],
-  [gr, gr, lGr,gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, bk, gr],
-  [gr, bk, gr, gr, gr, lGr,bk, gr, gr, gr, bk, gr, lGr,gr, gr, gr],
-  [lGr,gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr],
-  [gr, gr, gr, bk, gr, gr, gr, gr, lGr,gr, gr, gr, bk, gr, gr, bk],
-  [gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, lGr,gr],
-  [bk, gr, lGr,gr, gr, bk, gr, gr, gr, bk, gr, gr, gr, gr, gr, gr],
-  [gr, gr, gr, gr, gr, gr, gr, lGr,gr, gr, gr, lGr,bk, gr, gr, gr],
-  [gr, bk, gr, gr, lGr,gr, gr, gr, gr, gr, gr, gr, gr, gr, gr, bk],
+  [s,  s,  sM, s,  s,  s,  sD, s,  s,  sM, s,  s,  s,  s,  sD, s ],
+  [s,  sM, s,  s,  s,  s,  s,  s,  s,  s,  s,  sM, s,  s,  s,  s ],
+  [sD, s,  s,  s,  s,  sD, s,  sM, s,  s,  s,  s,  s,  s,  s,  sD],
+  [s,  s,  s,  sM, s,  s,  s,  s,  s,  sD, s,  s,  s,  sM, s,  s ],
+  [s,  s,  sD, s,  s,  s,  s,  s,  s,  s,  s,  s,  sD, s,  s,  s ],
+  [s,  sM, s,  s,  s,  s,  sM, s,  s,  s,  sM, s,  s,  s,  s,  s ],
+  [sD, s,  s,  s,  sD, s,  s,  s,  s,  s,  s,  s,  s,  sD, s,  sM],
+  [s,  s,  s,  s,  s,  s,  s,  sD, s,  sM, s,  s,  s,  s,  s,  s ],
+  [s,  s,  sM, s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  sD, s ],
+  [s,  sD, s,  s,  s,  sM, sD, s,  s,  s,  sD, s,  sM, s,  s,  s ],
+  [sM, s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s ],
+  [s,  s,  s,  sD, s,  s,  s,  s,  sM, s,  s,  s,  sD, s,  s,  sD],
+  [s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  sM, s ],
+  [sD, s,  sM, s,  s,  sD, s,  s,  s,  sD, s,  s,  s,  s,  s,  s ],
+  [s,  s,  s,  s,  s,  s,  s,  sM, s,  s,  s,  sM, sD, s,  s,  s ],
+  [s,  sD, s,  s,  sM, s,  s,  s,  s,  s,  s,  s,  s,  s,  s,  sD],
 ];
 
 /**
- * Water tile - animated (frame 1)
+ * Water tile - animated frame 1
  */
 export const WATER_TILE_1: SpriteData<"nature"> = [
-  [bl, bl, lBl,bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, lBl,bl],
-  [bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl],
-  [bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, bl, bl, lBl,bl, bl],
-  [lBl,bl, bl, bl, bl, bl, bl, pBl,lBl,bl, bl, bl, bl, bl, bl, lBl],
-  [bl, bl, bl, lBl,bl, bl, lBl,lBl,bl, bl, lBl,bl, bl, bl, bl, bl],
-  [bl, lBl,bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl,bl, bl, bl],
-  [bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl],
-  [bl, bl, lBl,bl, bl, bl, bl, bl, lBl,bl, bl, lBl,bl, bl, bl, bl],
-  [lBl,bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl,bl],
-  [bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl],
-  [bl, lBl,bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl],
-  [bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl],
-  [bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl],
-  [lBl,bl, bl, bl, bl, lBl,bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl],
-  [bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl],
-  [bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, lBl,bl],
+  [w,  w,  wM, w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  wM, w ],
+  [w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w ],
+  [w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  w,  w,  w,  wM, w,  w ],
+  [wM, w,  w,  w,  w,  w,  w,  wL, wM, w,  w,  w,  w,  w,  w,  wM],
+  [w,  w,  w,  wM, w,  w,  wM, wL, w,  w,  wM, w,  w,  w,  w,  w ],
+  [w,  wM, w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  wM, w,  w,  w ],
+  [w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  w,  w,  w,  w,  wM],
+  [w,  w,  wM, w,  w,  w,  w,  w,  wM, w,  w,  wM, w,  w,  w,  w ],
+  [wM, w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  wM, w ],
+  [w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  w ],
+  [w,  wM, w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  w ],
+  [w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  wM],
+  [w,  w,  w,  wM, w,  w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  w ],
+  [wM, w,  w,  w,  w,  wM, w,  w,  wM, w,  w,  w,  w,  wM, w,  w ],
+  [w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w ],
+  [w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  wM, w ],
 ];
 
 /**
- * Water tile - animated (frame 2)
+ * Water tile - animated frame 2
  */
 export const WATER_TILE_2: SpriteData<"nature"> = [
-  [bl, lBl,bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl],
-  [bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl],
-  [lBl,bl, bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, bl, bl],
-  [bl, bl, bl, bl, lBl,bl, pBl,lBl,bl, bl, bl, lBl,bl, bl, bl, bl],
-  [bl, bl, lBl,bl, bl, bl, lBl,bl, bl, lBl,bl, bl, bl, bl, lBl,bl],
-  [bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, bl, lBl,bl, bl],
-  [lBl,bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl],
-  [bl, bl, bl, lBl,bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, lBl,bl],
-  [bl, lBl,bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl],
-  [bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl],
-  [bl, bl, lBl,bl, bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl],
-  [lBl,bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl],
-  [bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl, bl, lBl],
-  [bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl, lBl,bl, bl, bl, bl],
-  [bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, bl, lBl,bl, bl],
-  [lBl,bl, bl, lBl,bl, bl, bl, lBl,bl, bl, bl, bl, bl, bl, bl, lBl],
+  [w,  wM, w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w,  wM],
+  [w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w ],
+  [wM, w,  w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  w,  w,  w ],
+  [w,  w,  w,  w,  wM, w,  wL, wM, w,  w,  w,  wM, w,  w,  w,  w ],
+  [w,  w,  wM, w,  w,  w,  wM, w,  w,  wM, w,  w,  w,  w,  wM, w ],
+  [w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  w,  w,  wM, w,  w ],
+  [wM, w,  w,  w,  w,  w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  w ],
+  [w,  w,  w,  wM, w,  w,  w,  wM, w,  w,  w,  w,  w,  w,  wM, w ],
+  [w,  wM, w,  w,  w,  w,  w,  w,  w,  w,  w,  wM, w,  w,  w,  w ],
+  [w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  w,  w,  w,  w,  wM],
+  [w,  w,  wM, w,  w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w ],
+  [wM, w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w ],
+  [w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w,  w,  wM],
+  [w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  w,  w ],
+  [w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  w,  wM, w,  w ],
+  [wM, w,  w,  wM, w,  w,  w,  wM, w,  w,  w,  w,  wM, w,  w,  wM],
 ];
 
 /**
- * Spawn point tile (red tinted)
+ * Spawn tile - dark red danger zone
  */
 export const SPAWN_TILE: SpriteData<"fantasy"> = [
-  ["red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red"],
-  ["red","orange","red","red","red","red","orange","red","red","red","red","orange","red","red","red","red"],
-  ["red","red","red","red","orange","red","red","red","red","orange","red","red","red","red","orange","red"],
-  ["red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red"],
-  ["red","red","orange","red","red","red","red","red","orange","red","red","red","red","red","red","red"],
-  ["red","red","red","red","red","orange","red","red","red","red","red","red","orange","red","red","red"],
-  ["red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red"],
-  ["orange","red","red","red","red","red","red","orange","red","red","red","red","red","red","orange","red"],
-  ["red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red"],
-  ["red","red","red","orange","red","red","red","red","red","red","orange","red","red","red","red","red"],
-  ["red","red","red","red","red","red","red","red","orange","red","red","red","red","red","red","red"],
-  ["red","orange","red","red","red","red","red","red","red","red","red","red","red","orange","red","red"],
-  ["red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","red"],
-  ["red","red","red","red","red","orange","red","red","red","red","red","red","orange","red","red","red"],
-  ["red","red","orange","red","red","red","red","red","red","orange","red","red","red","red","red","red"],
-  ["red","red","red","red","red","red","red","red","red","red","red","red","red","red","red","orange"],
+  [sp, sp, spM,sp, sp, sp, spD,sp, sp, spM,sp, sp, sp, sp, spD,sp],
+  [sp, spM,sp, sp, sp, sp, sp, sp, sp, sp, sp, spM,sp, sp, sp, sp],
+  [spD,sp, sp, sp, sp, spD,sp, spM,sp, sp, sp, sp, sp, sp, sp, spD],
+  [sp, sp, sp, spM,sp, sp, sp, sp, sp, spD,sp, sp, sp, spM,sp, sp],
+  [sp, sp, spD,sp, sp, sp, sp, sp, sp, sp, sp, sp, spD,sp, sp, sp],
+  [sp, spM,sp, sp, sp, sp, spM,sp, sp, sp, spM,sp, sp, sp, sp, sp],
+  [spD,sp, sp, sp, spD,sp, sp, sp, sp, sp, sp, sp, sp, spD,sp, spM],
+  [sp, sp, sp, sp, sp, sp, sp, spD,sp, spM,sp, sp, sp, sp, sp, sp],
+  [sp, sp, spM,sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, spD,sp],
+  [sp, spD,sp, sp, sp, spM,spD,sp, sp, sp, spD,sp, spM,sp, sp, sp],
+  [spM,sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp],
+  [sp, sp, sp, spD,sp, sp, sp, sp, spM,sp, sp, sp, spD,sp, sp, spD],
+  [sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, spM,sp],
+  [spD,sp, spM,sp, sp, spD,sp, sp, sp, spD,sp, sp, sp, sp, sp, sp],
+  [sp, sp, sp, sp, sp, sp, sp, spM,sp, sp, sp, spM,spD,sp, sp, sp],
+  [sp, spD,sp, sp, spM,sp, sp, sp, sp, sp, sp, sp, sp, sp, sp, spD],
 ];
 
 /**
- * Exit/goal tile (gold tinted)
+ * Exit tile - golden goal
  */
 export const EXIT_TILE: SpriteData<"fantasy"> = [
-  ["gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold"],
-  ["gold","yellow","gold","gold","gold","gold","yellow","gold","gold","gold","gold","yellow","gold","gold","gold","gold"],
-  ["gold","gold","gold","gold","yellow","gold","gold","gold","gold","yellow","gold","gold","gold","gold","yellow","gold"],
-  ["gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold"],
-  ["gold","gold","yellow","gold","gold","gold","gold","gold","yellow","gold","gold","gold","gold","gold","gold","gold"],
-  ["gold","gold","gold","gold","gold","yellow","gold","gold","gold","gold","gold","gold","yellow","gold","gold","gold"],
-  ["gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold"],
-  ["yellow","gold","gold","gold","gold","gold","gold","yellow","gold","gold","gold","gold","gold","gold","yellow","gold"],
-  ["gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold"],
-  ["gold","gold","gold","yellow","gold","gold","gold","gold","gold","gold","yellow","gold","gold","gold","gold","gold"],
-  ["gold","gold","gold","gold","gold","gold","gold","gold","yellow","gold","gold","gold","gold","gold","gold","gold"],
-  ["gold","yellow","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","yellow","gold","gold"],
-  ["gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold"],
-  ["gold","gold","gold","gold","gold","yellow","gold","gold","gold","gold","gold","gold","yellow","gold","gold","gold"],
-  ["gold","gold","yellow","gold","gold","gold","gold","gold","gold","yellow","gold","gold","gold","gold","gold","gold"],
-  ["gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","gold","yellow"],
+  [ex, ex, exM,ex, ex, ex, exD,ex, ex, exM,ex, ex, ex, ex, exD,ex],
+  [ex, exM,ex, ex, ex, ex, ex, ex, ex, ex, ex, exM,ex, ex, ex, ex],
+  [exD,ex, ex, ex, ex, exD,ex, exL,ex, ex, ex, ex, ex, ex, ex, exD],
+  [ex, ex, ex, exM,ex, ex, ex, ex, ex, exD,ex, ex, ex, exM,ex, ex],
+  [ex, ex, exD,ex, ex, ex, exL,exL,ex, ex, ex, ex, exD,ex, ex, ex],
+  [ex, exM,ex, ex, ex, ex, exL,exH,exL,ex, exM,ex, ex, ex, ex, ex],
+  [exD,ex, ex, ex, exD,ex, ex, exL,ex, ex, ex, ex, ex, exD,ex, exM],
+  [ex, ex, ex, ex, ex, ex, ex, exD,ex, exM,ex, ex, ex, ex, ex, ex],
+  [ex, ex, exM,ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, exD,ex],
+  [ex, exD,ex, ex, ex, exM,exD,ex, ex, ex, exD,ex, exM,ex, ex, ex],
+  [exM,ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex],
+  [ex, ex, ex, exD,ex, ex, ex, ex, exM,ex, ex, ex, exD,ex, ex, exD],
+  [ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, exM,ex],
+  [exD,ex, exM,ex, ex, exD,ex, ex, ex, exD,ex, ex, ex, ex, ex, ex],
+  [ex, ex, ex, ex, ex, ex, ex, exM,ex, ex, ex, exM,exD,ex, ex, ex],
+  [ex, exD,ex, ex, exM,ex, ex, ex, ex, ex, ex, ex, ex, ex, ex, exD],
 ];
 
 // Export all tiles

@@ -18,6 +18,7 @@ import {
   setWeatherUniforms,
   hexToVector3,
 } from "@/shaders/tileAtlasShader";
+import { setPixelTileWeatherUniforms } from "@/hooks/usePixelTileAtlas";
 
 export function WeatherLighting() {
   const ambientRef = useRef<THREE.AmbientLight>(null);
@@ -159,15 +160,20 @@ export function WeatherLighting() {
         ? hexToVector3(effectiveVisuals.screenTint)
         : new THREE.Vector3(1, 1, 1);
 
-      // Update weather effects
-      setWeatherUniforms(tileMaterial, {
+      // Update weather effects - try both old and new material systems
+      const weatherOptions = {
         time: time,
         screenDarkening: effectiveVisuals.screenDarkening,
         lightningFlash: lightning.active ? lightning.intensity : 0,
         weatherTint,
         weatherTintStrength: effectiveVisuals.screenTintStrength ?? 0,
-        // Fog handled by scene.fog below
-      });
+      };
+
+      // Try old atlas shader uniforms
+      setWeatherUniforms(tileMaterial, weatherOptions);
+
+      // Also try pixel tile uniforms (works with new material)
+      setPixelTileWeatherUniforms(tileMaterial, weatherOptions);
 
       // Debug logging (throttled)
       const now = Date.now();
