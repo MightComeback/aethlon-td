@@ -30,6 +30,7 @@ import { EffectCatalog } from "./sections/EffectCatalog";
 import { ElementCatalog } from "./sections/ElementCatalog";
 import { EnemyCatalog } from "./sections/EnemyCatalog";
 import { TowerCatalog } from "./sections/TowerCatalog";
+import { PixelArtEditor } from "./sections/PixelArtEditor";
 
 /**
  * Catalog section configuration
@@ -84,6 +85,12 @@ const CATALOG_SECTIONS: CatalogSection[] = [
     label: "Towers",
     component: TowerCatalog,
     description: "Defense towers with merge paths",
+  },
+  {
+    id: "editor",
+    label: "Sprite Editor",
+    component: PixelArtEditor,
+    description: "Create and edit pixel art sprites for objects and tiles",
   },
   // Future sections:
   // { id: "abilities", label: "Abilities", component: AbilityCatalog, description: "Player abilities" },
