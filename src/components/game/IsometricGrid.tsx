@@ -17,20 +17,6 @@ export function IsometricGrid({
   heightmap,
   zoom = 50,
 }: IsometricGridProps) {
-  // Generate default tiles if none provided (demo pattern)
-  const gridTiles = useMemo(() => {
-    if (tiles) return tiles;
-
-    const result: TileType[][] = [];
-    for (let x = 0; x < width; x++) {
-      result[x] = [];
-      for (let z = 0; z < height; z++) {
-        const isPath = x === 0 || x === width - 1 || z === Math.floor(height / 2);
-        result[x]![z] = isPath ? TileType.Path : TileType.Ground;
-      }
-    }
-    return result;
-  }, [width, height, tiles]);
 
   // Generate default heightmap if none provided
   const gridHeightmap = useMemo(() => {
@@ -51,7 +37,7 @@ export function IsometricGrid({
       <InstancedTileGrid
         width={width}
         height={height}
-        tiles={gridTiles}
+        tiles={tiles ?? []}
         heightmap={gridHeightmap}
         zoom={zoom}
       />

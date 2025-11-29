@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { FPSCounter } from "@/components/ui/FPSCounter";
+import { DevLogProvider } from "@/contexts/DevLogContext";
 import { useAppInit } from "@/hooks/useAppInit";
 import "../styles/globals.css";
 
@@ -28,7 +29,9 @@ function RootComponent() {
         <HeadContent />
       </head>
       <body suppressHydrationWarning>
-        <AppContent />
+        <DevLogProvider>
+          <AppContent />
+        </DevLogProvider>
         <Scripts />
       </body>
     </html>

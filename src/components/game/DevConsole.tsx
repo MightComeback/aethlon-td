@@ -7,13 +7,16 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useGameStore } from "@/stores/gameStore";
 import { useWeatherStore } from "@/stores/weatherStore";
+import { useDevLogSafe, type DevLogEntry } from "@/contexts/DevLogContext";
 import { WeatherType } from "@/types/weather";
 import { GameState } from "@/types/game";
 
 interface ConsoleEntry {
   id: number;
-  type: "input" | "output" | "error";
+  type: "input" | "output" | "error" | "log-info" | "log-warn" | "log-error" | "log-json";
   text: string;
+  data?: unknown;
+  expanded?: boolean;
 }
 
 interface DevCommand {
@@ -248,7 +251,24 @@ function createCommands(): DevCommand[] {
         return "__CLEAR__";
       },
     },
+    {
+      name: "logs",
+      description: "Show dev log info",
+      execute: () => {
+        return "Dev logs are shown automatically. Use 'clearlogs' to clear them.";
+      },
+    },
   ];
+}
+
+// Convert DevLogEntry to ConsoleEntry type
+function devLogTypeToConsoleType(type: DevLogEntry["type"]): ConsoleEntry["type"] {
+  switch (type) {
+    case "info": return "log-info";
+    case "warn": return "log-warn";
+    case "error": return "log-error";
+    case "json": return "log-json";
+  }
 }
 
 export function DevConsole() {
@@ -257,6 +277,9 @@ export function DevConsole() {
   const [history, setHistory] = useState<ConsoleEntry[]>([]);
   const [commandHistory, setCommandHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
+
+  const { logs, clearLogs, toggleExpand } = useDevLogSafe();
+  const lastLogIdRef = useRef(-1);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -282,12 +305,24 @@ export function DevConsole() {
     }
   }, [isOpen]);
 
-  // Auto-scroll to bottom
+  // Sync logs from DevLogContext into history
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [history]);
+    const newLogs = logs.filter((log) => log.id > lastLogIdRef.current);
+    if (newLogs.length === 0) return;
+
+    lastLogIdRef.current = logs[logs.length - 1]?.id ?? -1;
+
+    setHistory((prev) => [
+      ...prev,
+      ...newLogs.map((log) => ({
+        id: entryIdRef.current++,
+        type: devLogTypeToConsoleType(log.type),
+        text: log.message,
+        data: log.data,
+        expanded: log.expanded,
+      })),
+    ]);
+  }, [logs]);
 
   const addEntry = useCallback(
     (type: ConsoleEntry["type"], text: string) => {
@@ -331,6 +366,8 @@ export function DevConsole() {
         const result = cmd.execute(args);
         if (result === "__CLEAR__") {
           setHistory([]);
+          clearLogs();
+          lastLogIdRef.current = -1;
         } else {
           addEntry("output", result);
         }
@@ -338,7 +375,7 @@ export function DevConsole() {
         addEntry("error", `Error: ${String(e)}`);
       }
     },
-    [addEntry]
+    [addEntry, clearLogs]
   );
 
   const handleKeyDown = useCallback(
@@ -403,20 +440,54 @@ export function DevConsole() {
         ref={scrollRef}
         className="flex-1 overflow-auto p-2 font-mono text-xs max-h-40"
       >
-        {history.map((entry) => (
-          <div
-            key={entry.id}
-            className={`whitespace-pre-wrap ${
-              entry.type === "input"
-                ? "text-foreground-muted"
-                : entry.type === "error"
-                  ? "text-danger"
-                  : "text-accent-green"
-            }`}
-          >
-            {entry.text}
-          </div>
-        ))}
+        {history.map((entry) => {
+          const colorClass =
+            entry.type === "input"
+              ? "text-foreground-muted"
+              : entry.type === "error" || entry.type === "log-error"
+                ? "text-danger"
+                : entry.type === "log-warn"
+                  ? "text-accent-gold"
+                  : entry.type === "log-info"
+                    ? "text-accent-blue"
+                    : entry.type === "log-json"
+                      ? "text-accent-purple"
+                      : "text-accent-green";
+
+          if (entry.type === "log-json" && entry.data !== undefined) {
+            return (
+              <div key={entry.id} className={colorClass}>
+                <button
+                  onClick={() => {
+                    // Find the log entry in context and toggle
+                    const logEntry = logs.find((l) => l.message === entry.text);
+                    if (logEntry) toggleExpand(logEntry.id);
+                    // Also toggle local state
+                    setHistory((prev) =>
+                      prev.map((e) =>
+                        e.id === entry.id ? { ...e, expanded: !e.expanded } : e
+                      )
+                    );
+                  }}
+                  className="hover:underline text-left"
+                >
+                  {entry.expanded ? "▼" : "▶"} {entry.text}
+                </button>
+                {entry.expanded && (
+                  <pre className="ml-4 text-foreground-muted whitespace-pre-wrap break-all">
+                    {JSON.stringify(entry.data, null, 2)}
+                  </pre>
+                )}
+              </div>
+            );
+          }
+
+          return (
+            <div key={entry.id} className={`whitespace-pre-wrap ${colorClass}`}>
+              {entry.text}
+            </div>
+          );
+        })}
       </div>
 
       {/* Input */}

@@ -11,18 +11,26 @@ import { UV_TILE_SIZE } from "@/data/textures/tileAtlasConfig";
  * Create a tile atlas material based on MeshStandardMaterial
  * @param atlas - The tile atlas texture (optional, can be set later)
  */
+// Track material creation for debugging
+let _materialInstanceCount = 0;
+
 export function createTileAtlasMaterial(
   atlas?: THREE.Texture
 ): THREE.MeshStandardMaterial {
+  const instanceId = ++_materialInstanceCount;
+  console.log(`[tileAtlasShader] Creating material instance #${instanceId}`);
+
   const material = new THREE.MeshStandardMaterial({
     map: atlas || null,
     roughness: 0.8,
     metalness: 0.0,
     side: THREE.FrontSide,
     transparent: false,
+    fog: true, // Enable fog support
   });
 
   // Store uniforms in userData to be accessible
+  // NOTE: Fog uniforms are handled by Three.js automatically when scene.fog is set
   material.userData.uniforms = {
     tileUvSize: { value: UV_TILE_SIZE },
     time: { value: 0.0 },
@@ -30,13 +38,10 @@ export function createTileAtlasMaterial(
     lightningFlash: { value: 0.0 },
     weatherTint: { value: new THREE.Vector3(1, 1, 1) },
     weatherTintStrength: { value: 0.0 },
-    fogDensity: { value: 0.0 },
-    fogColor: { value: new THREE.Vector3(0.5, 0.5, 0.6) },
-    fogNear: { value: 10.0 },
-    fogFar: { value: 100.0 },
   };
 
   material.onBeforeCompile = (shader) => {
+    console.log(`[tileAtlasShader] onBeforeCompile called for instance #${instanceId}`);
     // Merge uniforms
     Object.assign(shader.uniforms, material.userData.uniforms);
 
@@ -70,6 +75,8 @@ export function createTileAtlasMaterial(
     // MeshStandardMaterial vertex shader usually exports vViewPosition.
 
     // 3. Inject uniforms in Fragment Shader
+    // NOTE: Do NOT declare fogColor, fogNear, fogFar, fogDensity here!
+    // Three.js automatically injects these when scene.fog is set and material.fog = true
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <common>',
       `
@@ -78,14 +85,12 @@ export function createTileAtlasMaterial(
       uniform float lightningFlash;
       uniform vec3 weatherTint;
       uniform float weatherTintStrength;
-      uniform float fogDensity;
-      uniform vec3 fogColor;
-      uniform float fogNear;
-      uniform float fogFar;
       `
     );
 
     // 4. Inject Weather Effects at the end of Fragment Shader
+    // NOTE: Three.js handles fog automatically via #include <fog_fragment>
+    // We only add our custom weather effects here
     shader.fragmentShader = shader.fragmentShader.replace(
       '#include <dithering_fragment>',
       `
@@ -103,30 +108,14 @@ export function createTileAtlasMaterial(
       if (lightningFlash > 0.0) {
         gl_FragColor.rgb += vec3(lightningFlash);
       }
-      
-      // Custom Fog Logic
-      // We need depth. gl_FragCoord.z is window space depth.
-      // Let's approximate distance from camera.
-      // In standard material, vViewPosition is -mvPosition. 
-      // But vViewPosition might not be defined if not using standard fog.
-      // Let's try to use standard THREE.js fog if possible, but here is the custom implementation:
-      
-      // Note: Re-implementing fog here requires access to depth.
-      // Simple Hack: If we don't have vViewPosition, we skip fog or use a simpler metric?
-      // Better: Let's assume the user will switch to scene.fog eventually, but for now allow the uniforms.
-      
-      if (fogDensity > 0.0) {
-         // This is hard to do robustly without vViewPosition guarantee. 
-         // Assuming this overhaul improves things, we should probably stick to standard Fog.
-         // But the uniform controls "Fog Density" from weather system.
-      }
       `
     );
   };
 
   // Necessary to make sure the onBeforeCompile is called and updates are tracked
+  // Include fog state in cache key so shader recompiles when fog is added/removed
   material.customProgramCacheKey = () => {
-    return 'tileAtlasMaterial';
+    return `tileAtlasMaterial_fog${material.fog ? '1' : '0'}`;
   };
 
   return material;
@@ -162,6 +151,13 @@ export function setLighting(
   // No-op: Lighting is handled by Scene lights + MeshStandardMaterial
 }
 
+// Debug flag - set to true to log uniform updates
+let _debugWeatherUniforms = false;
+
+export function setDebugWeatherUniforms(enabled: boolean): void {
+  _debugWeatherUniforms = enabled;
+}
+
 /**
  * Update weather uniforms on a material
  */
@@ -169,7 +165,12 @@ export function setWeatherUniforms(
   material: THREE.Material,
   options: any
 ): void {
-  if (!material.userData.uniforms) return;
+  if (!material.userData.uniforms) {
+    if (_debugWeatherUniforms) {
+      console.warn("[tileAtlasShader] setWeatherUniforms called but material.userData.uniforms is undefined!");
+    }
+    return;
+  }
   const uniforms = material.userData.uniforms;
 
   if (options.time !== undefined) {
@@ -187,18 +188,7 @@ export function setWeatherUniforms(
   if (options.weatherTintStrength !== undefined) {
     uniforms.weatherTintStrength.value = options.weatherTintStrength;
   }
-  if (options.fogDensity !== undefined) {
-    uniforms.fogDensity.value = options.fogDensity;
-  }
-  if (options.fogColor) {
-    uniforms.fogColor.value.copy(options.fogColor);
-  }
-  if (options.fogNear !== undefined) {
-    uniforms.fogNear.value = options.fogNear;
-  }
-  if (options.fogFar !== undefined) {
-    uniforms.fogFar.value = options.fogFar;
-  }
+  // NOTE: Fog is handled by Three.js scene.fog, not custom uniforms
 }
 
 /**
@@ -221,9 +211,5 @@ export function resetWeatherUniforms(material: THREE.Material): void {
     lightningFlash: 0,
     weatherTint: new THREE.Vector3(1, 1, 1),
     weatherTintStrength: 0,
-    fogDensity: 0,
-    fogColor: new THREE.Vector3(0.5, 0.5, 0.6),
-    fogNear: 10,
-    fogFar: 100,
   });
 }

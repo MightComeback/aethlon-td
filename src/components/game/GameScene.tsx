@@ -10,6 +10,7 @@ import { useGameStore } from "@/stores/gameStore";
 import { useMapStore } from "@/stores/mapStore";
 import { useWeatherStore } from "@/stores/weatherStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { useWeatherDevLog } from "@/hooks/useWeatherDevLog";
 import { WEATHER_QUALITY_PRESETS } from "@/data/weather/qualityPresets";
 import { TileType } from "@/types/map";
 import { ELEVATION_UNIT, getTileBaseHeight } from "@/constants/grid.constants";
@@ -18,6 +19,9 @@ import { OBJECT_COMPONENTS, type EditorObjectType } from "@/utils/objects.utils"
 export function GameScene() {
   const groupRef = useRef<Group>(null);
   const { camera } = useThree();
+
+  // Dev logging for weather changes
+  useWeatherDevLog();
 
   // Get map data from mapStore
   const loadedMap = useMapStore((s) => s.loadedMap);

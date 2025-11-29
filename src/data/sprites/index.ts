@@ -1,0 +1,7 @@
+/**
+ * Sprite Data
+ * Export all sprite definitions
+ */
+
+export { TILES, GRASS_TILE, DIRT_TILE, STONE_TILE, WATER_TILE_1, WATER_TILE_2, SPAWN_TILE, EXIT_TILE } from "./tiles";
+export { OBJECTS, OBJECT_PALETTES, PINE_TREE, OAK_TREE, BUSH, ROCK, SMALL_ROCK, FLOWER_RED, FLOWER_PURPLE, GRASS_TUFT, FENCE_POST, FENCE_HORIZONTAL, TORCH } from "./objects";

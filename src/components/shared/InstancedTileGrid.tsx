@@ -8,6 +8,7 @@ import { computeMapBlendData } from "@/utils/tileBlending";
 import { useTileAtlas } from "@/hooks/useTileAtlas";
 import { createTileAtlasMaterial, setAtlasTexture } from "@/shaders/tileAtlasShader";
 import { useTileMaterialStore } from "@/stores/tileMaterialStore";
+import { useDevLogSafe } from "@/contexts/DevLogContext";
 
 interface InstancedTileGridProps {
   width: number;
@@ -82,6 +83,8 @@ export function InstancedTileGrid({
   const { camera } = useThree();
   const meshRef = useRef<THREE.InstancedMesh | null>(null);
   const hoveredMeshRef = useRef<THREE.InstancedMesh | null>(null);
+  const { devLogJson } = useDevLogSafe();
+  const lastDebugLogRef = useRef(0);
 
   // Load tile atlas texture
   const atlasTexture = useTileAtlas();
@@ -208,7 +211,35 @@ export function InstancedTileGrid({
       (existingAttr.array as Float32Array).set(uvOffsetArray);
       existingAttr.needsUpdate = true;
     }
-  }, [tiles, heightmap, width, height, lodStep, visibleBounds, tileCount, blendData]);
+
+    // Debug logging (throttled to once per second)
+    const now = Date.now();
+    if (now - lastDebugLogRef.current > 1000) {
+      lastDebugLogRef.current = now;
+      const mat = mesh.material as THREE.MeshStandardMaterial;
+      devLogJson("TileGrid State", {
+        meshCount: mesh.count,
+        tileCount,
+        lodStep,
+        meshVisible: mesh.visible,
+        materialVisible: mat.visible,
+        materialFog: mat.fog,
+        materialMap: mat.map ? "loaded" : "null",
+        materialMapUUID: mat.map?.uuid?.slice(0, 8) ?? "none",
+        materialNeedsUpdate: mat.needsUpdate,
+        materialVersion: mat.version,
+        geometryUUID: mesh.geometry.uuid.slice(0, 8),
+        uvOffsetAttrLength: mesh.geometry.getAttribute("uvOffset")?.count ?? 0,
+        instanceMatrixCount: mesh.instanceMatrix?.count ?? 0,
+        uniforms: mat.userData?.uniforms ? {
+          screenDarkening: mat.userData.uniforms.screenDarkening?.value,
+          weatherTintStrength: mat.userData.uniforms.weatherTintStrength?.value,
+          lightningFlash: mat.userData.uniforms.lightningFlash?.value,
+          tileUvSize: mat.userData.uniforms.tileUvSize?.value,
+        } : "none",
+      });
+    }
+  }, [tiles, heightmap, width, height, lodStep, visibleBounds, tileCount, blendData, devLogJson]);
 
   // Update hovered tile (always full resolution)
   useEffect(() => {
